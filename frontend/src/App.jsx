@@ -1,0 +1,62 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import Navbar from './components/common/Navbar';
+import Home from './pages/customer/Home';
+import Login from './pages/auth/Login';
+import ProductDetails from './pages/customer/ProductDetails';
+import Cart from './pages/customer/Cart';
+import ShopPage from './pages/customer/ShopPage';
+import Checkout from './pages/customer/Checkout';
+import Orders from './pages/customer/Orders';
+import SellerDashboard from './pages/seller/SellerDashboard';
+import SellerProducts from './pages/seller/SellerProducts';
+import AddEditProduct from './pages/seller/AddEditProduct';
+import SellerOrders from './pages/seller/SellerOrders';
+import RegisterShop from './pages/seller/RegisterShop';
+import SellerShop from './pages/seller/SellerShop';
+import Profile from './pages/customer/Profile';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminShops from './pages/admin/AdminShops';
+import AdminProducts from './pages/admin/AdminProducts';
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/shop/:id" element={<ShopPage />} />
+            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+            {/* Seller Routes */}
+            <Route path="/seller/dashboard" element={<ProtectedRoute allowedRoles={['seller']}><SellerDashboard /></ProtectedRoute>} />
+            <Route path="/seller/products" element={<ProtectedRoute allowedRoles={['seller']}><SellerProducts /></ProtectedRoute>} />
+            <Route path="/seller/products/add" element={<ProtectedRoute allowedRoles={['seller']}><AddEditProduct /></ProtectedRoute>} />
+            <Route path="/seller/products/edit/:id" element={<ProtectedRoute allowedRoles={['seller']}><AddEditProduct /></ProtectedRoute>} />
+            <Route path="/seller/orders" element={<ProtectedRoute allowedRoles={['seller']}><SellerOrders /></ProtectedRoute>} />
+            <Route path="/seller/shop" element={<ProtectedRoute allowedRoles={['seller']}><SellerShop /></ProtectedRoute>} />
+            <Route path="/seller/register-shop" element={<ProtectedRoute allowedRoles={['seller']}><RegisterShop /></ProtectedRoute>} />
+
+            {/* Admin Routes */}
+            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/shops" element={<ProtectedRoute allowedRoles={['admin']}><AdminShops /></ProtectedRoute>} />
+            <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
+            {/* More routes will be added */}
+          </Routes>
+        </div>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;

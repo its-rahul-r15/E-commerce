@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  * {
+    @apply transition-colors duration-150;
+  }
+}
+
+@layer components {
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-dark text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-900 font-medium px-6 py-2.5 rounded-lg transition-all duration-200 shadow-sm hover:shadow active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 active:scale-[0.98];
+  }
+
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98];
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-md border border-gray-100 p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer;
+  }
+
+  /* Input styles */
+  .input-field {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-gray-400 transition-all duration-200;
+  }
+
+  /* Search bar */
+  .search-bar {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary pl-12 transition-all duration-200;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary/10 text-primary-dark;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-700;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-700;
+  }
+
+  /* Product card specific */
+  .product-card {
+    @apply bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer;
+  }
+
+  .product-card img {
+    @apply transform hover:scale-105 transition-transform duration-300;
+  }
+}
