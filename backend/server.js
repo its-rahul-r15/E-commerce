@@ -11,7 +11,7 @@ import { configureCloudinary } from './src/config/cloudinary.js';
 import configureGoogleOAuth from './src/config/passport.js';
 import errorHandler from './src/middlewares/errorHandler.js';
 
-// Load environment variables
+
 dotenv.config();
 
 // Initialize Express app
