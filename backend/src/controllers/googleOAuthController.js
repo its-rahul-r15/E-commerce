@@ -24,8 +24,10 @@ export const googleCallback = async (req, res, next) => {
     passport.authenticate('google', { session: false }, async (err, user) => {
         try {
             if (err || !user) {
+                console.error('Google Auth Error:', err);
+                const errorMessage = err?.message || 'Authentication failed';
                 // Redirect to frontend with error
-                return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed`);
+                return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed&details=${encodeURIComponent(errorMessage)}`);
             }
 
             // Generate tokens

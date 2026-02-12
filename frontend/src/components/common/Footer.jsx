@@ -126,9 +126,9 @@ const Footer = () => {
                                 <option>Español</option>
                             </select>
                             <select className="text-sm text-gray-600 bg-transparent border-none focus:outline-none cursor-pointer">
-                                <option>USD</option>
+
                                 <option>INR</option>
-                                <option>EUR</option>
+
                             </select>
                         </div>
                     </div>

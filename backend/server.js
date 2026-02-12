@@ -19,6 +19,7 @@ dotenv.config();
 const app = express();
 
 // Security & Performance Middleware
+app.set('trust proxy', 1); // Trust first proxy (Vercel/Heroku)
 app.use(helmet()); // Security headers
 // CORS - Allow multiple origins for dev and prod
 const allowedOrigins = [

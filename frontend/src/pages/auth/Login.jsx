@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ShoppingBagIcon, LockClosedIcon, UserIcon, PhoneIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
@@ -18,6 +18,18 @@ const Login = () => {
 
     const { login, register, googleLogin } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        const errorParam = searchParams.get('error');
+        const detailsParam = searchParams.get('details');
+
+        if (errorParam === 'oauth_failed') {
+            setError(detailsParam ? `Google Login Failed: ${detailsParam}` : 'Google Login Failed. Please try again.');
+        } else if (errorParam === 'missing_tokens') {
+            setError('Authentication failed: No tokens received.');
+        }
+    }, [searchParams]);
 
     const handleChange = (e) => {
         setFormData({
