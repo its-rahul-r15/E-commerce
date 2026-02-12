@@ -16,7 +16,14 @@ export const getCache = async (key) => {
         if (!client) return null;
 
         const data = await client.get(key);
-        return data ? JSON.parse(data) : null;
+        if (!data) return null;
+
+        try {
+            return JSON.parse(data);
+        } catch (parseError) {
+            console.warn(`Failed to parse cached data for key ${key}`);
+            return null;
+        }
     } catch (error) {
         console.error(`Cache get error for key ${key}:`, error.message);
         return null;
