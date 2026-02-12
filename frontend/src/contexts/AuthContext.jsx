@@ -76,24 +76,9 @@ export const AuthProvider = ({ children }) => {
 
     const googleLogin = () => {
         // Redirect to Google OAuth endpoint
-        window.location.href = 'http://localhost:5000/api/auth/google';
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        window.location.href = `${apiUrl}/auth/google`;
     };
-
-    // Handle Google OAuth callback
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-        const refreshToken = params.get('refreshToken');
-
-        if (token && refreshToken) {
-            localStorage.setItem('accessToken', token);
-            localStorage.setItem('refreshToken', refreshToken);
-            fetchUserProfile();
-
-            // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, []);
 
     const value = {
         user,

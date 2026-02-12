@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { shopService } from '../../services/api';
+import ImageUpload from '../../components/common/ImageUpload';
 
 const RegisterShop = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const RegisterShop = () => {
         latitude: '',
         longitude: '',
     });
-    const [images, setImages] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     const [gettingLocation, setGettingLocation] = useState(false);
 
@@ -27,13 +28,8 @@ const RegisterShop = () => {
         });
     };
 
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 3) {
-            alert('Maximum 3 images allowed');
-            return;
-        }
-        setImages(files);
+    const handleImagesChange = (previews) => {
+        setImagePreviews(previews);
     };
 
     const getCurrentLocation = () => {
@@ -66,7 +62,7 @@ const RegisterShop = () => {
             return;
         }
 
-        if (images.length === 0) {
+        if (imagePreviews.length === 0) {
             alert('Please upload at least one shop image');
             return;
         }
@@ -85,8 +81,11 @@ const RegisterShop = () => {
             data.append('location[coordinates][0]', formData.longitude);
             data.append('location[coordinates][1]', formData.latitude);
 
-            images.forEach(image => {
-                data.append('images', image);
+            // Add images (only file objects)
+            imagePreviews.forEach(preview => {
+                if (preview.file) {
+                    data.append('images', preview.file);
+                }
             });
 
             await shopService.createShop(data);
@@ -301,19 +300,15 @@ const RegisterShop = () => {
 
                     {/* Upload Images */}
                     <div className="border-t pt-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Shop Images *
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            required
-                            onChange={handleImageChange}
-                            className="input"
+                        <ImageUpload
+                            images={imagePreviews}
+                            onImagesChange={handleImagesChange}
+                            maxImages={3}
+                            label="Shop Images *"
+                            multiple={true}
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                            Upload 1-3 images of your shop. {images.length} selected
+                            Upload 1-3 high-quality images of your shop storefront and interior
                         </p>
                     </div>
 

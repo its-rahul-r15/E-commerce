@@ -87,7 +87,7 @@ export const getProducts = async (filters = {}) => {
             .sort(sort)
             .skip(skip)
             .limit(limit)
-            .select('-__v'),
+            .lean(), // Convert to plain objects - 50% faster!
         Product.countDocuments(query),
     ]);
 
@@ -117,12 +117,38 @@ export const getProducts = async (filters = {}) => {
  * @returns {Promise<Object>} Search results
  */
 export const searchProducts = async (keyword, page = 1, limit = 20) => {
-    return getProducts({
-        search: keyword,
-        page,
-        limit,
-        sort: { score: { $meta: 'textScore' } }, // Sort by relevance
-    });
+    const skip = (page - 1) * limit;
+
+    // Build query with case-insensitive regex search
+    const query = {
+        isAvailable: true,
+        isBanned: false,
+        $or: [
+            { name: { $regex: keyword, $options: 'i' } },
+            { description: { $regex: keyword, $options: 'i' } },
+            { tags: { $in: [new RegExp(keyword, 'i')] } },
+        ],
+    };
+
+    const [products, total] = await Promise.all([
+        Product.find(query)
+            .populate('shopId', 'shopName location rating')
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit)
+            .select('-__v'),
+        Product.countDocuments(query),
+    ]);
+
+    return {
+        products,
+        pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit),
+        },
+    };
 };
 
 /**

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productService } from '../../services/api';
+import ImageUpload from '../../components/common/ImageUpload';
 
 const AddEditProduct = () => {
     const navigate = useNavigate();
@@ -16,8 +17,7 @@ const AddEditProduct = () => {
         stock: '',
         tags: '',
     });
-    const [images, setImages] = useState([]);
-    const [existingImages, setExistingImages] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(isEdit);
     const [submitting, setSubmitting] = useState(false);
 
@@ -40,7 +40,8 @@ const AddEditProduct = () => {
                 stock: product.stock,
                 tags: product.tags?.join(', ') || '',
             });
-            setExistingImages(product.images || []);
+            // Set existing images as previews
+            setImagePreviews(product.images || []);
         } catch (error) {
             console.error('Error fetching product:', error);
             alert('Failed to load product');
@@ -57,13 +58,8 @@ const AddEditProduct = () => {
         });
     };
 
-    const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length + existingImages.length > 5) {
-            alert('Maximum 5 images allowed');
-            return;
-        }
-        setImages(files);
+    const handleImagesChange = (previews) => {
+        setImagePreviews(previews);
     };
 
     const handleSubmit = async (e) => {
@@ -89,8 +85,11 @@ const AddEditProduct = () => {
                 tagsArray.forEach(tag => data.append('tags', tag));
             }
 
-            images.forEach(image => {
-                data.append('images', image);
+            // Add new images (only file objects, not existing URLs)
+            imagePreviews.forEach(preview => {
+                if (preview.file) {
+                    data.append('images', preview.file);
+                }
             });
 
             if (isEdit) {
@@ -251,42 +250,14 @@ const AddEditProduct = () => {
                         <p className="text-xs text-gray-500 mt-1">Separate tags with commas</p>
                     </div>
 
-                    {/* Existing Images */}
-                    {isEdit && existingImages.length > 0 && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Current Images
-                            </label>
-                            <div className="grid grid-cols-5 gap-2">
-                                {existingImages.map((img, index) => (
-                                    <img
-                                        key={index}
-                                        src={img}
-                                        alt={`Product ${index + 1}`}
-                                        className="w-full h-20 object-cover rounded border"
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Upload Images */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {isEdit ? 'Upload New Images' : 'Product Images'} {!isEdit && '*'}
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            required={!isEdit}
-                            onChange={handleImageChange}
-                            className="input"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Upload up to 5 images (JPG, PNG). {images.length} selected
-                        </p>
-                    </div>
+                    {/* Product Images */}
+                    <ImageUpload
+                        images={imagePreviews}
+                        onImagesChange={handleImagesChange}
+                        maxImages={5}
+                        label={isEdit ? 'Product Images (upload new or keep existing)' : 'Product Images *'}
+                        multiple={true}
+                    />
 
                     {/* Action Buttons */}
                     <div className="flex space-x-4 pt-4">

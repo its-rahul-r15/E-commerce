@@ -1,39 +1,63 @@
 import { useState, useEffect } from 'react';
-import { shopService, productService } from '../../services/api';
-import ShopCard from '../../components/customer/ShopCard';
-import ProductCard from '../../components/customer/ProductCard';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { productService, shopService } from '../../services/api';
+import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 const Home = () => {
-    const [nearbyShops, setNearbyShops] = useState([]);
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
+    const [nearbyShops, setNearbyShops] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [location, setLocation] = useState(null);
-    const [error, setError] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [userLocation, setUserLocation] = useState(null);
+
+    const categories = [
+        { name: 'All', icon: '📦', color: 'bg-emerald-500' },
+        { name: 'Electronics', icon: '💻', color: 'bg-blue-500' },
+        { name: 'Fashion', icon: '👕', color: 'bg-pink-500' },
+        { name: 'Groceries', icon: '🛒', color: 'bg-orange-500' },
+        { name: 'Furniture', icon: '🛋️', color: 'bg-purple-500' },
+        { name: 'Sport', icon: '⚽', color: 'bg-red-500' },
+    ];
+
+    const featuredShops = [
+        { name: 'Green Garden', rating: 4.7 },
+        { name: 'Tech Haven', rating: 4.9 },
+        { name: 'Urban Threads', rating: 4.8 },
+        { name: 'Home Decor+', rating: 4.2 },
+        { name: 'The Baker\'s', rating: 4.9 },
+        { name: 'Fashion Co', rating: 4.6 },
+    ];
 
     useEffect(() => {
         getUserLocation();
-    }, []);
+        const query = searchParams.get('q');
+        if (query) {
+            setSearchQuery(query);
+            handleSearchProducts(query);
+        } else {
+            fetchData();
+        }
+    }, [selectedCategory, searchParams]);
 
     const getUserLocation = () => {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setLocation({ latitude, longitude });
+                    setUserLocation({ latitude, longitude });
                     fetchNearbyShops(latitude, longitude);
-                    fetchProducts();
                 },
                 (error) => {
                     console.error('Location error:', error);
-                    setError('Unable to get your location. Showing all products.');
-                    fetchProducts();
-                    setLoading(false);
+                    // Use default location or show all shops
+                    fetchAllShops();
                 }
             );
         } else {
-            setError('Location not supported. Showing all products.');
-            fetchProducts();
-            setLoading(false);
+            fetchAllShops();
         }
     };
 
@@ -42,129 +66,229 @@ const Home = () => {
             const data = await shopService.getNearbyShops(lat, lng);
             setNearbyShops(data.shops || []);
         } catch (error) {
+            console.error('Error fetching nearby shops:', error);
+        }
+    };
+
+    const fetchAllShops = async () => {
+        try {
+            const data = await shopService.getAllShops();
+            setNearbyShops((data.shops || []).slice(0, 4));
+        } catch (error) {
             console.error('Error fetching shops:', error);
+        }
+    };
+
+    const fetchData = async () => {
+        try {
+            const params = selectedCategory === 'All' ? {} : { category: selectedCategory };
+            const data = await productService.getProducts({ ...params, limit: 20 });
+            setProducts(data.products || data || []);
+        } catch (error) {
+            console.error('Error:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchProducts = async () => {
+    const handleSearchProducts = async (query) => {
         try {
-            const data = await productService.getProducts({ limit: 20 });
-            setProducts(data || []); // data is already the products array
+            setLoading(true);
+            const data = await productService.searchProducts(query, 1, 20);
+            const productsArray = Array.isArray(data) ? data : (data.products || []);
+            setProducts(productsArray);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error searching:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Hero Section - Clean Design */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="text-center max-w-3xl mx-auto">
-                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                            Discover Local Shops Near You
-                        </h1>
-                        <p className="text-lg text-gray-600 mb-6">
-                            Shop from nearby stores within 5km radius
+
+            {/* Nearby Shops Section */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Nearby Shops</h2>
+                        <p className="text-sm text-gray-500">
+                            {nearbyShops.length > 0
+                                ? `${nearbyShops.length} shops found near you`
+                                : 'Discover shops around your neighborhood'}
                         </p>
-                        {location && (
-                            <div className="inline-flex items-center space-x-2 bg-primary/5 text-primary px-4 py-2 rounded-lg">
-                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span className="font-medium">Showing shops near your location</span>
+                    </div>
+                    <div className="flex space-x-2">
+                        <button className="p-2 border rounded-full hover:bg-gray-100">
+                            <ChevronLeftIcon className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 border rounded-full hover:bg-gray-100">
+                            <ChevronRightIcon className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {nearbyShops.length > 0 ? (
+                        nearbyShops.slice(0, 4).map((shop) => (
+                            <div
+                                key={shop._id}
+                                onClick={() => navigate(`/shop/${shop._id}`)}
+                                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                            >
+                                <div className="h-40 bg-gradient-to-r from-emerald-400 to-cyan-400 relative">
+                                    {shop.images?.[0] && (
+                                        <img
+                                            src={shop.images[0]}
+                                            alt={shop.shopName}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    )}
+                                </div>
+                                <div className="p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-bold text-gray-900">{shop.shopName}</h3>
+                                        {shop.distance && (
+                                            <span className="text-xs text-emerald-600 font-medium">
+                                                {shop.distance.toFixed(1)} km
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mb-2">
+                                        {shop.location?.city || 'Local Shop'}
+                                    </p>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-1">
+                                            <span className="text-sm">⭐</span>
+                                            <span className="text-sm font-medium">
+                                                {shop.rating || 4.5}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">
+                                                Open Now
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        )}
+                        ))
+                    ) : (
+                        // Placeholder when no shops found
+                        [1, 2, 3, 4].map((i) => (
+                            <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                                <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
+                                <div className="p-4">
+                                    <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Deal of the Day Banner */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-8 text-white overflow-hidden relative">
+                    <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                            <p className="text-sm font-medium mb-2 opacity-90">DEAL OF THE DAY</p>
+                            <h2 className="text-4xl font-bold mb-3">Flash Sale: Up to<br />60% Off</h2>
+                            <p className="text-sm opacity-90 mb-6 max-w-md">
+                                Get the best tech gadgets from top-rated local vendors. Valid only for today.
+                            </p>
+                            <div className="flex items-center space-x-6 mb-6">
+                                <div className="text-center">
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                                        <div className="text-2xl font-bold">12</div>
+                                        <div className="text-xs opacity-75">HOURS</div>
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                                        <div className="text-2xl font-bold">45</div>
+                                        <div className="text-xs opacity-75">MINS</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button className="bg-white text-emerald-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                Shop Now
+                            </button>
+                        </div>
+                        <div className="hidden lg:block">
+                            <div className="w-80 h-80 bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl rotate-12 flex items-center justify-center">
+                                <div className="text-8xl -rotate-12">🎧</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Error Message */}
-                {error && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                        <p className="text-yellow-800">{error}</p>
+            {/* Trending Products */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Trending Products</h2>
+                    <div className="flex space-x-4">
+                        <button className="text-emerald-500 font-medium hover:text-emerald-600">All Sellers</button>
+                        <button className="text-gray-500 font-medium hover:text-gray-700">Top Rated</button>
+                        <button className="text-gray-500 font-medium hover:text-gray-700">Newest</button>
                     </div>
-                )}
-
-                {/* Loading State */}
-                {loading && (
-                    <div className="text-center py-20">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                        <p className="mt-4 text-gray-600">Loading shops and products...</p>
-                    </div>
-                )}
-
-                {!loading && (
-                    <>
-                        {/* Nearby Shops Section */}
-                        {nearbyShops.length > 0 && (
-                            <section className="mb-16">
-                                <div className="flex items-center justify-between mb-8">
-                                    <div>
-                                        <h2 className="text-3xl font-bold text-gray-900 mb-1">
-                                            Shops Near You
-                                        </h2>
-                                        <p className="text-gray-600">
-                                            {nearbyShops.length} shops found within 5km
-                                        </p>
-                                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {products.slice(0, 10).map((product) => (
+                        <div
+                            key={product._id}
+                            onClick={() => navigate(`/product/${product._id}`)}
+                            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group"
+                        >
+                            <div className="relative h-48 bg-gray-100">
+                                <img
+                                    src={product.images?.[0] || '/placeholder.png'}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                />
+                                {product.stock < 10 && (
+                                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                        New Stock
+                                    </span>
+                                )}
+                                {product.discountedPrice && (
+                                    <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                        -{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}%
+                                    </span>
+                                )}
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                                    {product.name}
+                                </h3>
+                                <div className="flex items-center mb-2">
+                                    <span className="text-xs text-gray-500">⭐ 4.5</span>
                                 </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {nearbyShops.map((shop) => (
-                                        <ShopCard key={shop._id} shop={shop} />
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Products Section */}
-                        <section>
-                            <div className="flex items-center justify-between mb-8">
-                                <div>
-                                    <h2 className="text-3xl font-bold text-gray-900 mb-1">
-                                        {nearbyShops.length > 0 ? 'Featured Products' : 'All Products'}
-                                    </h2>
-                                    <p className="text-gray-600">
-                                        Browse products from local shops
-                                    </p>
+                                <div className="flex items-baseline space-x-2">
+                                    <span className="text-lg font-bold text-gray-900">
+                                        ₹{product.discountedPrice || product.price}
+                                    </span>
+                                    {product.discountedPrice && (
+                                        <span className="text-xs text-gray-400 line-through">
+                                            ₹{product.price}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
-
-                            {products.length === 0 ? (
-                                <div className="text-center py-12 bg-white rounded-lg">
-                                    <svg
-                                        className="mx-auto h-12 w-12 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                                        />
-                                    </svg>
-                                    <p className="mt-4 text-gray-600">No products available yet</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                    {products.map((product) => (
-                                        <ProductCard key={product._id} product={product} />
-                                    ))}
-                                </div>
-                            )}
-                        </section>
-                    </>
-                )
-                }
-            </div >
-        </div >
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
 };
 

@@ -51,8 +51,8 @@ export const productService = {
     },
 
     // Search products
-    searchProducts: async (keyword, page = 1) => {
-        const response = await axios.get(`/products/search?q=${keyword}&page=${page}`);
+    searchProducts: async (keyword, page = 1, limit = 20) => {
+        const response = await axios.get(`/products/search?q=${keyword}&page=${page}&limit=${limit}`);
         return response.data.data;
     },
 
