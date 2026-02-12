@@ -65,11 +65,13 @@ export const getNearbyShops = async (longitude, latitude, maxDistance = 5000) =>
             },
         },
     })
-        .select('-__v')
+        .lean() // Return plain JS objects for better performance
         .limit(50); // Limit results
 
     // Cache for 10 minutes
-    await setCache(cacheKey, JSON.stringify(shops), 600);
+    await setCache(cacheKey, JSON.stringify(shops), 600).catch(err => {
+        console.error('Cache set error:', err.message);
+    });
 
     return shops;
 };

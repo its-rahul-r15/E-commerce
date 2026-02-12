@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productService, shopService } from '../../services/api';
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
@@ -9,13 +9,16 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [nearbyShops, setNearbyShops] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [shopsLoading, setShopsLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [userLocation, setUserLocation] = useState(null);
 
-   
+
     useEffect(() => {
+        // Start both shops and products loading in parallel
         getUserLocation();
+
         const query = searchParams.get('q');
         if (query) {
             setSearchQuery(query);
@@ -23,9 +26,9 @@ const Home = () => {
         } else {
             fetchData();
         }
-    }, [selectedCategory, searchParams]);
+    }, [selectedCategory]);
 
-    const getUserLocation = () => {
+    const getUserLocation = useCallback(() => {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -42,23 +45,29 @@ const Home = () => {
         } else {
             fetchAllShops();
         }
-    };
+    }, []);
 
     const fetchNearbyShops = async (lat, lng) => {
         try {
+            setShopsLoading(true);
             const data = await shopService.getNearbyShops(lat, lng);
             setNearbyShops(data.shops || []);
         } catch (error) {
             console.error('Error fetching nearby shops:', error);
+        } finally {
+            setShopsLoading(false);
         }
     };
 
     const fetchAllShops = async () => {
         try {
+            setShopsLoading(true);
             const data = await shopService.getAllShops();
             setNearbyShops((data.shops || []).slice(0, 4));
         } catch (error) {
             console.error('Error fetching shops:', error);
+        } finally {
+            setShopsLoading(false);
         }
     };
 
@@ -119,7 +128,22 @@ const Home = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {nearbyShops.length > 0 ? (
+                    {shopsLoading ? (
+                        // Loading skeleton
+                        [1, 2, 3, 4].map((i) => (
+                            <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm animate-pulse">
+                                <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300"></div>
+                                <div className="p-4">
+                                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                                    <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
+                                    <div className="flex justify-between">
+                                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                                        <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : nearbyShops.length > 0 ? (
                         nearbyShops.slice(0, 4).map((shop) => (
                             <div
                                 key={shop._id}

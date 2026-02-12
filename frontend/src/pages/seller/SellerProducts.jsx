@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { productService } from '../../services/api';
+import SellerLayout from '../../components/layout/SellerLayout';
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 const SellerProducts = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('all');
 
     useEffect(() => {
         fetchProducts();
@@ -14,7 +17,7 @@ const SellerProducts = () => {
     const fetchProducts = async () => {
         try {
             const data = await productService.getMyProducts();
-            setProducts(data || []); // data is already the products array
+            setProducts(data || []);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -34,109 +37,218 @@ const SellerProducts = () => {
         }
     };
 
+    const filteredProducts = products.filter(product => {
+        if (filter === 'active') return product.isAvailable && product.stock > 0;
+        if (filter === 'inactive') return !product.isAvailable;
+        if (filter === 'low-stock') return product.stock < 10 && product.stock > 0;
+        if (filter === 'out-of-stock') return product.stock === 0;
+        return true;
+    });
+
+    const stats = {
+        total: products.length,
+        active: products.filter(p => p.isAvailable && p.stock > 0).length,
+        lowStock: products.filter(p => p.stock < 10 && p.stock > 0).length,
+        outOfStock: products.filter(p => p.stock === 0).length,
+    };
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-            </div>
+            <SellerLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading products...</p>
+                    </div>
+                </div>
+            </SellerLayout>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">My Products</h1>
-                    <Link to="/seller/products/add" className="btn-primary">
-                        + Add Product
-                    </Link>
+        <SellerLayout>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                        My Products
+                    </h1>
+                    <p className="text-gray-600 mt-1">Manage your product inventory</p>
                 </div>
+                <Link
+                    to="/seller/products/add"
+                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-cyan-600 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40"
+                >
+                    <PlusIcon className="h-5 w-5" />
+                    <span>Add Product</span>
+                </Link>
+            </div>
 
-                {products.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Total Products</p>
+                    <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Active</p>
+                    <p className="text-3xl font-bold text-emerald-600">{stats.active}</p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Low Stock</p>
+                    <p className="text-3xl font-bold text-orange-600">{stats.lowStock}</p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium mb-1">Out of Stock</p>
+                    <p className="text-3xl font-bold text-red-600">{stats.outOfStock}</p>
+                </div>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div className="flex overflow-x-auto">
+                    {[
+                        { key: 'all', label: 'All Products' },
+                        { key: 'active', label: 'Active' },
+                        { key: 'inactive', label: 'Inactive' },
+                        { key: 'low-stock', label: 'Low Stock' },
+                        { key: 'out-of-stock', label: 'Out of Stock' },
+                    ].map((item) => (
+                        <button
+                            key={item.key}
+                            onClick={() => setFilter(item.key)}
+                            className={`px-6 py-3 font-medium whitespace-nowrap border-b-2 transition-colors ${filter === item.key
+                                    ? 'border-emerald-500 text-emerald-600 bg-emerald-50/50'
+                                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                }`}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Products Grid */}
+            {filteredProducts.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No products yet</h3>
-                        <p className="text-gray-600 mb-6">Start by adding your first product</p>
-                        <Link to="/seller/products/add" className="btn-primary">
-                            Add Product
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+                    <p className="text-gray-600 mb-6">
+                        {filter === 'all' ? 'Start by adding your first product' : `No ${filter.replace('-', ' ')} products`}
+                    </p>
+                    {filter === 'all' && (
+                        <Link to="/seller/products/add" className="inline-flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-all">
+                            <PlusIcon className="h-5 w-5" />
+                            <span>Add Product</span>
                         </Link>
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {products.map((product) => (
-                                    <tr key={product._id}>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center space-x-3">
-                                                <img
-                                                    src={product.images?.[0] || '/placeholder-product.png'}
-                                                    alt={product.name}
-                                                    className="w-12 h-12 object-cover rounded"
-                                                />
-                                                <div>
-                                                    <p className="font-medium text-gray-900">{product.name}</p>
-                                                    <p className="text-sm text-gray-500 line-clamp-1">{product.description}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{product.category}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm">
-                                                <p className="font-semibold text-gray-900">₹{product.discountedPrice || product.price}</p>
-                                                {product.discountedPrice && (
-                                                    <p className="text-gray-500 line-through text-xs">₹{product.price}</p>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`text-sm font-medium ${product.stock === 0 ? 'text-red-600' :
+                    )}
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                        <div key={product._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                            {/* Product Image */}
+                            <div className="relative h-48 bg-gray-100">
+                                {product.images?.[0] ? (
+                                    <img
+                                        src={product.images[0]}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                )}
+                                {/* Status Badge */}
+                                <div className="absolute top-3 right-3">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${product.isAvailable && product.stock > 0
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-red-100 text-red-700'
+                                        }`}>
+                                        {product.isAvailable && product.stock > 0 ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                                {/* Stock Badge */}
+                                {product.stock < 10 && product.stock > 0 && (
+                                    <div className="absolute top-3 left-3">
+                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+                                            Low Stock
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Product Info */}
+                            <div className="p-5">
+                                <div className="flex items-start justify-between mb-2">
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">{product.name}</h3>
+                                        <p className="text-xs text-gray-500 mb-2">{product.category}</p>
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-gray-600 line-clamp-2 mb-4">{product.description}</p>
+
+                                {/* Price & Stock */}
+                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                                    <div>
+                                        <p className="text-xs text-gray-500 mb-1">Price</p>
+                                        <div className="flex items-baseline space-x-2">
+                                            <p className="text-lg font-bold text-gray-900">
+                                                ₹{product.discountedPrice || product.price}
+                                            </p>
+                                            {product.discountedPrice && (
+                                                <p className="text-xs text-gray-500 line-through">₹{product.price}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500 mb-1">Stock</p>
+                                        <p className={`text-lg font-bold ${product.stock === 0 ? 'text-red-600' :
                                                 product.stock < 10 ? 'text-orange-600' :
-                                                    'text-green-600'
-                                                }`}>
-                                                {product.stock}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 text-xs rounded-full ${product.isAvailable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                {product.isAvailable ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-sm space-x-3">
-                                            <Link
-                                                to={`/seller/products/edit/${product._id}`}
-                                                className="text-primary hover:text-primary-dark font-medium"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(product._id)}
-                                                className="text-red-600 hover:text-red-700 font-medium"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-        </div>
+                                                    'text-emerald-600'
+                                            }`}>
+                                            {product.stock}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex space-x-2">
+                                    <Link
+                                        to={`/product/${product._id}`}
+                                        className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                                    >
+                                        <EyeIcon className="h-4 w-4" />
+                                        <span>View</span>
+                                    </Link>
+                                    <Link
+                                        to={`/seller/products/edit/${product._id}`}
+                                        className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors text-sm font-medium"
+                                    >
+                                        <PencilIcon className="h-4 w-4" />
+                                        <span>Edit</span>
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(product._id)}
+                                        className="px-3 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    >
+                                        <TrashIcon className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </SellerLayout>
     );
 };
 
