@@ -8,15 +8,58 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const [location, setLocation] = useState('New York, NY');
+    const [location, setLocation] = useState('Detecting location...');
     const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+
+    // Fetch user's actual location on component mount
+    useEffect(() => {
+        getUserLocation();
+    }, []);
 
     useEffect(() => {
         if (isAuthenticated && user?.role === 'customer') {
             fetchCartCount();
         }
     }, [isAuthenticated, user]);
+
+    const getUserLocation = () => {
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    try {
+                        // Reverse geocoding using OpenStreetMap Nominatim API (free)
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                        );
+                        const data = await response.json();
+
+                        // Extract city and state/country
+                        const city = data.address.city || data.address.town || data.address.village || data.address.county;
+                        const state = data.address.state || data.address.country;
+
+                        setLocation(city && state ? `${city}, ${state}` : 'Location detected');
+                    } catch (error) {
+                        console.error('Error fetching location name:', error);
+                        setLocation(`${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`);
+                    }
+                },
+                (error) => {
+                    console.error('Geolocation error:', error);
+                    setLocation('Location unavailable');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000 // Cache for 5 minutes
+                }
+            );
+        } else {
+            setLocation('Location not supported');
+        }
+    };
 
     const fetchCartCount = async () => {
         try {
