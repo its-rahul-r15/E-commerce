@@ -13,24 +13,7 @@ const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [userLocation, setUserLocation] = useState(null);
 
-    const categories = [
-        { name: 'All', icon: '📦', color: 'bg-emerald-500' },
-        { name: 'Electronics', icon: '💻', color: 'bg-blue-500' },
-        { name: 'Fashion', icon: '👕', color: 'bg-pink-500' },
-        { name: 'Groceries', icon: '🛒', color: 'bg-orange-500' },
-        { name: 'Furniture', icon: '🛋️', color: 'bg-purple-500' },
-        { name: 'Sport', icon: '⚽', color: 'bg-red-500' },
-    ];
-
-    const featuredShops = [
-        { name: 'Green Garden', rating: 4.7 },
-        { name: 'Tech Haven', rating: 4.9 },
-        { name: 'Urban Threads', rating: 4.8 },
-        { name: 'Home Decor+', rating: 4.2 },
-        { name: 'The Baker\'s', rating: 4.9 },
-        { name: 'Fashion Co', rating: 4.6 },
-    ];
-
+   
     useEffect(() => {
         getUserLocation();
         const query = searchParams.get('q');
