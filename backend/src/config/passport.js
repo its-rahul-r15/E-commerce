@@ -15,6 +15,7 @@ const configureGoogleOAuth = () => {
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET,
                 callbackURL: process.env.GOOGLE_CALLBACK_URL,
                 scope: ['profile', 'email'],
+                proxy: true, // Enable proxy for Vercel/Heroku
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
@@ -39,14 +40,11 @@ const configureGoogleOAuth = () => {
                     }
 
                     // Create new user with Google data
-                    // Generate a random phone number placeholder (they can update later)
-                    const randomPhone = `9${Math.floor(Math.random() * 1000000000)}`.padEnd(10, '0');
-
                     user = await User.create({
                         name,
                         email,
                         googleId,
-                        phone: randomPhone, // Placeholder - user should update
+                        phone: null, // No phone needed for OAuth
                         role: 'customer', // Default role for OAuth users
                         isEmailVerified: true, // Google emails are verified
                         avatar,

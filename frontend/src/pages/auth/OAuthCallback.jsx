@@ -17,8 +17,9 @@ const OAuthCallback = () => {
         const error = searchParams.get('error');
 
         if (error) {
-            console.error('OAuth error:', error);
-            navigate('/login?error=oauth_failed');
+            const details = searchParams.get('details');
+            console.error('OAuth error:', error, details);
+            navigate(`/login?error=oauth_failed&details=${encodeURIComponent(details || '')}`);
             return;
         }
 
