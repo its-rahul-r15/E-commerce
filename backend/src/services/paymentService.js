@@ -1,4 +1,4 @@
-import razorpay from '../config/razorpay.js';
+import getRazorpay from '../config/razorpay.js';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
 
@@ -15,6 +15,12 @@ import Order from '../models/Order.js';
  */
 export const createRazorpayOrder = async (amount, orderId) => {
     try {
+        const razorpay = getRazorpay();
+
+        if (!razorpay) {
+            throw new Error('Payment gateway not configured');
+        }
+
         const options = {
             amount: Math.round(amount * 100), // Convert to paise
             currency: 'INR',
@@ -122,6 +128,12 @@ export const processFailedPayment = async (orderId) => {
  */
 export const getPaymentDetails = async (paymentId) => {
     try {
+        const razorpay = getRazorpay();
+
+        if (!razorpay) {
+            throw new Error('Payment gateway not configured');
+        }
+
         const payment = await razorpay.payments.fetch(paymentId);
         return payment;
     } catch (error) {
