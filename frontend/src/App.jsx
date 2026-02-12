@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/common/Navbar';
+import Footer from './components/common/Footer';
 import Home from './pages/customer/Home';
 import Login from './pages/auth/Login';
+import OAuthCallback from './pages/auth/OAuthCallback';
 import ProductDetails from './pages/customer/ProductDetails';
 import Cart from './pages/customer/Cart';
 import ShopPage from './pages/customer/ShopPage';
 import Checkout from './pages/customer/Checkout';
 import Orders from './pages/customer/Orders';
+import SearchResults from './pages/customer/SearchResults';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SellerProducts from './pages/seller/SellerProducts';
 import AddEditProduct from './pages/seller/AddEditProduct';
@@ -30,6 +33,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
             <Route path="/shop/:id" element={<ShopPage />} />
@@ -53,6 +58,7 @@ function App() {
             <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
             {/* More routes will be added */}
           </Routes>
+          <Footer />
         </div>
       </AuthProvider>
     </Router>
