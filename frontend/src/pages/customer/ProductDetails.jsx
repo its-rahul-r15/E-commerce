@@ -156,43 +156,6 @@ const ProductDetails = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-6 mb-8">
-                                {/* Color Selector (Mock) */}
-                                <div>
-                                    <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Select Color</h3>
-                                    <div className="flex space-x-3">
-                                        {colors.map((color) => (
-                                            <button
-                                                key={color}
-                                                onClick={() => setSelectedColor(color)}
-                                                className={`w-8 h-8 rounded-full border-2 ring-2 transition-all ${selectedColor === color ? 'border-white ring-gray-900 scale-110' : 'border-transparent ring-transparent hover:scale-110'
-                                                    }`}
-                                                style={{ backgroundColor: color.toLowerCase().replace(' ', '') }}
-                                                title={color}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Size Selector (Mock) */}
-                                <div>
-                                    <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Size</h3>
-                                    <div className="flex space-x-3">
-                                        {sizes.map((size) => (
-                                            <button
-                                                key={size}
-                                                onClick={() => setSelectedSize(size)}
-                                                className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${selectedSize === size
-                                                        ? 'border-emerald-500 text-emerald-600 bg-emerald-50'
-                                                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                                                    }`}
-                                            >
-                                                {size}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
 
                             <div className="flex space-x-4 mb-8">
                                 <div className="flex items-center border border-gray-300 rounded-lg">
@@ -345,34 +308,36 @@ const ProductDetails = () => {
             </div>
 
             {/* Login Prompt Modal */}
-            {showLoginPrompt && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl transform transition-all">
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                                🔐
+            {
+                showLoginPrompt && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl transform transition-all">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                                    🔐
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Login Required</h2>
+                                <p className="text-gray-500 mt-2">Please login to add items to your cart and continue shopping.</p>
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900">Login Required</h2>
-                            <p className="text-gray-500 mt-2">Please login to add items to your cart and continue shopping.</p>
-                        </div>
-                        <div className="flex space-x-3">
-                            <button
-                                onClick={() => setShowLoginPrompt(false)}
-                                className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-medium"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => navigate('/login')}
-                                className="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 font-medium shadow-lg shadow-emerald-200"
-                            >
-                                Login
-                            </button>
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={() => setShowLoginPrompt(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => navigate('/login')}
+                                    className="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 font-medium shadow-lg shadow-emerald-200"
+                                >
+                                    Login
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

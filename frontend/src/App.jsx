@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
@@ -17,6 +17,8 @@ import AddEditProduct from './pages/seller/AddEditProduct';
 import SellerOrders from './pages/seller/SellerOrders';
 import RegisterShop from './pages/seller/RegisterShop';
 import SellerShop from './pages/seller/SellerShop';
+import SellerAnalytics from './pages/seller/SellerAnalytics';
+import SellerInventory from './pages/seller/SellerInventory';
 import Profile from './pages/customer/Profile';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -24,12 +26,27 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 
+function Layout({ children }) {
+  const location = useLocation();
+
+  // Hide navbar and footer on seller and admin routes
+  const hideNavAndFooter = location.pathname.startsWith('/seller') ||
+    location.pathname.startsWith('/admin');
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {!hideNavAndFooter && <Navbar />}
+      {children}
+      {!hideNavAndFooter && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
+        <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -49,6 +66,8 @@ function App() {
             <Route path="/seller/products/edit/:id" element={<ProtectedRoute allowedRoles={['seller']}><AddEditProduct /></ProtectedRoute>} />
             <Route path="/seller/orders" element={<ProtectedRoute allowedRoles={['seller']}><SellerOrders /></ProtectedRoute>} />
             <Route path="/seller/shop" element={<ProtectedRoute allowedRoles={['seller']}><SellerShop /></ProtectedRoute>} />
+            <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={['seller']}><SellerAnalytics /></ProtectedRoute>} />
+            <Route path="/seller/inventory" element={<ProtectedRoute allowedRoles={['seller']}><SellerInventory /></ProtectedRoute>} />
             <Route path="/seller/register-shop" element={<ProtectedRoute allowedRoles={['seller']}><RegisterShop /></ProtectedRoute>} />
 
             {/* Admin Routes */}
@@ -58,8 +77,7 @@ function App() {
             <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
             {/* More routes will be added */}
           </Routes>
-          <Footer />
-        </div>
+        </Layout>
       </AuthProvider>
     </Router>
   );

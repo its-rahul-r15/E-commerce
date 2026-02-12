@@ -10,6 +10,7 @@ import { connectRedis, closeRedis } from './src/config/redis.js';
 import { configureCloudinary } from './src/config/cloudinary.js';
 import configureGoogleOAuth from './src/config/passport.js';
 import errorHandler from './src/middlewares/errorHandler.js';
+import verifyIndexes from './src/utils/verifyIndexes.js';
 
 
 dotenv.config();
@@ -114,6 +115,9 @@ const startServer = async () => {
     try {
         // Connect to MongoDB
         await connectDB();
+
+        // Verify database indexes
+        await verifyIndexes();
 
         // Connect to Redis (optional - app continues without it)
         await connectRedis();
