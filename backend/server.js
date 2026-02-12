@@ -19,8 +19,25 @@ const app = express();
 
 // Security & Performance Middleware
 app.use(helmet()); // Security headers
+// CORS - Allow multiple origins for dev and prod
+const allowedOrigins = [
+    'https://e-commerce-hack-tau.vercel.app', // Production frontend
+    'http://localhost:5173', // Local development
+    process.env.FRONTEND_URL, // Custom frontend URL from env
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`⚠️  CORS blocked origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(compression()); // Response compression
