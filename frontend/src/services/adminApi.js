@@ -36,6 +36,11 @@ export const adminService = {
         return response.data.data;
     },
 
+    getApprovedShops: async () => {
+        const response = await axios.get('/shops/admin/all');
+        return response.data.data;
+    },
+
     approveShop: async (shopId) => {
         const response = await axios.patch(`/shops/admin/${shopId}/approve`);
         return response.data;

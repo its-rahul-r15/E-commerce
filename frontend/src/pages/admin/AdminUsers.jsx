@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminApi';
+import AdminLayout from '../../components/admin/AdminLayout';
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [roleFilter, setRoleFilter] = useState('');
     const [updating, setUpdating] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
         fetchUsers();
     }, [roleFilter]);
 
     const fetchUsers = async () => {
+        setLoading(true);
         try {
             const data = await adminService.getUsers(1, roleFilter);
-            setUsers(data || []); // data is already the users array
+            setUsers(data || []);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -27,7 +30,6 @@ const AdminUsers = () => {
         setUpdating(true);
         try {
             await adminService.blockUser(userId);
-            alert('User blocked successfully');
             fetchUsers();
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to block user');
@@ -40,7 +42,6 @@ const AdminUsers = () => {
         setUpdating(true);
         try {
             await adminService.unblockUser(userId);
-            alert('User unblocked successfully');
             fetchUsers();
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to unblock user');
@@ -54,7 +55,6 @@ const AdminUsers = () => {
         setUpdating(true);
         try {
             await adminService.deleteUser(userId);
-            alert('User deleted successfully');
             fetchUsers();
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to delete user');
@@ -63,118 +63,137 @@ const AdminUsers = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-            </div>
-        );
-    }
+    const getRoleBadgeColor = (role) => {
+        switch (role) {
+            case 'admin': return 'bg-purple-600';
+            case 'seller': return 'bg-blue-600';
+            case 'customer': return 'bg-emerald-600';
+            default: return 'bg-slate-600';
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">User Management</h1>
-
-                {/* Filter */}
-                <div className="bg-white rounded-lg shadow-sm mb-6">
-                    <div className="flex overflow-x-auto">
-                        {['', 'customer', 'seller', 'admin'].map((role) => (
-                            <button
-                                key={role}
-                                onClick={() => setRoleFilter(role)}
-                                className={`px-6 py-3 font-medium whitespace-nowrap border-b-2 transition-colors ${roleFilter === role
-                                    ? 'border-primary text-primary'
-                                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                                    }`}
-                            >
-                                {role === '' ? 'All Users' : role.charAt(0).toUpperCase() + role.slice(1) + 's'}
-                            </button>
-                        ))}
-                    </div>
+        <AdminLayout>
+            {/* Page Header */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold">User Management</h1>
+                    <p className="text-slate-400 mt-2">Manage platform users and permissions</p>
                 </div>
-
-                {/* Users Table */}
-                {users.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <p className="text-gray-600">No users found</p>
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {users.map((user) => (
-                                    <tr key={user._id}>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center">
-                                                <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center">
-                                                    {user.name.charAt(0).toUpperCase()}
-                                                </div>
-                                                <div className="ml-3">
-                                                    <p className="font-medium text-gray-900">{user.name}</p>
-                                                    <p className="text-sm text-gray-500">{user.phone || 'No phone'}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{user.email}</td>
-                                        <td className="px-6 py-4">
-                                            <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                                                {user.role}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 text-xs rounded-full ${user.isBlocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                                                }`}>
-                                                {user.isBlocked ? 'Blocked' : 'Active'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">
-                                            {new Date(user.createdAt).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-sm space-x-3">
-                                            {user.isBlocked ? (
-                                                <button
-                                                    onClick={() => handleUnblockUser(user._id)}
-                                                    disabled={updating}
-                                                    className="text-green-600 hover:text-green-700 font-medium disabled:opacity-50"
-                                                >
-                                                    Unblock
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleBlockUser(user._id)}
-                                                    disabled={updating}
-                                                    className="text-orange-600 hover:text-orange-700 font-medium disabled:opacity-50"
-                                                >
-                                                    Block
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => handleDeleteUser(user._id)}
-                                                disabled={updating}
-                                                className="text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                    <span className="text-slate-400 text-sm">Total Users: </span>
+                    <span className="text-white font-bold text-lg">{users.length}</span>
+                </div>
             </div>
-        </div>
+
+            {/* Filter Tabs */}
+            <div className="bg-slate-800 rounded-2xl p-2 mb-6 inline-flex space-x-2 border border-slate-700">
+                {[
+                    { value: '', label: 'All Users' },
+                    { value: 'customer', label: 'Customers' },
+                    { value: 'seller', label: 'Sellers' },
+                    { value: 'admin', label: 'Admins' }
+                ].map((filter) => (
+                    <button
+                        key={filter.value}
+                        onClick={() => setRoleFilter(filter.value)}
+                        className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${roleFilter === filter.value
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                            }`}
+                    >
+                        {filter.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Users Table */}
+            {loading ? (
+                <div className="flex items-center justify-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                </div>
+            ) : users.length === 0 ? (
+                <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <p className="text-slate-400 text-lg">No users found</p>
+                </div>
+            ) : (
+                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+                    <table className="min-w-full divide-y divide-slate-700">
+                        <thead className="bg-slate-700/50">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">User</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Email</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Role</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Joined</th>
+                                <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                            {users.map((user) => (
+                                <tr key={user._id} className="hover:bg-slate-700/30 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold">
+                                                {user.name?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="ml-3">
+                                                <p className="font-semibold text-white">{user.name}</p>
+                                                <p className="text-sm text-slate-400">{user.phone || 'No phone'}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-slate-300">{user.email}</td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)} text-white`}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${user.isBlocked ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+                                            }`}>
+                                            {user.isBlocked ? 'Blocked' : 'Active'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-slate-400">
+                                        {new Date(user.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 text-right space-x-2">
+                                        {user.isBlocked ? (
+                                            <button
+                                                onClick={() => handleUnblockUser(user._id)}
+                                                disabled={updating}
+                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                            >
+                                                Unblock
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleBlockUser(user._id)}
+                                                disabled={updating}
+                                                className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                            >
+                                                Block
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => handleDeleteUser(user._id)}
+                                            disabled={updating}
+                                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </AdminLayout>
     );
 };
 
