@@ -16,7 +16,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { login, register, googleLogin } = useAuth();
+    const { login, register, googleLogin, user } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -30,6 +30,13 @@ const Login = () => {
             setError('Authentication failed: No tokens received.');
         }
     }, [searchParams]);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         setFormData({

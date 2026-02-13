@@ -74,7 +74,7 @@ function App() {
             <Route path="/seller/shop" element={<ProtectedRoute allowedRoles={['seller']}><SellerShop /></ProtectedRoute>} />
             <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={['seller']}><SellerAnalytics /></ProtectedRoute>} />
             <Route path="/seller/inventory" element={<ProtectedRoute allowedRoles={['seller']}><SellerInventory /></ProtectedRoute>} />
-            <Route path="/seller/register-shop" element={<ProtectedRoute allowedRoles={['seller']}><RegisterShop /></ProtectedRoute>} />
+            <Route path="/seller/register-shop" element={<ProtectedRoute allowedRoles={['customer', 'seller']}><RegisterShop /></ProtectedRoute>} />
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />

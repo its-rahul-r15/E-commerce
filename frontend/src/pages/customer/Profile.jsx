@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { shopService } from '../../services/api';
 
 const Profile = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [editing, setEditing] = useState(false);
+    const [shopData, setShopData] = useState(null);
+    const [loadingShop, setLoadingShop] = useState(false);
+    const [showBecomeSellerForm, setShowBecomeSellerForm] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -19,8 +23,26 @@ const Profile = () => {
                 email: user.email || '',
                 phone: user.phone || '',
             });
+
+            // Check if user has a shop (for become seller feature)
+            if (user.role === 'seller') {
+                fetchShopStatus();
+            }
         }
     }, [user]);
+
+    const fetchShopStatus = async () => {
+        setLoadingShop(true);
+        try {
+            const shop = await shopService.getMyShop();
+            setShopData(shop);
+        } catch (error) {
+            console.log('No shop found or error:', error);
+            setShopData(null);
+        } finally {
+            setLoadingShop(false);
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -226,6 +248,107 @@ const Profile = () => {
                                     <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Member Since</p>
                                     <p className="mt-2 text-sm font-semibold text-gray-900">2024</p>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Become a Seller Section - Only for customers (NOT admin) */}
+                        {user.role === 'customer' && (
+                            <div className="mt-6 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-6">
+                                <div className="flex items-start space-x-4">
+                                    <div className="flex-shrink-0">
+                                        <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
+                                            <svg className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Start Selling on Our Platform</h3>
+                                        <p className="text-sm text-gray-600 mb-4">
+                                            Register your shop and reach thousands of customers. Simple process, quick approval!
+                                        </p>
+                                        <button
+                                            onClick={() => navigate('/seller/register-shop')}
+                                            className="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
+                                        >
+                                            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Become a Seller
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Seller Shop Status - Only for sellers */}
+                        {user.role === 'seller' && (
+                            <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Shop Status</h3>
+                                {loadingShop ? (
+                                    <div className="text-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent mx-auto"></div>
+                                        <p className="text-sm text-gray-500 mt-2">Loading shop status...</p>
+                                    </div>
+                                ) : shopData ? (
+                                    <div>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div>
+                                                <p className="font-semibold text-gray-900">{shopData.shopName}</p>
+                                                <p className="text-sm text-gray-500">{shopData.location?.city}</p>
+                                            </div>
+                                            <span className={`px-3 py-1 text-sm font-medium rounded-full ${shopData.approvalStatus === 'approved'
+                                                ? 'bg-green-100 text-green-800'
+                                                : shopData.approvalStatus === 'pending'
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                {shopData.approvalStatus.charAt(0).toUpperCase() + shopData.approvalStatus.slice(1)}
+                                            </span>
+                                        </div>
+
+                                        {shopData.approvalStatus === 'approved' && (
+                                            <button
+                                                onClick={() => navigate('/seller/dashboard')}
+                                                className="w-full bg-emerald-600 text-white py-2 rounded-md hover:bg-emerald-700 font-medium"
+                                            >
+                                                Go to Seller Dashboard
+                                            </button>
+                                        )}
+
+                                        {shopData.approvalStatus === 'pending' && (
+                                            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                                                <p className="text-sm text-yellow-800">
+                                                    ⏳ Your shop registration is under review. You'll be notified once approved by admin.
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {shopData.approvalStatus === 'rejected' && (
+                                            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                                                <p className="text-sm text-red-800 mb-2">
+                                                    ❌ Your shop registration was rejected.
+                                                </p>
+                                                <button
+                                                    onClick={() => navigate('/seller/register-shop')}
+                                                    className="text-sm text-red-600 hover:text-red-700 font-medium"
+                                                >
+                                                    Register Again →
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-6">
+                                        <p className="text-gray-500 mb-4">No shop registered yet</p>
+                                        <button
+                                            onClick={() => navigate('/seller/register-shop')}
+                                            className="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700"
+                                        >
+                                            Register Your Shop
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
