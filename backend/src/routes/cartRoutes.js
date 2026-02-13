@@ -1,20 +1,14 @@
 import express from 'express';
 import * as cartController from '../controllers/cartController.js';
 import auth from '../middlewares/auth.js';
-import requireRole from '../middlewares/roleCheck.js';
+import { requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
 import { mongoIdValidator } from '../middlewares/validator.js';
 
-/**
- * Cart Routes
- * /api/cart
- * All routes require customer authentication
- */
-
 const router = express.Router();
 
-// All cart routes require customer role
-router.use(auth, requireRole('customer'));
+// All cart routes require customer or seller role
+router.use(auth, requireCustomerOrSeller);
 
 router.get('/', cartController.getCart);
 

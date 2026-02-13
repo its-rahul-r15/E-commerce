@@ -12,6 +12,10 @@ const FilterPanel = ({ onFilterChange, onClearFilters }) => {
         minPrice: '',
         maxPrice: '',
         sort: '',
+        brand: '',
+        style: '',
+        sizes: '',
+        colors: '',
     });
 
     const categories = [
@@ -61,6 +65,10 @@ const FilterPanel = ({ onFilterChange, onClearFilters }) => {
             minPrice: '',
             maxPrice: '',
             sort: '',
+            brand: '',
+            style: '',
+            sizes: '',
+            colors: '',
         };
         setFilters(emptyFilters);
         onClearFilters();
@@ -173,6 +181,78 @@ const FilterPanel = ({ onFilterChange, onClearFilters }) => {
                                     min="0"
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Brand */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+                        <input
+                            type="text"
+                            placeholder="Search Brand"
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => onFilterChange({ ...filters, brand: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Style */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Style</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Casual, Formal"
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            onChange={(e) => onFilterChange({ ...filters, style: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Common Sizes */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Size</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['S', 'M', 'L', 'XL', 'XXL', 'UK 7', 'UK 8', 'UK 9'].map(size => (
+                                <button
+                                    key={size}
+                                    onClick={() => {
+                                        const currentSizes = filters.sizes ? filters.sizes.split(',') : [];
+                                        const newSizes = currentSizes.includes(size)
+                                            ? currentSizes.filter(s => s !== size)
+                                            : [...currentSizes, size];
+                                        onFilterChange({ ...filters, sizes: newSizes.join(',') });
+                                    }}
+                                    className={`px-3 py-1 text-xs border rounded-full ${filters.sizes?.split(',').includes(size)
+                                        ? 'bg-emerald-500 text-white border-emerald-500'
+                                        : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                                        }`}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Common Colors */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow'].map(color => (
+                                <button
+                                    key={color}
+                                    onClick={() => {
+                                        const currentColors = filters.colors ? filters.colors.split(',') : [];
+                                        const newColors = currentColors.includes(color)
+                                            ? currentColors.filter(c => c !== color)
+                                            : [...currentColors, color];
+                                        onFilterChange({ ...filters, colors: newColors.join(',') });
+                                    }}
+                                    className={`w-6 h-6 rounded-full border shadow-sm ${filters.colors?.split(',').includes(color)
+                                        ? 'ring-2 ring-offset-1 ring-emerald-500'
+                                        : 'hover:scale-110'
+                                        }`}
+                                    style={{ backgroundColor: color.toLowerCase() }}
+                                    title={color}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

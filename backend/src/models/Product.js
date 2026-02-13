@@ -42,6 +42,26 @@ const productSchema = new mongoose.Schema({
             message: 'Invalid product category',
         },
     },
+    subCategory: {
+        type: String,
+        trim: true,
+    },
+    brand: {
+        type: String,
+        trim: true,
+    },
+    sizes: [{
+        type: String,
+        trim: true,
+    }],
+    colors: [{
+        type: String,
+        trim: true,
+    }],
+    style: {
+        type: String,
+        trim: true,
+    },
     price: {
         type: Number,
         required: [true, 'Price is required'],
@@ -92,7 +112,7 @@ const productSchema = new mongoose.Schema({
 // Indexes for performance
 productSchema.index({ shopId: 1 });
 productSchema.index({ category: 1 });
-productSchema.index({ name: 'text', description: 'text', tags: 'text' }); // Full-text search
+productSchema.index({ name: 'text', description: 'text', tags: 'text', brand: 'text', subCategory: 'text', style: 'text' }); // Full-text search
 productSchema.index({ isAvailable: 1, isBanned: 1 }); // Compound index for filtering
 productSchema.index({ price: 1 }); // For price range queries
 

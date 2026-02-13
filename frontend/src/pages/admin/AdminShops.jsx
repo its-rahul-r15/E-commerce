@@ -16,7 +16,8 @@ const AdminShops = () => {
         try {
             if (filter === 'pending') {
                 const data = await adminService.getPendingShops();
-                const shopsArray = Array.isArray(data) ? data : [];
+                // Handle response format from getPendingShops which is { shops: [], count: X }
+                const shopsArray = data.shops || (Array.isArray(data) ? data : []);
                 setShops(shopsArray);
             } else {
                 const data = await shopService.getAllShops();

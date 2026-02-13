@@ -41,19 +41,36 @@ export const errorResponse = (res, message = 'Internal server error', statusCode
  * @param {number} limit - Items per page
  * @param {number} total - Total items count
  */
-export const paginatedResponse = (res, data, page, limit, total) => {
-    const totalPages = Math.ceil(total / limit);
+export const paginatedResponse = (res, data, pageOrPagination, limit, total) => {
+    let pagination;
+
+    if (typeof pageOrPagination === 'object' && pageOrPagination !== null) {
+        // Handle case where pagination object is passed as 3rd arg
+        const p = pageOrPagination;
+        pagination = {
+            currentPage: p.page || p.currentPage,
+            totalPages: p.pages || p.totalPages || Math.ceil((p.total || p.totalItems) / (p.limit || p.itemsPerPage)),
+            totalItems: p.total || p.totalItems,
+            itemsPerPage: p.limit || p.itemsPerPage,
+            hasNextPage: (p.page || p.currentPage) < (p.pages || p.totalPages),
+            hasPrevPage: (p.page || p.currentPage) > 1,
+        };
+    } else {
+        // Handle standard arguments
+        const totalPages = Math.ceil(total / limit);
+        pagination = {
+            currentPage: pageOrPagination,
+            totalPages,
+            totalItems: total,
+            itemsPerPage: limit,
+            hasNextPage: pageOrPagination < totalPages,
+            hasPrevPage: pageOrPagination > 1,
+        };
+    }
 
     return res.status(200).json({
         success: true,
         data,
-        pagination: {
-            currentPage: page,
-            totalPages,
-            totalItems: total,
-            itemsPerPage: limit,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-        },
+        pagination,
     });
 };

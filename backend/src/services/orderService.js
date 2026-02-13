@@ -84,9 +84,10 @@ export const createOrder = async (customerId, orderData) => {
         orders.push(order);
     }
 
-    // Clear cart after successful order
-    cart.items = [];
-    await cart.save();
+    // DON'T clear cart here - it should only be cleared after successful payment
+    // Cart clearing is now handled in payment verification handler
+    // cart.items = [];
+    // await cart.save();
 
     // Invalidate product caches
     await deleteCachePattern('products:*');
@@ -189,17 +190,20 @@ export const getOrderById = async (orderId, userId, userRole) => {
         throw new Error('Order not found');
     }
 
-    // Access control
-    if (userRole === 'customer' && order.customerId._id.toString() !== userId) {
-        throw new Error('Access denied');
+    // Access control: Allow if user is the customer OR the shop owner
+    const isCustomer = order.customerId._id.toString() === userId;
+
+    if (isCustomer) {
+        return order;
     }
 
-    if (userRole === 'seller') {
-        const shop = await Shop.findOne({ sellerId: userId });
-        if (!shop || order.shopId._id.toString() !== shop._id.toString()) {
-            throw new Error('Access denied');
-        }
+    // Check if user is the shop owner
+    const shop = await Shop.findOne({ sellerId: userId });
+    if (shop && order.shopId._id.toString() === shop._id.toString()) {
+        return order;
     }
+
+    throw new Error('Access denied');
 
     return order;
 };
@@ -256,11 +260,10 @@ export const cancelOrder = async (orderId, userId, userRole) => {
     }
 
     // Verify access
-    if (userRole === 'customer' && order.customerId.toString() !== userId) {
-        throw new Error('Access denied');
-    }
+    const isCustomer = order.customerId.toString() === userId;
+    const isShopOwner = order.shopId.sellerId.toString() === userId;
 
-    if (userRole === 'seller' && order.shopId.sellerId.toString() !== userId) {
+    if (!isCustomer && !isShopOwner) {
         throw new Error('Access denied');
     }
 

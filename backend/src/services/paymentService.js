@@ -1,6 +1,7 @@
 import getRazorpay from '../config/razorpay.js';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
+import Cart from '../models/Cart.js';
 
 /**
  * Payment Service
@@ -94,6 +95,12 @@ export const processSuccessfulPayment = async (orderId, paymentData) => {
     if (!order) {
         throw new Error('Order not found');
     }
+
+    // Clear cart after successful payment
+    await Cart.findOneAndUpdate(
+        { customerId: order.customerId._id },
+        { $set: { items: [] } }
+    );
 
     return order;
 };

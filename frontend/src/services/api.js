@@ -37,17 +37,55 @@ export const shopService = {
 
     // Get all shops (admin)
     getAllShops: async () => {
-        const response = await axios.get('/shops');
+        const response = await axios.get('/shops/admin/all');
         return response.data.data;
+    },
+
+    // Get public shops (approved only)
+    getPublicShops: async (page = 1, limit = 20) => {
+        const response = await axios.get(`/shops?page=${page}&limit=${limit}`);
+        return {
+            shops: response.data.data,
+            pagination: response.data.pagination
+        };
+    },
+
+    // DEBUG: Diagnose DB state
+    diagnose: async () => {
+        const response = await axios.get('/shops/debug/diagnose');
+        return response.data.data;
+    },
+
+    // DEBUG: Approve all shops
+    approveAll: async () => {
+        const response = await axios.get('/shops/debug/approve-all');
+        return response.data;
     },
 };
 
 export const productService = {
     // Get products with filters
     getProducts: async (filters = {}) => {
-        const params = new URLSearchParams(filters);
+        console.log('Original filters:', filters);
+        // Convert categories array to comma-separated string if it's an array
+        const processedFilters = { ...filters };
+        if (Array.isArray(processedFilters.categories)) {
+            console.log('Converting categories array:', processedFilters.categories);
+            processedFilters.categories = processedFilters.categories.join(',');
+            console.log('After conversion:', processedFilters.categories);
+        }
+        // Remove empty values
+        Object.keys(processedFilters).forEach(key => {
+            if (processedFilters[key] === '' || processedFilters[key] === undefined || processedFilters[key] === null) {
+                delete processedFilters[key];
+            }
+        });
+
+        console.log('Final processed filters:', processedFilters);
+        const params = new URLSearchParams(processedFilters);
+        console.log('URL params:', params.toString());
         const response = await axios.get(`/products?${params}`);
-        return response.data.data;
+        return response.data; // Return full response object (contains data and pagination)
     },
 
     // Search products
@@ -62,10 +100,17 @@ export const productService = {
         return response.data.data;
     },
 
-    // Get shop products
-    getShopProducts: async (shopId, page = 1) => {
-        const response = await axios.get(`/products/shop/${shopId}?page=${page}`);
+    // Get product comparisons
+    getComparisons: async (productId) => {
+        const response = await axios.get(`/products/${productId}/compare`);
         return response.data.data;
+    },
+
+    // Get shop products
+    getShopProducts: async (shopId, filters = {}) => {
+        const { page = 1, ...rest } = filters;
+        const response = await axios.get(`/products/shop/${shopId}?page=${page}&${new URLSearchParams(rest)}`);
+        return response.data; // Return full response for pagination
     },
 
     // Get seller's products
@@ -99,6 +144,19 @@ export const productService = {
     // Get all products (admin only - includes banned products)
     getAllProducts: async () => {
         const response = await axios.get('/products/admin/all');
+        return response.data.data;
+    },
+
+    // DEBUG: Get all products raw
+    debugGetAllProducts: async () => {
+        const response = await axios.get('/products/debug/all');
+        return response.data.data; // Response format from successResponse
+    },
+
+    // DEBUG: Verify query
+    debugVerifyQuery: async (filters) => {
+        const params = new URLSearchParams(filters);
+        const response = await axios.get(`/products/debug/inspector?${params}`);
         return response.data.data;
     },
 };
@@ -173,6 +231,14 @@ export const orderService = {
     // Cancel order
     cancelOrder: async (orderId) => {
         const response = await axios.patch(`/orders/${orderId}/cancel`);
+        return response.data.data;
+    },
+};
+
+export const couponService = {
+    // Validate coupon
+    validateCoupon: async (code, amount, shopId) => {
+        const response = await axios.post('/coupons/validate', { code, amount, shopId });
         return response.data.data;
     },
 };

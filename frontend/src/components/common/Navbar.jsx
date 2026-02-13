@@ -18,7 +18,7 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        if (isAuthenticated && user?.role === 'customer') {
+        if (isAuthenticated && ['customer', 'seller'].includes(user?.role)) {
             fetchCartCount();
         }
     }, [isAuthenticated, user]);
@@ -108,6 +108,13 @@ const Navbar = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
+
+                        <Link to="/products" className="hidden md:flex items-center font-medium text-gray-700 hover:text-emerald-600 transition-colors">
+                            Browse
+                        </Link>
+                        <Link to="/shops" className="hidden md:flex items-center font-medium text-gray-700 hover:text-emerald-600 transition-colors">
+                            Stores
+                        </Link>
                     </div>
 
                     {/* Center: Search Bar */}
@@ -151,7 +158,7 @@ const Navbar = () => {
                         )}
 
                         {/* Cart */}
-                        {(!user || user.role === 'customer') && (
+                        {(!user || ['customer', 'seller'].includes(user.role)) && (
                             <button
                                 onClick={handleCartClick}
                                 className="relative text-gray-700 hover:text-emerald-600 transition-colors"

@@ -14,13 +14,11 @@ const ProductDetails = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [moreFromShop, setMoreFromShop] = useState([]);
+    const [comparisons, setComparisons] = useState([]);
 
-    // Mock variants for UI demo (since backend might not have them yet)
-    const [selectedColor, setSelectedColor] = useState('Space Grey');
-    const [selectedSize, setSelectedSize] = useState('Standard');
-
-    const colors = ['Space Grey', 'Silver', 'Gold', 'Midnight'];
-    const sizes = ['Standard', 'Studio XL'];
+    // Selected variants
+    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedSize, setSelectedSize] = useState('');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -32,10 +30,17 @@ const ProductDetails = () => {
             const data = await productService.getProductById(id);
             setProduct(data.product);
 
+            // Set default variants if available
+            if (data.product.colors?.length > 0) setSelectedColor(data.product.colors[0]);
+            if (data.product.sizes?.length > 0) setSelectedSize(data.product.sizes[0]);
+
             // Fetch more products from same shop
             if (data.product?.shopId?._id) {
                 fetchMoreFromShop(data.product.shopId._id);
             }
+
+            // Fetch comparisons (other sellers)
+            fetchComparisons();
         } catch (error) {
             console.error('Error fetching product:', error);
         } finally {
@@ -43,10 +48,19 @@ const ProductDetails = () => {
         }
     };
 
+    const fetchComparisons = async () => {
+        try {
+            const data = await productService.getComparisons(id);
+            setComparisons(data.comparisons || []);
+        } catch (error) {
+            console.error('Error fetching comparisons:', error);
+        }
+    };
+
     const fetchMoreFromShop = async (shopId) => {
         try {
             const data = await productService.getProducts({ shop: shopId, limit: 5 });
-            setMoreFromShop(data.products.filter(p => p._id !== id).slice(0, 4));
+            setMoreFromShop(data.products?.filter(p => p._id !== id).slice(0, 4) || []);
         } catch (error) {
             console.error('Error fetching shop products:', error);
         }
@@ -68,6 +82,20 @@ const ProductDetails = () => {
             alert(error.response?.data?.error || 'Failed to add to cart');
         } finally {
             setAddingToCart(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        if (!isAuthenticated) {
+            setShowLoginPrompt(true);
+            return;
+        }
+
+        try {
+            await cartService.addToCart(id, quantity);
+            navigate('/cart');
+        } catch (error) {
+            alert(error.response?.data?.error || 'Failed to process request');
         }
     };
 
@@ -142,6 +170,12 @@ const ProductDetails = () => {
                                 <span className="text-sm text-gray-500">SKU: {product._id.slice(-8).toUpperCase()}</span>
                             </div>
 
+                            {/* Brand & Sub-category */}
+                            <div className="mb-4 text-sm text-gray-500">
+                                {product.brand && <span className="mr-4">Brand: <span className="font-medium text-gray-900">{product.brand}</span></span>}
+                                {product.subCategory && <span>Type: <span className="font-medium text-gray-900">{product.subCategory}</span></span>}
+                            </div>
+
                             <div className="bg-emerald-50 rounded-xl p-6 mb-8">
                                 <div className="flex items-baseline space-x-3">
                                     <span className="text-4xl font-bold text-gray-900">₹{price}</span>
@@ -156,6 +190,50 @@ const ProductDetails = () => {
                                 </div>
                             </div>
 
+                            {/* Variants Selection */}
+                            {(product.colors?.length > 0 || product.sizes?.length > 0) && (
+                                <div className="mb-6 space-y-4">
+                                    {product.colors?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-900 mb-2">Color</h3>
+                                            <div className="flex space-x-2">
+                                                {product.colors.map(color => (
+                                                    <button
+                                                        key={color}
+                                                        onClick={() => setSelectedColor(color)}
+                                                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedColor === color
+                                                            ? 'border-emerald-500 text-emerald-600 bg-emerald-50'
+                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                            }`}
+                                                    >
+                                                        {color}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {product.sizes?.length > 0 && (
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-900 mb-2">Size</h3>
+                                            <div className="flex space-x-2">
+                                                {product.sizes.map(size => (
+                                                    <button
+                                                        key={size}
+                                                        onClick={() => setSelectedSize(size)}
+                                                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedSize === size
+                                                            ? 'border-emerald-500 text-emerald-600 bg-emerald-50'
+                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                            }`}
+                                                    >
+                                                        {size}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="flex space-x-4 mb-8">
                                 <div className="flex items-center border border-gray-300 rounded-lg">
@@ -182,6 +260,15 @@ const ProductDetails = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                     <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
+                                </button>
+                                <button
+                                    onClick={handleBuyNow}
+                                    className="flex-1 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-orange-200"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <span>Buy Now</span>
                                 </button>
                             </div>
 
@@ -259,51 +346,99 @@ const ProductDetails = () => {
                     </div>
                 )}
 
-                {/* Compare Sellers (Mock for now) */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-12">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="text-xl font-bold text-gray-900">Compare with Other Sellers</h2>
+                {/* Compare Sellers */}
+                {comparisons.length > 0 && (
+                    <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-12">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                                <span className="mr-2">⚖️</span> Compare with Other Sellers
+                            </h2>
+                            <p className="text-sm text-gray-500 mt-1">Found {comparisons.length} other sellers for this item</p>
+                        </div>
+                        <div className="p-0 overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th className="px-6 py-3 font-medium">Seller</th>
+                                        <th className="px-6 py-3 font-medium">Rating</th>
+                                        <th className="px-6 py-3 font-medium">Price</th>
+                                        <th className="px-6 py-3 font-medium">Shipping</th>
+                                        <th className="px-6 py-3 font-medium text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {/* Current Product */}
+                                    <tr className="bg-emerald-50/30">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-xs text-emerald-700 font-bold">
+                                                    {product.shopId?.shopName?.charAt(0) || 'S'}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900 flex items-center">
+                                                        {product.shopId?.shopName}
+                                                        <span className="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold border border-emerald-200">
+                                                            CURRENT
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center text-emerald-500 font-medium">
+                                                <span>{product.shopId?.rating || 4.5}</span>
+                                                <svg className="w-4 h-4 fill-current ml-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-bold text-gray-900">
+                                            ₹{product.discountedPrice || product.price}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500">
+                                            Standard Delivery
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-gray-400 text-sm font-medium italic">Viewing</span>
+                                        </td>
+                                    </tr>
+
+                                    {/* Comparison Products */}
+                                    {comparisons.map((item) => (
+                                        <tr key={item._id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-xs text-blue-700 font-bold">
+                                                        {item.shopId?.shopName?.charAt(0) || 'O'}
+                                                    </div>
+                                                    <span className="font-medium text-gray-900">{item.shopId?.shopName}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center text-gray-600">
+                                                    <span>{item.shopId?.rating || 4.2}</span>
+                                                    <svg className="w-4 h-4 fill-current ml-1 text-yellow-400" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 font-bold text-gray-900">
+                                                ₹{item.discountedPrice || item.price}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500">
+                                                Standard Delivery
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button
+                                                    onClick={() => navigate(`/product/${item._id}`)}
+                                                    className="border border-emerald-500 text-emerald-500 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-emerald-50 transition-colors"
+                                                >
+                                                    Select
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div className="p-0 overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                                <tr>
-                                    <th className="px-6 py-3 font-medium">Seller</th>
-                                    <th className="px-6 py-3 font-medium">Rating</th>
-                                    <th className="px-6 py-3 font-medium">Price</th>
-                                    <th className="px-6 py-3 font-medium">Shipping</th>
-                                    <th className="px-6 py-3 font-medium text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                <tr>
-                                    <td className="px-6 py-4 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs">A</div>
-                                        <span className="font-medium text-gray-900">{product.shopId?.shopName} <span className="text-xs bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded ml-1">Current</span></span>
-                                    </td>
-                                    <td className="px-6 py-4 text-emerald-500">4.9 ⭐</td>
-                                    <td className="px-6 py-4 font-bold text-gray-900">₹{price}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">2-4 Business Days</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button disabled className="bg-gray-100 text-gray-400 px-4 py-1.5 rounded-full text-sm font-medium">In Cart</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-xs text-blue-600">S</div>
-                                        <span className="font-medium text-gray-900">SoundDirect Outlet</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-emerald-500">4.7 ⭐</td>
-                                    <td className="px-6 py-4 font-bold text-gray-900">₹{price * 0.95}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">7-10 Business Days</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="border border-emerald-500 text-emerald-500 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-emerald-50">Select</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                )}
 
             </div>
 

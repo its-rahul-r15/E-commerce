@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cartService } from '../../services/api';
+import { cartService, couponService } from '../../services/api';
 
 const Cart = () => {
     const navigate = useNavigate();
@@ -8,6 +8,9 @@ const Cart = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [discount, setDiscount] = useState(0);
+    const [couponError, setCouponError] = useState('');
 
     useEffect(() => {
         fetchCart();
@@ -52,6 +55,24 @@ const Cart = () => {
         }
     };
 
+    const handleApplyCoupon = async () => {
+        setCouponError('');
+        try {
+            // Validate against the first shop in cart for now (assuming single shop checkout optimization or backend handles it)
+            // In a real multi-vendor cart, coupons might be shop-specific. 
+            // Here we pass the first shop ID found.
+            const shopId = cart?.items?.[0]?.productId?.shopId?._id;
+
+            const data = await couponService.validateCoupon(couponCode, subtotal, shopId);
+            setAppliedCoupon(data.coupon);
+            setDiscount(data.discountAmount);
+        } catch (error) {
+            setCouponError(error.response?.data?.error || 'Invalid coupon');
+            setAppliedCoupon(null);
+            setDiscount(0);
+        }
+    };
+
     // Group items by shop
     const groupedItems = cart?.items?.reduce((acc, item) => {
         const shopId = item.productId?.shopId?._id;
@@ -79,9 +100,7 @@ const Cart = () => {
     };
 
     const subtotal = calculateTotal();
-    const date = new Date();
-    date.setDate(date.getDate() + 3); // Est delivery 3 days
-    const estDelivery = date.toLocaleDateString('en-US', { disable: true, month: 'short', day: 'numeric' });
+    const estDelivery = '10 min'; // Fast delivery!
 
     if (loading) {
         return (
@@ -251,68 +270,84 @@ const Cart = () => {
                                     <span>Subtotal ({itemCount} items)</span>
                                     <span className="font-medium text-gray-900">₹{subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-emerald-600">
                                     <span>Shipping</span>
-                                    <span className="font-medium text-gray-900">₹40.00</span>
-                                </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Estimated Tax</span>
-                                    <span className="font-medium text-gray-900">₹{(subtotal * 0.05).toFixed(2)}</span>
-                                </div>
-                                <div className="border-t border-dashed border-gray-200 my-4"></div>
-                                <div className="flex justify-between items-end">
-                                    <div>
-                                        <span className="text-lg font-bold text-gray-900 block">Total Amount</span>
-                                        <span className="text-xs text-gray-500">VAT Included</span>
-                                    </div>
-                                    <span className="text-3xl font-bold text-emerald-600">₹{(subtotal + 40 + subtotal * 0.05).toFixed(2)}</span>
+                                    <span className="font-medium">FREE</span>
                                 </div>
                             </div>
-
-                            <button
-                                onClick={() => navigate('/checkout')}
-                                className="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl hover:bg-emerald-600 transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-200 flex items-center justify-center space-x-2 group"
-                            >
-                                <span>Proceed to Checkout</span>
-                                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </button>
-                            <p className="text-xs text-center text-gray-400 mt-4">
-                                By proceeding, you agree to our Terms of Service
-                            </p>
-
-                            {/* Coupon Code */}
-                            <div className="mt-8">
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Have a coupon code?</label>
-                                <div className="flex space-x-2">
-                                    <input
-                                        type="text"
-                                        placeholder="CODE123"
-                                        value={couponCode}
-                                        onChange={(e) => setCouponCode(e.target.value)}
-                                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 bg-gray-50"
-                                    />
-                                    <button className="px-4 py-2 border border-emerald-500 text-emerald-600 font-bold rounded-lg text-sm hover:bg-emerald-50 transition-colors">
-                                        Apply
-                                    </button>
+                            {discount > 0 && (
+                                <div className="flex justify-between text-emerald-600">
+                                    <span>Discount</span>
+                                    <span className="font-medium">-₹{discount.toFixed(2)}</span>
                                 </div>
+                            )}
+                            <div className="border-t border-dashed border-gray-200 my-4"></div>
+                            <div className="flex justify-between items-end">
+                                <div>
+                                    <span className="text-lg font-bold text-gray-900 block">Total Amount</span>
+                                    <span className="text-xs text-emerald-600">✨ Free Shipping & No Tax</span>
+                                </div>
+                                <span className="text-3xl font-bold text-emerald-600">₹{(subtotal - discount).toFixed(2)}</span>
                             </div>
+                        </div>
 
-                            {/* Trust Icons */}
-                            <div className="mt-8 flex justify-center space-x-6 grayscale opacity-60">
-                                <div className="flex flex-col items-center">
-                                    <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                    <span className="text-[10px] uppercase font-bold">Secure</span>
+                        <button
+                            onClick={() => navigate('/checkout')}
+                            className="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl hover:bg-emerald-600 transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-200 flex items-center justify-center space-x-2 group"
+                        >
+                            <span>Proceed to Checkout</span>
+                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                        <p className="text-xs text-center text-gray-400 mt-4">
+                            By proceeding, you agree to our Terms of Service
+                        </p>
+
+                        {/* Coupon Code */}
+                        <div className="mt-8">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Have a coupon code?</label>
+                            <div className="flex space-x-2">
+                                <input
+                                    type="text"
+                                    placeholder="CODE123"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value)}
+                                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 bg-gray-50"
+                                />
+                                <button
+                                    onClick={handleApplyCoupon}
+                                    disabled={!couponCode || appliedCoupon}
+                                    className={`px-4 py-2 border font-bold rounded-lg text-sm transition-colors ${appliedCoupon
+                                        ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                                        : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50'
+                                        }`}
+                                >
+                                    {appliedCoupon ? 'Applied' : 'Apply'}
+                                </button>
+                            </div>
+                            {couponError && <p className="text-xs text-red-500 mt-2">{couponError}</p>}
+                            {appliedCoupon && (
+                                <div className="mt-2 bg-emerald-50 border border-emerald-100 rounded-lg p-2 flex justify-between items-center">
+                                    <span className="text-xs text-emerald-700">Coupon <b>{appliedCoupon.code}</b> applied!</span>
+                                    <button onClick={() => { setAppliedCoupon(null); setDiscount(0); }} className="text-xs text-red-500 hover:underline">Remove</button>
                                 </div>
-                                <div className="flex flex-col items-center">
-                                    <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                                    <span className="text-[10px] uppercase font-bold">Protected</span>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                                    <span className="text-[10px] uppercase font-bold">Returns</span>
-                                </div>
+                            )}
+                        </div>
+
+                        {/* Trust Icons */}
+                        <div className="mt-8 flex justify-center space-x-6 grayscale opacity-60">
+                            <div className="flex flex-col items-center">
+                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                <span className="text-[10px] uppercase font-bold">Secure</span>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                                <span className="text-[10px] uppercase font-bold">Protected</span>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                <span className="text-[10px] uppercase font-bold">Returns</span>
                             </div>
                         </div>
                     </div>

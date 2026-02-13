@@ -76,6 +76,7 @@ import cartRoutes from './src/routes/cartRoutes.js';
 import orderRoutes from './src/routes/orderRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import paymentRoutes from './src/routes/paymentRoutes.js';
+import couponRoutes from './src/routes/couponRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -84,6 +85,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/coupons', couponRoutes);
 
 // Future route imports will go here:
 // import shopRoutes from './src/routes/shopRoutes.js';

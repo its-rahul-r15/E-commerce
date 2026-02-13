@@ -13,6 +13,55 @@ import { deleteCache, deleteCachePattern, setCache, getCache } from './cacheServ
  * @param {Object} productData - Product details
  * @returns {Promise<Object>} Created product
  */
+// Helper to inspect query for debugging
+export const inspectQuery = (filters = {}) => {
+    const {
+        category,
+        categories,
+        subCategory,
+        brand,
+        sizes,
+        colors,
+        style,
+        shopId,
+        minPrice,
+        maxPrice,
+        search,
+        sort = '-createdAt',
+    } = filters;
+
+    const query = {
+        isAvailable: true,
+        isBanned: false,
+    };
+
+    if (categories) {
+        const catList = Array.isArray(categories) ? categories : categories.split(',');
+        if (catList.length > 0) query.category = { $in: catList };
+    } else if (category) {
+        query.category = category;
+    }
+
+    if (subCategory) query.subCategory = subCategory;
+    if (brand) query.brand = brand;
+    if (style) query.style = style;
+
+    if (minPrice || maxPrice) {
+        query.price = {}; // Simulating the logic
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (sizes) {
+        query.sizes = { $in: sizes.split(',') };
+    }
+    if (colors) query.colors = { $in: colors.split(',') };
+    if (shopId) query.shopId = shopId;
+    if (search) query.$text = { $search: search };
+
+    return { filters, mongoQuery: query };
+};
+
 export const createProduct = async (sellerId, productData) => {
     // Get seller's shop
     const shop = await Shop.findOne({ sellerId, status: 'approved' });
@@ -42,7 +91,15 @@ export const createProduct = async (sellerId, productData) => {
 export const getProducts = async (filters = {}) => {
     const {
         category,
+        categories, // Support multiple categories
+        subCategory,
+        brand,
+        sizes,
+        colors,
+        style,
         shopId,
+        minPrice,
+        maxPrice,
         search,
         page = 1,
         limit = 20,
@@ -57,8 +114,48 @@ export const getProducts = async (filters = {}) => {
         isBanned: false, // Don't show banned products
     };
 
-    if (category) {
+    // Category filter (support single or multiple)
+    if (categories) {
+        // Handle if comma-separated string or array
+        const catList = Array.isArray(categories) ? categories : categories.split(',');
+        if (catList.length > 0) query.category = { $in: catList };
+    } else if (category) {
         query.category = category;
+    }
+
+    if (subCategory) query.subCategory = subCategory;
+    if (brand) query.brand = brand;
+    if (style) query.style = style; // Current UI uses 'style' as regex/exact match
+
+    // Price Filter
+    if (minPrice || maxPrice) {
+        query.discountedPrice = {}; // Filter on discountedPrice (effective price)
+        if (minPrice) query.discountedPrice.$gte = Number(minPrice);
+        if (maxPrice) query.discountedPrice.$lte = Number(maxPrice);
+        // Fallback to price if discountedPrice logic is complex, 
+        // but typically e-commerce filters on the 'selling price'.
+        // Simplified: assuming all products have discountedPrice set (or equal to price).
+        // If your schema only has 'price' and 'discountedPrice' is optional, strict query needed.
+        // For Hackathon, let's assume filtering on 'price' field itself might be safer if discountedPrice is not guaranteed.
+        // Re-evaluating: Most products have price. discountedPrice is optional.
+        // Better implementation:
+        // $expr might be needed to compare effectively, OR just filter 'price' for simplicity now.
+        // Let's filter 'price' for now to be safe and simple.
+        delete query.discountedPrice;
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Array filters (if product has ANY of the specified values)
+    if (sizes) {
+        const sizeList = sizes.split(',');
+        query.sizes = { $in: sizeList };
+    }
+
+    if (colors) {
+        const colorList = colors.split(',');
+        query.colors = { $in: colorList };
     }
 
     if (shopId) {
@@ -71,7 +168,7 @@ export const getProducts = async (filters = {}) => {
     }
 
     // Try cache (only for non-search queries)
-    const cacheKey = `products:${JSON.stringify({ category, shopId, page, limit, sort })}`;
+    const cacheKey = `products:${JSON.stringify({ category, subCategory, brand, sizes, colors, style, shopId, page, limit, sort })}`;
 
     if (!search) {
         const cached = await getCache(cacheKey);
@@ -84,7 +181,7 @@ export const getProducts = async (filters = {}) => {
     const [products, total] = await Promise.all([
         Product.find(query)
             .populate('shopId', 'shopName location rating')
-            .sort(sort)
+            .sort(sort || '-createdAt') // Pass default if sort is falsy/empty string
             .skip(skip)
             .limit(limit)
             .lean(), // Convert to plain objects - 50% faster!
@@ -353,4 +450,35 @@ export const getAllProducts = async (filters = {}) => {
             pages: Math.ceil(total / limit),
         },
     };
+};
+
+/**
+ * Get product comparisons (similar products from other sellers)
+ * @param {string} productId - Source product ID
+ * @returns {Promise<Array>} List of comparable products
+ */
+export const getComparisons = async (productId) => {
+    const product = await Product.findById(productId);
+    if (!product) {
+        throw new Error('Product not found');
+    }
+
+    const query = {
+        _id: { $ne: productId },
+        name: product.name,
+        isAvailable: true,
+        isBanned: false,
+        stock: { $gt: 0 }
+    };
+
+    if (product.brand) {
+        query.brand = product.brand;
+    }
+
+    const comparisons = await Product.find(query)
+        .populate('shopId', 'shopName rating location')
+        .sort('price')
+        .limit(10);
+
+    return comparisons;
 };
