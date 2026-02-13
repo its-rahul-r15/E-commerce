@@ -262,3 +262,63 @@ export const getAllShops = async (req, res, next) => {
         next(error);
     }
 };
+
+/**
+ * TEMP: Diagnose shop data (Check counts and statuses)
+ * GET /api/shops/debug/diagnose
+ */
+export const diagnoseShops = async (req, res, next) => {
+    try {
+        const total = await shopService.Shop.countDocuments();
+        const byStatus = await shopService.Shop.aggregate([
+            { $group: { _id: '$status', count: { $sum: 1 } } }
+        ]);
+        const sampleShops = await shopService.Shop.find().limit(5).select('shopName status _id ownerId');
+
+        return successResponse(res, {
+            total,
+            byStatus,
+            sampleShops
+        }, 'Shop Diagnosis');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * TEMP: Approve all shops (for debugging)
+ * GET /api/shops/debug/approve-all
+ */
+export const debugApproveAllShops = async (req, res, next) => {
+    try {
+        const result = await shopService.updateManyShops({}, { status: 'approved' });
+        return successResponse(res, result, 'All shops approved successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Get public shops (Approved only)
+ * GET /api/shops
+ */
+export const getPublicShops = async (req, res, next) => {
+    try {
+        const { page, limit } = req.query;
+
+        const result = await shopService.getAllShops({
+            status: 'approved',
+            page: parseInt(page) || 1,
+            limit: parseInt(limit) || 20,
+        });
+
+        return paginatedResponse(
+            res,
+            result.shops,
+            result.pagination,
+            'Shops retrieved successfully'
+        );
+    } catch (error) {
+        next(error);
+    }
+};

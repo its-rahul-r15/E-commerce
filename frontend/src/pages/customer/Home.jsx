@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productService, shopService } from '../../services/api';
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
+import CouponBanner from '../../components/customer/CouponBanner';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -51,9 +52,10 @@ const Home = () => {
         try {
             setShopsLoading(true);
             const data = await shopService.getNearbyShops(lat, lng);
-            setNearbyShops(data.shops || []);
+            setNearbyShops(data?.shops || []);
         } catch (error) {
             console.error('Error fetching nearby shops:', error);
+            setNearbyShops([]);
         } finally {
             setShopsLoading(false);
         }
@@ -75,9 +77,10 @@ const Home = () => {
         try {
             const params = selectedCategory === 'All' ? {} : { category: selectedCategory };
             const data = await productService.getProducts({ ...params, limit: 20 });
-            setProducts(data.products || data || []);
+            setProducts(data?.data || []);
         } catch (error) {
             console.error('Error:', error);
+            setProducts([]);
         } finally {
             setLoading(false);
         }
@@ -106,6 +109,10 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            {/* Coupon Banner Section */}
+            <div className="max-w-7xl mx-auto px-4 pt-6">
+                <CouponBanner />
+            </div>
 
             {/* Nearby Shops Section */}
             <div className="max-w-7xl mx-auto px-4 py-8">

@@ -18,6 +18,7 @@ router.get('/', readRateLimiter, paginationValidator, productController.getProdu
 router.get('/search', readRateLimiter, productController.searchProducts);
 router.get('/shop/:shopId', readRateLimiter, shopIdValidator, productController.getShopProducts);
 router.get('/:id', readRateLimiter, mongoIdValidator, productController.getProductById);
+router.get('/:id/compare', readRateLimiter, mongoIdValidator, productController.getComparisons);
 
 // Seller routes (protected)
 router.post(
@@ -73,5 +74,8 @@ router.patch(
     mongoIdValidator,
     productController.toggleProductBan
 );
+
+router.get('/debug/all', productController.debugGetAll);
+router.get('/debug/inspector', productController.debugQueryInspector);
 
 export default router;

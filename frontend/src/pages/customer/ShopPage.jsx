@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { shopService, productService } from '../../services/api';
 import ProductCard from '../../components/customer/ProductCard';
+import FilterPanel from '../../components/common/FilterPanel';
 
 const ShopPage = () => {
     const { id } = useParams();
@@ -10,10 +11,11 @@ const ShopPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [productsLoading, setProductsLoading] = useState(true);
+    const [filters, setFilters] = useState({});
 
     useEffect(() => {
         fetchShop();
-        fetchProducts();
+        fetchProducts(); // Initial fetch without filters
     }, [id]);
 
     const fetchShop = async () => {
@@ -27,10 +29,11 @@ const ShopPage = () => {
         }
     };
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (currentFilters = filters) => {
         try {
-            const data = await productService.getShopProducts(id);
-            setProducts(data || []); // data is already the products array
+            setProductsLoading(true);
+            const response = await productService.getShopProducts(id, currentFilters);
+            setProducts(response.data || []);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -114,26 +117,51 @@ const ShopPage = () => {
 
             {/* Products Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Products</h2>
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Sidebar Filters */}
+                    <div className="w-full lg:w-64 flex-shrink-0">
+                        <FilterPanel
+                            onFilterChange={(newFilters) => {
+                                setFilters(newFilters);
+                                // Reset to page 1 when filters change
+                                fetchProducts(newFilters);
+                            }}
+                            onClearFilters={() => {
+                                setFilters({});
+                                fetchProducts({});
+                            }}
+                        />
+                    </div>
 
-                {productsLoading ? (
-                    <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+                    {/* Product Grid */}
+                    <div className="flex-1">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                Products ({products.length})
+                            </h2>
+                            {/* Sort could go here if extracted from FilterPanel */}
+                        </div>
+
+                        {productsLoading ? (
+                            <div className="text-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="text-center py-12 bg-white rounded-lg border border-gray-100">
+                                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                                <p className="mt-4 text-gray-600">No products found matching your filters</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {products.map((product) => (
+                                    <ProductCard key={product._id} product={product} />
+                                ))}
+                            </div>
+                        )}
                     </div>
-                ) : products.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-lg">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                        </svg>
-                        <p className="mt-4 text-gray-600">No products available yet</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {products.map((product) => (
-                            <ProductCard key={product._id} product={product} />
-                        ))}
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     );

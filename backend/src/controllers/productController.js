@@ -44,11 +44,19 @@ export const createProduct = async (req, res, next) => {
  */
 export const getProducts = async (req, res, next) => {
     try {
-        const { category, shopId, page, limit, sort } = req.query;
+        const { category, subCategory, brand, sizes, colors, style, shopId, page, limit, sort } = req.query;
 
         const result = await productService.getProducts({
             category,
+            categories: req.query.categories,
+            subCategory,
+            brand,
+            sizes,
+            colors,
+            style,
             shopId,
+            minPrice: req.query.minPrice,
+            maxPrice: req.query.maxPrice,
             page: parseInt(page) || 1,
             limit: parseInt(limit) || 20,
             sort,
@@ -57,8 +65,9 @@ export const getProducts = async (req, res, next) => {
         return paginatedResponse(
             res,
             result.products,
-            result.pagination,
-            'Products retrieved successfully'
+            result.pagination.page,
+            result.pagination.limit,
+            result.pagination.total
         );
     } catch (error) {
         next(error);
@@ -109,6 +118,27 @@ export const getProductById = async (req, res, next) => {
         );
     } catch (error) {
         if (error.message.includes('not found') || error.message.includes('not available')) {
+            return errorResponse(res, error.message, 404, 'PRODUCT_NOT_FOUND');
+        }
+        next(error);
+    }
+};
+
+/**
+ * Get product comparisons (other sellers selling same item)
+ * GET /api/products/:id/compare
+ */
+export const getComparisons = async (req, res, next) => {
+    try {
+        const comparisons = await productService.getComparisons(req.params.id);
+
+        return successResponse(
+            res,
+            { comparisons },
+            'Comparisons retrieved successfully'
+        );
+    } catch (error) {
+        if (error.message.includes('not found')) {
             return errorResponse(res, error.message, 404, 'PRODUCT_NOT_FOUND');
         }
         next(error);
@@ -279,6 +309,33 @@ export const getAllProducts = async (req, res, next) => {
             result.pagination,
             'Products retrieved successfully'
         );
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Debug: Get all products
+ * GET /api/products/debug/all
+ */
+export const debugGetAll = async (req, res, next) => {
+    try {
+        const result = await productService.getAllProducts({ limit: 100 });
+        return successResponse(res, result, 'Debug All Products');
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const debugQueryInspector = (req, res, next) => {
+    try {
+        const result = productService.inspectQuery({
+            ...req.query,
+            categories: req.query.categories,
+            minPrice: req.query.minPrice,
+            maxPrice: req.query.maxPrice
+        });
+        return successResponse(res, result, 'Query Inspection');
     } catch (error) {
         next(error);
     }

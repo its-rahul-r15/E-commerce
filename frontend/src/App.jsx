@@ -11,6 +11,8 @@ import ShopPage from './pages/customer/ShopPage';
 import Checkout from './pages/customer/Checkout';
 import Orders from './pages/customer/Orders';
 import SearchResults from './pages/customer/SearchResults';
+import ShopsList from './pages/customer/ShopsList';
+import AllProducts from './pages/customer/AllProducts';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SellerProducts from './pages/seller/SellerProducts';
 import AddEditProduct from './pages/seller/AddEditProduct';
@@ -23,6 +25,7 @@ import Profile from './pages/customer/Profile';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 
@@ -54,6 +57,9 @@ function App() {
             <Route path="/search" element={<SearchResults />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/shops" element={<ShopsList />} />
+            <Route path="/products" element={<AllProducts />} />
             <Route path="/shop/:id" element={<ShopPage />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
@@ -73,6 +79,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/coupons" element={<ProtectedRoute allowedRoles={['admin']}><AdminCoupons /></ProtectedRoute>} />
             <Route path="/admin/shops" element={<ProtectedRoute allowedRoles={['admin']}><AdminShops /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
             {/* More routes will be added */}

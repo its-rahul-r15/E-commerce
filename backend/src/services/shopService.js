@@ -270,3 +270,9 @@ export const getAllShops = async (filters = {}) => {
         },
     };
 };
+
+export const updateManyShops = async (filter, update) => {
+    return await Shop.updateMany(filter, update);
+};
+
+export { Shop };

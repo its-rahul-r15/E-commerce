@@ -23,6 +23,11 @@ const AddEditProduct = () => {
         category: '',
         stock: '',
         tags: '',
+        brand: '',
+        subCategory: '',
+        style: '',
+        sizes: '',
+        colors: '',
     });
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(isEdit);
@@ -46,6 +51,11 @@ const AddEditProduct = () => {
                 category: product.category,
                 stock: product.stock,
                 tags: product.tags?.join(', ') || '',
+                brand: product.brand || '',
+                subCategory: product.subCategory || '',
+                style: product.style || '',
+                sizes: product.sizes?.join(', ') || '',
+                colors: product.colors?.join(', ') || '',
             });
             setImagePreviews(product.images || []);
         } catch (error) {
@@ -89,6 +99,20 @@ const AddEditProduct = () => {
             if (formData.tags) {
                 const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
                 tagsArray.forEach(tag => data.append('tags', tag));
+            }
+
+            if (formData.brand) data.append('brand', formData.brand);
+            if (formData.subCategory) data.append('subCategory', formData.subCategory);
+            if (formData.style) data.append('style', formData.style);
+
+            if (formData.sizes) {
+                const sizesArray = formData.sizes.split(',').map(size => size.trim()).filter(size => size);
+                sizesArray.forEach(size => data.append('sizes', size));
+            }
+
+            if (formData.colors) {
+                const colorsArray = formData.colors.split(',').map(color => color.trim()).filter(color => color);
+                colorsArray.forEach(color => data.append('colors', color));
             }
 
             imagePreviews.forEach(preview => {
@@ -211,6 +235,84 @@ const AddEditProduct = () => {
                                     <option value="Grocery">🛒 Grocery</option>
                                     <option value="Other">📦 Other</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {/* Detailed Information */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4">
+                            <h2 className="text-xl font-bold text-white flex items-center">
+                                <TagIcon className="h-6 w-6 mr-2" />
+                                Product Details & Variants
+                            </h2>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                {/* Brand */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
+                                    <input
+                                        type="text"
+                                        name="brand"
+                                        value={formData.brand}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                        placeholder="e.g., Nike, Samsung"
+                                    />
+                                </div>
+                                {/* Sub Category */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sub Category</label>
+                                    <input
+                                        type="text"
+                                        name="subCategory"
+                                        value={formData.subCategory}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                        placeholder="e.g., Wireless, Running Shoes"
+                                    />
+                                </div>
+                                {/* Style */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Style</label>
+                                    <input
+                                        type="text"
+                                        name="style"
+                                        value={formData.style}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                        placeholder="e.g., Casual, Formal"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {/* Sizes */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sizes (comma separated)</label>
+                                    <input
+                                        type="text"
+                                        name="sizes"
+                                        value={formData.sizes}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                        placeholder="e.g., S, M, L, XL or 7, 8, 9"
+                                    />
+                                </div>
+                                {/* Colors */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Colors (comma separated)</label>
+                                    <input
+                                        type="text"
+                                        name="colors"
+                                        value={formData.colors}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                        placeholder="e.g., Red, Blue, Black"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -368,9 +470,9 @@ const AddEditProduct = () => {
                             )}
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     );
 };
 

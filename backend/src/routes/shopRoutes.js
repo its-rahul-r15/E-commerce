@@ -13,8 +13,12 @@ import { upload } from '../utils/cloudinaryUpload.js';
 
 const router = express.Router();
 
+// Debug route (place before others to avoid conflict)
+router.get('/debug/approve-all', shopController.debugApproveAllShops);
+router.get('/debug/diagnose', shopController.diagnoseShops);
+
 // Public routes
-router.get('/', readRateLimiter, shopController.getAllShops);
+router.get('/', readRateLimiter, shopController.getPublicShops);
 router.get('/nearby', readRateLimiter, shopController.getNearbyShops);
 router.get('/:id', readRateLimiter, mongoIdValidator, shopController.getShopById);
 

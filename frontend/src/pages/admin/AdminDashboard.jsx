@@ -289,6 +289,25 @@ const AdminDashboard = () => {
                                 </svg>
                             </div>
                         </Link>
+
+                        <Link to="/admin/coupons" className="group bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all hover:-translate-y-0.5">
+                            <div className="flex items-center space-x-4">
+                                <div className="bg-orange-600 p-4 rounded-lg group-hover:bg-orange-700 transition-colors">
+                                    <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">
+                                        Manage Coupons
+                                    </h3>
+                                    <p className="text-sm text-gray-600">Create, edit promotional coupons & offers</p>
+                                </div>
+                                <svg className="h-5 w-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </Link>
                     </div>
                 </div>
             </div>

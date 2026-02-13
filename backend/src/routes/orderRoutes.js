@@ -1,7 +1,7 @@
 import express from 'express';
 import * as orderController from '../controllers/orderController.js';
 import auth from '../middlewares/auth.js';
-import { requireCustomer, requireSeller, requireAdmin } from '../middlewares/roleCheck.js';
+import { requireCustomer, requireSeller, requireAdmin, requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
 import { mongoIdValidator, paginationValidator } from '../middlewares/validator.js';
 
@@ -12,11 +12,11 @@ import { mongoIdValidator, paginationValidator } from '../middlewares/validator.
 
 const router = express.Router();
 
-// Customer routes
+// Customer/Seller buying routes
 router.post(
     '/',
     auth,
-    requireCustomer,
+    requireCustomerOrSeller,
     apiRateLimiter,
     orderController.createOrder
 );
@@ -24,7 +24,7 @@ router.post(
 router.get(
     '/customer/my-orders',
     auth,
-    requireCustomer,
+    requireCustomerOrSeller,
     paginationValidator,
     orderController.getMyOrders
 );

@@ -1,7 +1,7 @@
 import express from 'express';
 import * as paymentController from '../controllers/paymentController.js';
 import auth from '../middlewares/auth.js';
-import { requireCustomer } from '../middlewares/roleCheck.js';
+import { requireCustomer, requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
 
 /**
@@ -13,7 +13,8 @@ const router = express.Router();
 
 // All payment routes require authentication
 router.use(auth);
-router.use(requireCustomer);
+// Allow both customers and sellers to pay
+router.use(requireCustomerOrSeller);
 
 // Create Razorpay order
 router.post('/create-order', apiRateLimiter, paymentController.createOrder);
