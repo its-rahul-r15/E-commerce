@@ -1,15 +1,7 @@
 import * as cartService from '../services/cartService.js';
 import { successResponse, errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Cart Controller
- * Handles HTTP requests for cart management
- */
 
-/**
- * Get customer's cart
- * GET /api/cart
- */
 export const getCart = async (req, res, next) => {
     try {
         const cart = await cartService.getCart(req.user.userId);

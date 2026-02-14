@@ -2,15 +2,7 @@ import * as shopService from '../services/shopService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
 import { uploadMultipleImages } from '../utils/cloudinaryUpload.js';
 
-/**
- * Shop Controller
- * Handles HTTP requests for shop management
- */
 
-/**
- * Create/Register shop
- * POST /api/shops
- */
 export const createShop = async (req, res, next) => {
     try {
         const sellerId = req.user.userId;
@@ -38,10 +30,7 @@ export const createShop = async (req, res, next) => {
     }
 };
 
-/**
- * Get nearby shops (within 5km radius)
- * GET /api/shops/nearby?lat=<latitude>&lng=<longitude>
- */
+
 export const getNearbyShops = async (req, res, next) => {
     try {
         const { lat, lng } = req.query;

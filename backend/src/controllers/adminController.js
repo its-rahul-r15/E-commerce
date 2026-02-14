@@ -5,15 +5,7 @@ import * as orderService from '../services/orderService.js';
 import User from '../models/User.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
 
-/**
- * Admin Controller
- * Handles HTTP requests for admin operations
- */
 
-/**
- * Get platform statistics
- * GET /api/admin/stats
- */
 export const getStats = async (req, res, next) => {
     try {
         const [

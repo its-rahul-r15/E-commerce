@@ -87,18 +87,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
 
-// Future route imports will go here:
-// import shopRoutes from './src/routes/shopRoutes.js';
-// import productRoutes from './src/routes/productRoutes.js';
-// import orderRoutes from './src/routes/orderRoutes.js';
-// import adminRoutes from './src/routes/adminRoutes.js';
-
-// Mount routes:
-// app.use('/api/shops', shopRoutes);
-// import productRoutes from './src/routes/productRoutes.js';
-// app.use('/api/orders', orderRoutes);
-// app.use('/api/admin', adminRoutes);
-
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({

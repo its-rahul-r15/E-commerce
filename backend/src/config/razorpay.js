@@ -3,11 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-/**
- * Razorpay Configuration
- * Initialize Razorpay instance for payment processing
- * Lazy initialization - only creates instance if credentials exist
- */
 
 let razorpayInstance = null;
 

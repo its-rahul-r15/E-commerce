@@ -1,11 +1,6 @@
 import { body, param, query, validationResult } from 'express-validator';
 import { errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Validation Middleware
- * Input validation and sanitization rules
- */
-
 // Helper to handle validation errors
 export const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);

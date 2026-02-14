@@ -2,10 +2,7 @@ import { verifyAccessToken } from '../utils/tokenUtils.js';
 import { errorResponse } from '../utils/responseFormatter.js';
 import User from '../models/User.js';
 
-/**
- * Authentication Middleware
- * Verifies JWT access token and attaches user info to request
- */
+
 
 const auth = async (req, res, next) => {
     try {

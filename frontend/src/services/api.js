@@ -236,9 +236,16 @@ export const orderService = {
 };
 
 export const couponService = {
+    // Get active coupons
+    getActiveCoupons: async () => {
+        const response = await axios.get('/coupons/active');
+        return response.data.data;
+    },
+
     // Validate coupon
     validateCoupon: async (code, amount, shopId) => {
         const response = await axios.post('/coupons/validate', { code, amount, shopId });
         return response.data.data;
     },
 };
+

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { productService, shopService } from '../../services/api';
-import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { productService, shopService, couponService } from '../../services/api';
+import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, GiftIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import CouponBanner from '../../components/customer/CouponBanner';
 
 const Home = () => {
@@ -9,6 +10,7 @@ const Home = () => {
     const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [nearbyShops, setNearbyShops] = useState([]);
+    const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [shopsLoading, setShopsLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -17,9 +19,8 @@ const Home = () => {
 
 
     useEffect(() => {
-        // Start both shops and products loading in parallel
         getUserLocation();
-
+        fetchCoupons();
         const query = searchParams.get('q');
         if (query) {
             setSearchQuery(query);
@@ -28,6 +29,7 @@ const Home = () => {
             fetchData();
         }
     }, [selectedCategory]);
+
 
     const getUserLocation = useCallback(() => {
         if ('geolocation' in navigator) {
@@ -39,7 +41,6 @@ const Home = () => {
                 },
                 (error) => {
                     console.error('Location error:', error);
-                    // Use default location or show all shops
                     fetchAllShops();
                 }
             );
@@ -73,6 +74,17 @@ const Home = () => {
         }
     };
 
+    const fetchCoupons = async () => {
+        try {
+            const data = await couponService.getActiveCoupons();
+            setCoupons((data || []).slice(0, 3)); // Get top 3 active coupons
+        } catch (error) {
+            console.error('Error fetching coupons:', error);
+            setCoupons([]);
+        }
+    };
+
+
     const fetchData = async () => {
         try {
             const params = selectedCategory === 'All' ? {} : { category: selectedCategory };
@@ -99,54 +111,143 @@ const Home = () => {
         }
     };
 
+    const valentineCategories = [
+        { name: 'For Her', icon: '💝', color: 'from-pink-400 to-rose-400', categories: ['Clothing', 'Health & Beauty'] },
+        { name: 'For Him', icon: '🎁', color: 'from-blue-400 to-indigo-400', categories: ['Electronics', 'Sports & Fitness'] },
+        { name: 'Gifts', icon: '🎀', color: 'from-purple-400 to-pink-400', categories: ['Other'] },
+        { name: 'Chocolates', icon: '🍫', color: 'from-amber-400 to-orange-400', categories: ['Food & Beverages'] },
+        { name: 'Flowers', icon: '🌹', color: 'from-rose-400 to-red-400', categories: ['Other'] },
+        { name: 'Jewelry', icon: '💍', color: 'from-yellow-400 to-amber-400', categories: ['Other'] },
+    ];
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-rose-50 to-red-50">
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-rose-500 border-t-transparent"></div>
+                    <HeartSolidIcon className="w-6 h-6 text-rose-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Coupon Banner Section */}
-            <div className="max-w-7xl mx-auto px-4 pt-6">
-                <CouponBanner />
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-red-50">
+            {/* Floating Hearts Animation */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+                {[...Array(15)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute animate-float-heart"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 5}s`,
+                            animationDuration: `${8 + Math.random() * 4}s`,
+                            opacity: 0.1 + Math.random() * 0.2
+                        }}
+                    >
+                        <HeartSolidIcon className="w-8 h-8 text-rose-400" />
+                    </div>
+                ))}
             </div>
 
-            {/* Nearby Shops Section */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Nearby Shops</h2>
-                        <p className="text-sm text-gray-500">
-                            {nearbyShops.length > 0
-                                ? `${nearbyShops.length} shops found near you`
-                                : 'Discover shops around your neighborhood'}
-                        </p>
-                    </div>
-                    <div className="flex space-x-2">
-                        <button className="p-2 border rounded-full hover:bg-gray-100">
-                            <ChevronLeftIcon className="w-5 h-5" />
-                        </button>
-                        <button className="p-2 border rounded-full hover:bg-gray-100">
-                            <ChevronRightIcon className="w-5 h-5" />
-                        </button>
+
+
+
+
+
+
+
+
+
+
+            {/* Valentine's Special Deals */}
+            <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+                <div className="bg-gradient-to-r from-red-500 via-pink-500 to-rose-500 rounded-3xl p-8 text-white overflow-hidden relative shadow-2xl">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/20 rounded-full blur-2xl"></div>
+
+                    <div className="relative flex flex-col lg:flex-row items-center justify-between">
+                        <div className="flex-1 mb-6 lg:mb-0">
+                            <div className="flex items-center space-x-2 mb-4">
+                                <HeartSolidIcon className="w-6 h-6 text-yellow-300 animate-pulse" />
+                                <p className="text-sm font-semibold bg-white/20 backdrop-blur-sm rounded-full px-4 py-1">
+                                    LIMITED TIME ONLY
+                                </p>
+                            </div>
+                            <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+                                Valentine's Day Sale
+                                <span className="block text-yellow-300">Up to 60% Off!</span>
+                            </h2>
+                            <p className="text-lg text-white/90 mb-6 max-w-2xl">
+                                Show your love without breaking the bank. Huge discounts on flowers, chocolates, jewelry, and romantic gifts from local sellers.
+                            </p>
+
+                            <div className="flex items-center space-x-6 mb-6">
+                                <div className="text-center">
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
+                                        <div className="text-3xl font-bold">00</div>
+                                        <div className="text-xs opacity-75">DAYS</div>
+                                    </div>
+                                </div>
+                                <div className="text-2xl">:</div>
+                                <div className="text-center">
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
+                                        <div className="text-3xl font-bold">14</div>
+                                        <div className="text-xs opacity-75">HOURS</div>
+                                    </div>
+                                </div>
+                                <div className="text-2xl">:</div>
+                                <div className="text-center">
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
+                                        <div className="text-3xl font-bold">00</div>
+                                        <div className="text-xs opacity-75">MINS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="bg-white text-rose-600 font-bold px-8 py-4 rounded-full hover:bg-rose-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center space-x-2"
+                            >
+                                <GiftIcon className="w-5 h-5" />
+                                <span>Shop Valentine's Sale</span>
+                            </button>
+                        </div>
+
+                        <div className="hidden lg:block">
+                            <div className="relative w-72 h-72">
+                                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-50 blur-2xl animate-pulse"></div>
+                                <div className="relative flex items-center justify-center h-full">
+                                    <div className="text-9xl animate-bounce">💖</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Nearby Shops */}
+            <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900">
+                            Nearby <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">Love Shops</span>
+                        </h2>
+                        <p className="text-gray-600 mt-1">
+                            {nearbyShops.length > 0 ? `${nearbyShops.length} romantic shops near you` : 'Discover love around your neighborhood'}
+                        </p>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {shopsLoading ? (
-                        // Loading skeleton
                         [1, 2, 3, 4].map((i) => (
-                            <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm animate-pulse">
-                                <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300"></div>
-                                <div className="p-4">
+                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                                <div className="h-48 bg-gradient-to-r from-pink-200 to-rose-200"></div>
+                                <div className="p-5">
                                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
-                                    <div className="flex justify-between">
-                                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                                        <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-                                    </div>
+                                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
                                 </div>
                             </div>
                         ))
@@ -155,51 +256,47 @@ const Home = () => {
                             <div
                                 key={shop._id}
                                 onClick={() => navigate(`/shop/${shop._id}`)}
-                                className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
                             >
-                                <div className="h-40 bg-gradient-to-r from-emerald-400 to-cyan-400 relative">
+                                <div className="h-48 bg-gradient-to-r from-rose-400 to-pink-400 relative overflow-hidden">
                                     {shop.images?.[0] && (
                                         <img
                                             src={shop.images[0]}
                                             alt={shop.shopName}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                         />
                                     )}
+                                    <div className="absolute top-3 right-3">
+                                        <HeartIcon className="w-6 h-6 text-white hover:fill-current transition-all" />
+                                    </div>
                                 </div>
-                                <div className="p-4">
+                                <div className="p-5">
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-bold text-gray-900">{shop.shopName}</h3>
+                                        <h3 className="font-bold text-gray-900 group-hover:text-rose-600 transition-colors">{shop.shopName}</h3>
                                         {shop.distance && (
-                                            <span className="text-xs text-emerald-600 font-medium">
+                                            <span className="text-xs text-rose-600 font-semibold bg-rose-50 px-2 py-1 rounded-full">
                                                 {shop.distance.toFixed(1)} km
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-gray-500 mb-2">
-                                        {shop.location?.city || 'Local Shop'}
-                                    </p>
+                                    <p className="text-sm text-gray-500 mb-3">{shop.location?.city || 'Local Shop'}</p>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-1">
-                                            <span className="text-sm">⭐</span>
-                                            <span className="text-sm font-medium">
-                                                {shop.rating || 4.5}
-                                            </span>
+                                            <span className="text-yellow-400">⭐</span>
+                                            <span className="text-sm font-semibold text-gray-900">{shop.rating || 4.5}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">
-                                                Open Now
-                                            </span>
-                                        </div>
+                                        <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
+                                            Open Now
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        // Placeholder when no shops found
                         [1, 2, 3, 4].map((i) => (
-                            <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                                <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
-                                <div className="p-4">
+                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg">
+                                <div className="h-48 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
+                                <div className="p-5">
                                     <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
                                     <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse"></div>
                                 </div>
@@ -209,86 +306,56 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Deal of the Day Banner */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-8 text-white overflow-hidden relative">
-                    <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                            <p className="text-sm font-medium mb-2 opacity-90">DEAL OF THE DAY</p>
-                            <h2 className="text-4xl font-bold mb-3">Flash Sale: Up to<br />60% Off</h2>
-                            <p className="text-sm opacity-90 mb-6 max-w-md">
-                                Get the best tech gadgets from top-rated local vendors. Valid only for today.
-                            </p>
-                            <div className="flex items-center space-x-6 mb-6">
-                                <div className="text-center">
-                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                                        <div className="text-2xl font-bold">12</div>
-                                        <div className="text-xs opacity-75">HOURS</div>
-                                    </div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                                        <div className="text-2xl font-bold">45</div>
-                                        <div className="text-xs opacity-75">MINS</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button className="bg-white text-emerald-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                                Shop Now
-                            </button>
-                        </div>
-                        <div className="hidden lg:block">
-                            <div className="w-80 h-80 bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl rotate-12 flex items-center justify-center">
-                                <div className="text-8xl -rotate-12">🎧</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Trending Products */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            {/* Trending Valentine's Products */}
+            <div className="max-w-7xl mx-auto px-4 py-8 pb-16 relative z-10">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Trending Products</h2>
-                    <div className="flex space-x-4">
-                        <button className="text-emerald-500 font-medium hover:text-emerald-600">All Sellers</button>
-                        <button className="text-gray-500 font-medium hover:text-gray-700">Top Rated</button>
-                        <button className="text-gray-500 font-medium hover:text-gray-700">Newest</button>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900">
+                            Trending <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">Love Gifts</span>
+                        </h2>
+                        <p className="text-gray-600 mt-1">Most loved gifts this Valentine's season</p>
                     </div>
+                    <button
+                        onClick={() => navigate('/products')}
+                        className="text-rose-600 font-semibold hover:text-rose-700 flex items-center space-x-1"
+                    >
+                        <span>View All</span>
+                        <ChevronRightIcon className="w-5 h-5" />
+                    </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     {products.slice(0, 10).map((product) => (
                         <div
                             key={product._id}
                             onClick={() => navigate(`/product/${product._id}`)}
-                            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group"
+                            className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
                         >
-                            <div className="relative h-48 bg-gray-100">
+                            <div className="relative h-52 bg-gradient-to-br from-pink-100 to-rose-100">
                                 <img
                                     src={product.images?.[0] || '/placeholder.png'}
                                     alt={product.name}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                 />
-                                {product.stock < 10 && (
-                                    <span className="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                        New Stock
-                                    </span>
-                                )}
+                                <button className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-rose-50 transition-colors">
+                                    <HeartIcon className="w-5 h-5 text-rose-500 hover:fill-current transition-all" />
+                                </button>
                                 {product.discountedPrice && (
-                                    <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                        -{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}%
-                                    </span>
+                                    <div className="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                                        {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
+                                    </div>
                                 )}
                             </div>
                             <div className="p-4">
-                                <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                                <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors">
                                     {product.name}
                                 </h3>
-                                <div className="flex items-center mb-2">
-                                    <span className="text-xs text-gray-500">⭐ 4.5</span>
+                                <div className="flex items-center mb-3">
+                                    <span className="text-yellow-400 text-xs">★★★★★</span>
+                                    <span className="text-xs text-gray-500 ml-1">(4.5)</span>
                                 </div>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className="text-lg font-bold text-gray-900">
+                                    <span className="text-lg font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
                                         ₹{product.discountedPrice || product.price}
                                     </span>
                                     {product.discountedPrice && (
@@ -302,8 +369,24 @@ const Home = () => {
                     ))}
                 </div>
             </div>
+
+            {/* Custom CSS for animations */}
+            <style jsx>{`
+                @keyframes float-heart {
+                    0% {
+                        transform: translateY(100vh) rotate(0deg);
+                    }
+                    100% {
+                        transform: translateY(-100vh) rotate(360deg);
+                    }
+                }
+                .animate-float-heart {
+                    animation: float-heart linear infinite;
+                }
+            `}</style>
         </div>
     );
 };
 
 export default Home;
+
