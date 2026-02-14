@@ -15,22 +15,21 @@ import verifyIndexes from './src/utils/verifyIndexes.js';
 
 dotenv.config();
 
-// Initialize Express app
+
 const app = express();
 
-// Security & Performance Middleware
-app.set('trust proxy', 1); // Trust first proxy (Vercel/Heroku)
-app.use(helmet()); // Security headers
-// CORS - Allow multiple origins for dev and prod
+
+app.set('trust proxy', 1); 
+app.use(helmet()); 
 const allowedOrigins = [
-    'https://e-commerce-hack-tau.vercel.app', // Production frontend
-    'http://localhost:5173', // Local development
-    process.env.FRONTEND_URL, // Custom frontend URL from env
-].filter(Boolean); // Remove undefined values
+    'https://e-commerce-hack-tau.vercel.app', 
+    'http://localhost:5173', 
+    process.env.FRONTEND_URL, 
+].filter(Boolean); 
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
+        
         if (!origin) return callback(null, true);
 
         if (allowedOrigins.includes(origin)) {
@@ -42,15 +41,15 @@ app.use(cors({
     },
     credentials: true,
 }));
-app.use(compression()); // Response compression
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(compression()); 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 
-// Passport initialization
+
 app.use(passport.initialize());
 configureGoogleOAuth();
 
-// Health check endpoint
+
 app.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -59,7 +58,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API Routes (will be added as we build)
+
 app.get('/api', (req, res) => {
     res.status(200).json({
         success: true,
@@ -68,7 +67,7 @@ app.get('/api', (req, res) => {
     });
 });
 
-// API Routes
+
 import authRoutes from './src/routes/authRoutes.js';
 import shopRoutes from './src/routes/shopRoutes.js';
 import productRoutes from './src/routes/productRoutes.js';
@@ -87,19 +86,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
 
-// Future route imports will go here:
-// import shopRoutes from './src/routes/shopRoutes.js';
-// import productRoutes from './src/routes/productRoutes.js';
-// import orderRoutes from './src/routes/orderRoutes.js';
-// import adminRoutes from './src/routes/adminRoutes.js';
 
-// Mount routes:
-// app.use('/api/shops', shopRoutes);
-// import productRoutes from './src/routes/productRoutes.js';
-// app.use('/api/orders', orderRoutes);
-// app.use('/api/admin', adminRoutes);
-
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -107,28 +94,25 @@ app.use((req, res) => {
     });
 });
 
-// Error handler (must be last)
+
 app.use(errorHandler);
 
-// Server Configuration
+
 const PORT = process.env.PORT || 5000;
 
-// Start server
+
 const startServer = async () => {
     try {
-        // Connect to MongoDB
         await connectDB();
 
-        // Verify database indexes
         await verifyIndexes();
 
-        // Connect to Redis (optional - app continues without it)
         await connectRedis();
 
-        // Configure Cloudinary
+       
         configureCloudinary();
 
-        // Start listening
+        
         app.listen(PORT, () => {
             console.log('='.repeat(50));
             console.log(`🚀 Server running on port ${PORT}`);
@@ -143,14 +127,12 @@ const startServer = async () => {
     }
 };
 
-// Graceful shutdown
+
 const gracefulShutdown = async (signal) => {
     console.log(`\n${signal} received. Closing server gracefully...`);
 
-    // Close Redis connection
     await closeRedis();
 
-    // Close MongoDB connection
     await mongoose.connection.close();
 
     console.log('✅ All connections closed. Exiting...');
@@ -160,7 +142,6 @@ const gracefulShutdown = async (signal) => {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Start the server
 startServer();
 
 export default app;
