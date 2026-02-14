@@ -1,9 +1,5 @@
 import { createClient } from 'redis';
 
-/**
- * Redis Client Configuration
- * Used for caching, session management, and rate limiting
- */
 
 let redisClient = null;
 

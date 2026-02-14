@@ -1,15 +1,7 @@
 import * as orderService from '../services/orderService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
 
-/**
- * Order Controller
- * Handles HTTP requests for order management
- */
 
-/**
- * Create order from cart
- * POST /api/orders
- */
 export const createOrder = async (req, res, next) => {
     try {
         const customerId = req.user.userId;
@@ -38,10 +30,7 @@ export const createOrder = async (req, res, next) => {
     }
 };
 
-/**
- * Get customer's orders
- * GET /api/orders/customer/my-orders?status=<status>&page=<page>&limit=<limit>
- */
+
 export const getMyOrders = async (req, res, next) => {
     try {
         const { status, page, limit } = req.query;
@@ -63,10 +52,6 @@ export const getMyOrders = async (req, res, next) => {
     }
 };
 
-/**
- * Get shop's orders (Seller only)
- * GET /api/orders/seller/shop-orders?status=<status>&page=<page>&limit=<limit>
- */
 export const getShopOrders = async (req, res, next) => {
     try {
         const { status, page, limit } = req.query;
@@ -91,10 +76,7 @@ export const getShopOrders = async (req, res, next) => {
     }
 };
 
-/**
- * Get order by ID
- * GET /api/orders/:id
- */
+
 export const getOrderById = async (req, res, next) => {
     try {
         const order = await orderService.getOrderById(

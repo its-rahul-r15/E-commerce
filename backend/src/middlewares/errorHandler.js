@@ -1,9 +1,6 @@
 import { errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Centralized Error Handler Middleware
- * Catches all errors and returns formatted responses
- */
+
 
 const errorHandler = (err, req, res, next) => {
     console.error('❌ Error:', err);

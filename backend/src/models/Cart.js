@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-/**
- * Cart Schema
- * Stores customer shopping cart
- */
 
 const cartItemSchema = new mongoose.Schema({
     productId: {

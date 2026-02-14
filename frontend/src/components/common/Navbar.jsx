@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { cartService } from '../../services/api';
-import { MapPinIcon, BellIcon, ShoppingCartIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { MapPinIcon, BellIcon, ShoppingCartIcon, UserCircleIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -87,33 +88,38 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
+        <nav className="bg-gradient-to-r from-rose-50 via-pink-50 to-red-50 shadow-md sticky top-0 z-50 border-b-2 border-rose-200">
+            {/* Valentine's Decoration Bar */}
+            <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 h-1"></div>
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     {/* Left: Logo + Location */}
                     <div className="flex items-center space-x-6">
                         {/* Logo */}
                         <Link to="/" className="flex items-center space-x-2 group">
-                            <div className="w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
-                                <span className="text-white font-bold text-lg">🛒</span>
+                            <div className="w-9 h-9 bg-gradient-to-br from-rose-500 to-pink-500 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-all group-hover:scale-110">
+                                <HeartSolidIcon className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900">ShopLocal</span>
+                            <span className="text-xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">ShopLocal</span>
+                            <span className="text-xl">💝</span>
                         </Link>
 
                         {/* Location Selector */}
-                        <button className="hidden lg:flex items-center space-x-1 text-gray-700 hover:text-emerald-600 transition-colors">
-                            <MapPinIcon className="w-5 h-5 text-emerald-600" />
+                        <button className="hidden lg:flex items-center space-x-1 text-gray-700 hover:text-rose-600 transition-colors group">
+                            <MapPinIcon className="w-5 h-5 text-rose-500 group-hover:text-rose-600" />
                             <span className="text-sm font-medium">{location}</span>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
 
-                        <Link to="/products" className="hidden md:flex items-center font-medium text-gray-700 hover:text-emerald-600 transition-colors">
-                            Browse
+                        <Link to="/products" className="hidden md:flex items-center font-medium text-gray-700 hover:text-rose-600 transition-colors relative group">
+                            <span>Browse</span>
+                            <HeartIcon className="w-3 h-3 absolute -top-1 -right-3 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </Link>
-                        <Link to="/shops" className="hidden md:flex items-center font-medium text-gray-700 hover:text-emerald-600 transition-colors">
-                            Stores
+                        <Link to="/shops" className="hidden md:flex items-center font-medium text-gray-700 hover:text-rose-600 transition-colors relative group">
+                            <span>Stores</span>
+                            <HeartIcon className="w-3 h-3 absolute -top-1 -right-3 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </Link>
                     </div>
 
@@ -122,26 +128,14 @@ const Navbar = () => {
                         <div className="relative w-full">
                             <input
                                 type="text"
-                                placeholder="Search products & shops"
+                                placeholder="Search Valentine's gifts & shops 💕"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-4 py-2.5 pl-11 bg-gray-50 border border-gray-200 rounded-lg 
-                                         focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white
-                                         placeholder:text-gray-400 transition-all"
+                                className="w-full px-4 py-2.5 pl-11 bg-white/80 backdrop-blur-sm border-2 border-rose-200 rounded-xl 
+                                         focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 focus:bg-white
+                                         placeholder:text-rose-300 transition-all shadow-sm"
                             />
-                            <svg
-                                className="absolute left-3.5 top-3 h-5 w-5 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
+                            <HeartIcon className="absolute left-3.5 top-3 h-5 w-5 text-rose-400" />
                         </div>
                     </form>
 
@@ -149,11 +143,12 @@ const Navbar = () => {
                     <div className="flex items-center space-x-6">
                         {/* Notification Bell */}
                         {isAuthenticated && (
-                            <button className="relative text-gray-700 hover:text-emerald-600 transition-colors">
+                            <button className="relative text-gray-700 hover:text-rose-600 transition-colors group">
                                 <BellIcon className="w-6 h-6" />
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-rose-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
                                     3
                                 </span>
+                                <HeartIcon className="w-3 h-3 absolute -bottom-1 -right-1 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
                         )}
 
@@ -161,14 +156,15 @@ const Navbar = () => {
                         {(!user || ['customer', 'seller'].includes(user.role)) && (
                             <button
                                 onClick={handleCartClick}
-                                className="relative text-gray-700 hover:text-emerald-600 transition-colors"
+                                className="relative text-gray-700 hover:text-rose-600 transition-colors group"
                             >
                                 <ShoppingCartIcon className="w-6 h-6" />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-rose-500 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-md">
                                         {cartCount}
                                     </span>
                                 )}
+                                <HeartIcon className="w-3 h-3 absolute -bottom-1 -right-1 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
                         )}
 
@@ -177,10 +173,11 @@ const Navbar = () => {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                                    className="flex items-center space-x-2 text-gray-700 hover:text-emerald-600 transition-colors"
+                                    className="flex items-center space-x-2 text-gray-700 hover:text-rose-600 transition-colors group"
                                 >
-                                    <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-cyan-500 text-white rounded-full flex items-center justify-center font-semibold shadow-sm">
+                                    <div className="w-9 h-9 bg-gradient-to-br from-rose-400 to-pink-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md relative overflow-hidden">
                                         {user?.name?.charAt(0).toUpperCase()}
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/20"></div>
                                     </div>
                                 </button>
 
@@ -203,17 +200,17 @@ const Navbar = () => {
                                                     <Link
                                                         to="/orders"
                                                         onClick={() => setShowProfileMenu(false)}
-                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                     >
-                                                        <span className="mr-3">📦</span>
+                                                        <span className="mr-3">💝</span>
                                                         My Orders
                                                     </Link>
                                                     <Link
                                                         to="/profile"
                                                         onClick={() => setShowProfileMenu(false)}
-                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                     >
-                                                        <span className="mr-3">👤</span>
+                                                        <span className="mr-3">💖</span>
                                                         My Profile
                                                     </Link>
                                                 </>
@@ -224,7 +221,7 @@ const Navbar = () => {
                                                     <Link
                                                         to="/seller/dashboard"
                                                         onClick={() => setShowProfileMenu(false)}
-                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                     >
                                                         <span className="mr-3">📊</span>
                                                         Dashboard
@@ -232,17 +229,17 @@ const Navbar = () => {
                                                     <Link
                                                         to="/seller/products"
                                                         onClick={() => setShowProfileMenu(false)}
-                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                     >
-                                                        <span className="mr-3">📦</span>
+                                                        <span className="mr-3">🎁</span>
                                                         My Products
                                                     </Link>
                                                     <Link
                                                         to="/seller/orders"
                                                         onClick={() => setShowProfileMenu(false)}
-                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                     >
-                                                        <span className="mr-3">🛍️</span>
+                                                        <span className="mr-3">💌</span>
                                                         Shop Orders
                                                     </Link>
                                                 </>
@@ -252,7 +249,7 @@ const Navbar = () => {
                                                 <Link
                                                     to="/admin/dashboard"
                                                     onClick={() => setShowProfileMenu(false)}
-                                                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                                                 >
                                                     <span className="mr-3">⚙️</span>
                                                     Admin Panel
@@ -279,9 +276,10 @@ const Navbar = () => {
                         ) : (
                             <Link
                                 to="/login"
-                                className="bg-emerald-500 text-white px-5 py-2 rounded-lg font-medium hover:bg-emerald-600 transition-colors shadow-sm hover:shadow-md"
+                                className="bg-gradient-to-r from-rose-500 to-pink-500 text-white px-6 py-2.5 rounded-full font-semibold hover:from-rose-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg hover:scale-105 flex items-center space-x-1"
                             >
-                                Login
+                                <span>Login</span>
+                                <HeartIcon className="w-4 h-4" />
                             </Link>
                         )}
                     </div>

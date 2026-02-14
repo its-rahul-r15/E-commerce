@@ -2,15 +2,6 @@ import * as productService from '../services/productService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
 import { uploadMultipleImages } from '../utils/cloudinaryUpload.js';
 
-/**
- * Product Controller
- * Handles HTTP requests for product management
- */
-
-/**
- * Create product
- * POST /api/products
- */
 export const createProduct = async (req, res, next) => {
     try {
         const sellerId = req.user.userId;

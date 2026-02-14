@@ -1,10 +1,7 @@
 import multer from 'multer';
 import { AppError } from './errorHandler.js';
 
-/**
- * Multer Middleware
- * Handles file upload validation and storage
- */
+
 
 // Configure multer to use memory storage (buffer)
 const storage = multer.memoryStorage();

@@ -1,9 +1,6 @@
 import { errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Role-Based Access Control Middleware
- * Restricts routes to specific user roles
- */
+
 
 /**
  * Check if user has required role

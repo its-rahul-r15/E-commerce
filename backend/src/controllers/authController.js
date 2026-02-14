@@ -1,15 +1,7 @@
 import * as authService from '../services/authService.js';
 import { successResponse, errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Authentication Controller
- * Handles HTTP requests for authentication endpoints
- */
 
-/**
- * Register new user
- * POST /api/auth/register
- */
 export const register = async (req, res, next) => {
     try {
         const result = await authService.registerUser(req.body);

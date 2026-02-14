@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-/**
- * MongoDB Database Connection
- * Implements connection pooling and retry logic
- */
 
 const connectDB = async () => {
   try {

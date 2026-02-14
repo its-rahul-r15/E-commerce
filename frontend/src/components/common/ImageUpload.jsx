@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-/**
- * ImageUpload Component
- * Reusable component for uploading and previewing images
- */
+
 const ImageUpload = ({
     images = [],
     onImagesChange,

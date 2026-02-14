@@ -1,10 +1,7 @@
 import { incrementCache } from '../services/cacheService.js';
 import { errorResponse } from '../utils/responseFormatter.js';
 
-/**
- * Rate Limiting Middleware
- * Uses Redis to track and limit API requests
- */
+
 
 /**
  * Create rate limiter for specific endpoint
@@ -53,11 +50,6 @@ const rateLimiter = (maxRequests = 100, windowMs = 15 * 60 * 1000, message = 'To
     };
 };
 
-/**
- * Preset rate limiters for common scenarios
- */
-
-// Strict rate limiting for authentication endpoints
 export const authRateLimiter = rateLimiter(
     10,                    // 5 requests
     15 * 60 * 1000,       // per 15 minutes
