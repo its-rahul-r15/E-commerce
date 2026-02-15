@@ -5,11 +5,11 @@ const User = require('./src/models/User');
 
 const createAdminUser = async () => {
     try {
-        // Connect to MongoDB
+      
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('Connected to MongoDB');
 
-        // Admin credentials
+        
         const adminData = {
             name: 'Admin',
             email: 'admin@gallikart.com',
@@ -18,7 +18,7 @@ const createAdminUser = async () => {
             isBlocked: false,
         };
 
-        // Check if admin already exists
+        
         const existingAdmin = await User.findOne({ email: adminData.email });
         if (existingAdmin) {
             console.log('Admin user already exists!');
@@ -26,7 +26,7 @@ const createAdminUser = async () => {
             process.exit(0);
         }
 
-        // Create admin user
+      
         const admin = await User.create(adminData);
         console.log('✅ Admin user created successfully!');
         console.log('Email:', adminData.email);

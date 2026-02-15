@@ -199,6 +199,13 @@ export const shopIdValidator = [
     handleValidationErrors,
 ];
 
+export const productIdValidator = [
+    param('productId')
+        .isMongoId().withMessage('Invalid product ID format'),
+
+    handleValidationErrors,
+];
+
 export const paginationValidator = [
     query('page')
         .optional()
@@ -210,3 +217,4 @@ export const paginationValidator = [
 
     handleValidationErrors,
 ];
+
