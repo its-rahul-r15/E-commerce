@@ -80,7 +80,7 @@ const Login = () => {
                     <div>
                         <Link to="/" className="flex items-center space-x-2">
                             <ShoppingBagIcon className="h-10 w-10" />
-                            <span className="text-3xl font-bold">LocalMarket</span>
+                            <span className="text-3xl font-bold">Local Shop</span>
                         </Link>
                         <div className="flex items-center space-x-2 mt-4 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 w-fit">
                             <LockClosedIcon className="h-4 w-4" />
@@ -120,7 +120,7 @@ const Login = () => {
                     <div className="lg:hidden text-center mb-8">
                         <Link to="/" className="inline-flex items-center space-x-2 text-2xl font-bold text-gray-900">
                             <ShoppingBagIcon className="h-8 w-8 text-purple-600" />
-                            <span>LocalMarket</span>
+                            <span>LocalShop</span>
                         </Link>
                     </div>
 
