@@ -1,4 +1,3 @@
-// Quick test to check if products exist in database
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -15,7 +14,6 @@ async function checkProducts() {
         const totalProducts = await Product.countDocuments();
         console.log(`\n📦 Total products in database: ${totalProducts}`);
 
-        // Check for products with "oil" in name
         const oilProducts = await Product.find({
             name: { $regex: 'oil', $options: 'i' }
         }).select('name category price');
@@ -25,7 +23,7 @@ async function checkProducts() {
             console.log(`  - ${p.name} (${p.category}) - ₹${p.price}`);
         });
 
-        // Show all products
+    
         const allProducts = await Product.find().limit(10).select('name category');
         console.log(`\n📋 First 10 products:`);
         allProducts.forEach(p => {

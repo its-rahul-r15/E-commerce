@@ -4,6 +4,7 @@ import { productService, shopService, couponService } from '../../services/api';
 import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, GiftIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import CouponBanner from '../../components/customer/CouponBanner';
+import BannerCarousel from '../../components/customer/BannerCarousel';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -112,9 +113,9 @@ const Home = () => {
     };
 
     const valentineCategories = [
-        { name: 'For Her', icon: '💝', color: 'from-pink-400 to-rose-400', categories: ['Clothing', 'Health & Beauty'] },
+        { name: 'For Her', icon: '💝', color: 'from-amber-300 to-orange-300', categories: ['Clothing', 'Health & Beauty'] },
         { name: 'For Him', icon: '🎁', color: 'from-blue-400 to-indigo-400', categories: ['Electronics', 'Sports & Fitness'] },
-        { name: 'Gifts', icon: '🎀', color: 'from-purple-400 to-pink-400', categories: ['Other'] },
+        { name: 'Gifts', icon: '🎀', color: 'from-amber-400 to-yellow-400', categories: ['Other'] },
         { name: 'Chocolates', icon: '🍫', color: 'from-amber-400 to-orange-400', categories: ['Food & Beverages'] },
         { name: 'Flowers', icon: '🌹', color: 'from-rose-400 to-red-400', categories: ['Other'] },
         { name: 'Jewelry', icon: '💍', color: 'from-yellow-400 to-amber-400', categories: ['Other'] },
@@ -122,109 +123,24 @@ const Home = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-rose-50 to-red-50">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="relative">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-rose-500 border-t-transparent"></div>
-                    <HeartSolidIcon className="w-6 h-6 text-rose-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-red-50">
-            {/* Floating Hearts Animation */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                {[...Array(15)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="absolute animate-float-heart"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 5}s`,
-                            animationDuration: `${8 + Math.random() * 4}s`,
-                            opacity: 0.1 + Math.random() * 0.2
-                        }}
-                    >
-                        <HeartSolidIcon className="w-8 h-8 text-rose-400" />
-                    </div>
-                ))}
-            </div>
+        <div className="min-h-screen bg-beige-50">
+            {/* Remove floating hearts for professional look */}
 
 
 
 
-
-
-
-
-
-
-
-            {/* Valentine's Special Deals */}
-            <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-                <div className="bg-gradient-to-r from-red-500 via-pink-500 to-rose-500 rounded-3xl p-8 text-white overflow-hidden relative shadow-2xl">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/20 rounded-full blur-2xl"></div>
-
-                    <div className="relative flex flex-col lg:flex-row items-center justify-between">
-                        <div className="flex-1 mb-6 lg:mb-0">
-                            <div className="flex items-center space-x-2 mb-4">
-                                <HeartSolidIcon className="w-6 h-6 text-yellow-300 animate-pulse" />
-                                <p className="text-sm font-semibold bg-white/20 backdrop-blur-sm rounded-full px-4 py-1">
-                                    LIMITED TIME ONLY
-                                </p>
-                            </div>
-                            <h2 className="text-4xl lg:text-5xl font-bold mb-4">
-                                Valentine's Day Sale
-                                <span className="block text-yellow-300">Up to 60% Off!</span>
-                            </h2>
-                            <p className="text-lg text-white/90 mb-6 max-w-2xl">
-                                Show your love without breaking the bank. Huge discounts on flowers, chocolates, jewelry, and romantic gifts from local sellers.
-                            </p>
-
-                            <div className="flex items-center space-x-6 mb-6">
-                                <div className="text-center">
-                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
-                                        <div className="text-3xl font-bold">00</div>
-                                        <div className="text-xs opacity-75">DAYS</div>
-                                    </div>
-                                </div>
-                                <div className="text-2xl">:</div>
-                                <div className="text-center">
-                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
-                                        <div className="text-3xl font-bold">14</div>
-                                        <div className="text-xs opacity-75">HOURS</div>
-                                    </div>
-                                </div>
-                                <div className="text-2xl">:</div>
-                                <div className="text-center">
-                                    <div className="bg-white/20 backdrop-blur-sm rounded-xl px-5 py-3 min-w-[80px]">
-                                        <div className="text-3xl font-bold">00</div>
-                                        <div className="text-xs opacity-75">MINS</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="bg-white text-rose-600 font-bold px-8 py-4 rounded-full hover:bg-rose-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center space-x-2"
-                            >
-                                <GiftIcon className="w-5 h-5" />
-                                <span>Shop Valentine's Sale</span>
-                            </button>
-                        </div>
-
-                        <div className="hidden lg:block">
-                            <div className="relative w-72 h-72">
-                                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full opacity-50 blur-2xl animate-pulse"></div>
-                                <div className="relative flex items-center justify-center h-full">
-                                    <div className="text-9xl animate-bounce">💖</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Banner Carousel Section */}
+            <div className="max-w-7xl mx-auto px-4 pt-8">
+                <BannerCarousel />
             </div>
 
             {/* Nearby Shops */}
@@ -232,10 +148,10 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-3xl font-bold text-gray-900">
-                            Nearby <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">Love Shops</span>
+                            Nearby <span className="text-emerald-600">Shops</span>
                         </h2>
                         <p className="text-gray-600 mt-1">
-                            {nearbyShops.length > 0 ? `${nearbyShops.length} romantic shops near you` : 'Discover love around your neighborhood'}
+                            {nearbyShops.length > 0 ? `${nearbyShops.length} shops near you` : 'Discover shops around your neighborhood'}
                         </p>
                     </div>
                 </div>
@@ -244,7 +160,7 @@ const Home = () => {
                     {shopsLoading ? (
                         [1, 2, 3, 4].map((i) => (
                             <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
-                                <div className="h-48 bg-gradient-to-r from-pink-200 to-rose-200"></div>
+                                <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200"></div>
                                 <div className="p-5">
                                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                                     <div className="h-3 bg-gray-200 rounded w-2/3"></div>
@@ -258,7 +174,7 @@ const Home = () => {
                                 onClick={() => navigate(`/shop/${shop._id}`)}
                                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
                             >
-                                <div className="h-48 bg-gradient-to-r from-rose-400 to-pink-400 relative overflow-hidden">
+                                <div className="h-48 bg-gradient-to-br from-emerald-400 to-blue-500 relative overflow-hidden">
                                     {shop.images?.[0] && (
                                         <img
                                             src={shop.images[0]}
@@ -267,14 +183,16 @@ const Home = () => {
                                         />
                                     )}
                                     <div className="absolute top-3 right-3">
-                                        <HeartIcon className="w-6 h-6 text-white hover:fill-current transition-all" />
+                                        <button className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition">
+                                            <HeartIcon className="w-5 h-5 text-gray-400 hover:text-red-500 transition" />
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="p-5">
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-bold text-gray-900 group-hover:text-rose-600 transition-colors">{shop.shopName}</h3>
+                                        <h3 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{shop.shopName}</h3>
                                         {shop.distance && (
-                                            <span className="text-xs text-rose-600 font-semibold bg-rose-50 px-2 py-1 rounded-full">
+                                            <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-1 rounded-full">
                                                 {shop.distance.toFixed(1)} km
                                             </span>
                                         )}
@@ -311,13 +229,13 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-3xl font-bold text-gray-900">
-                            Trending <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">Love Gifts</span>
+                            Trending <span className="text-emerald-600">Products</span>
                         </h2>
-                        <p className="text-gray-600 mt-1">Most loved gifts this Valentine's season</p>
+                        <p className="text-gray-600 mt-1">Most popular items this season</p>
                     </div>
                     <button
                         onClick={() => navigate('/products')}
-                        className="text-rose-600 font-semibold hover:text-rose-700 flex items-center space-x-1"
+                        className="text-emerald-600 font-semibold hover:text-emerald-700 flex items-center space-x-1"
                     >
                         <span>View All</span>
                         <ChevronRightIcon className="w-5 h-5" />
@@ -331,23 +249,23 @@ const Home = () => {
                             onClick={() => navigate(`/product/${product._id}`)}
                             className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
                         >
-                            <div className="relative h-52 bg-gradient-to-br from-pink-100 to-rose-100">
+                            <div className="relative h-52 bg-gray-100">
                                 <img
                                     src={product.images?.[0] || '/placeholder.png'}
                                     alt={product.name}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                 />
-                                <button className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-rose-50 transition-colors">
-                                    <HeartIcon className="w-5 h-5 text-rose-500 hover:fill-current transition-all" />
+                                <button className="absolute top-3 right-3 bg-white p-2 rounded-full hover:bg-gray-50 transition-colors shadow-md">
+                                    <HeartIcon className="w-5 h-5 text-gray-400 hover:text-red-500 transition-all" />
                                 </button>
                                 {product.discountedPrice && (
-                                    <div className="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                                    <div className="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
                                         {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
                                     </div>
                                 )}
                             </div>
                             <div className="p-4">
-                                <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-rose-600 transition-colors">
+                                <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
                                     {product.name}
                                 </h3>
                                 <div className="flex items-center mb-3">
@@ -355,7 +273,7 @@ const Home = () => {
                                     <span className="text-xs text-gray-500 ml-1">(4.5)</span>
                                 </div>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className="text-lg font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                                    <span className="text-lg font-bold text-emerald-600">
                                         ₹{product.discountedPrice || product.price}
                                     </span>
                                     {product.discountedPrice && (

@@ -3,7 +3,7 @@ import * as cartController from '../controllers/cartController.js';
 import auth from '../middlewares/auth.js';
 import { requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
-import { mongoIdValidator } from '../middlewares/validator.js';
+import { productIdValidator } from '../middlewares/validator.js';
 
 const router = express.Router();
 
@@ -17,17 +17,18 @@ router.post('/items', apiRateLimiter, cartController.addToCart);
 router.patch(
     '/items/:productId',
     apiRateLimiter,
-    mongoIdValidator,
+    productIdValidator,
     cartController.updateCartItem
 );
 
 router.delete(
     '/items/:productId',
     apiRateLimiter,
-    mongoIdValidator,
+    productIdValidator,
     cartController.removeFromCart
 );
 
 router.delete('/', apiRateLimiter, cartController.clearCart);
 
 export default router;
+

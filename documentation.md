@@ -5,7 +5,7 @@
 ## 📋 Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Features](#features)
+2. [Features](#features)The Book Haven is your one-stop destination for bestselling books, inspiring reads, and timeless classics. Discover stories that educate, motivate, and entertain readers of all ages.
 3. [Tech Stack](#tech-stack)
 4. [Architecture](#architecture)
 5. [Installation & Setup](#installation--setup)

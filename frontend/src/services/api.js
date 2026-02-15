@@ -165,31 +165,31 @@ export const cartService = {
     // Get cart
     getCart: async () => {
         const response = await axios.get('/cart');
-        return response.data.data;
+        return response.data.data; // Returns { cart: {...} }
     },
 
     // Add to cart
     addToCart: async (productId, quantity = 1) => {
         const response = await axios.post('/cart/items', { productId, quantity });
-        return response.data.data;
+        return response.data.data; // Returns { cart: {...} }
     },
 
     // Update cart item
     updateCartItem: async (productId, quantity) => {
         const response = await axios.patch(`/cart/items/${productId}`, { quantity });
-        return response.data.data;
+        return response.data.data; // Returns { cart: {...} }
     },
 
     // Remove from cart
     removeFromCart: async (productId) => {
         const response = await axios.delete(`/cart/items/${productId}`);
-        return response.data.data;
+        return response.data.data; // Returns { cart: {...} }
     },
 
     // Clear cart
     clearCart: async () => {
         const response = await axios.delete('/cart');
-        return response.data.data;
+        return response.data.data; // Returns { cart: {...} }
     },
 };
 
