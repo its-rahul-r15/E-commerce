@@ -1,10 +1,6 @@
 import { generateTokenPair } from '../utils/tokenUtils.js';
 import { setCache } from './cacheService.js';
 
-/**
- * Google OAuth Service
-  * Handle Google Sign-In flow
- */
 
 /**
  * Handle Google OAuth callback
