@@ -108,32 +108,32 @@ Expected response:
 ### Health Check
 - `GET /health` - Server health status
 
-### Authentication (Coming Soon)
+### Authentication 
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Refresh access token
 - `POST /api/auth/logout` - User logout
 
-### Shops (Coming Soon)
+### Shops 
 - `GET /api/shops/nearby` - Get nearby shops
 - `POST /api/shops` - Create shop (Seller only)
 - `GET /api/shops/:id` - Get shop details
 - `PATCH /api/shops/:id` - Update shop (Seller only)
 
-### Products (Coming Soon)
+### Products
 - `GET /api/products` - List products with pagination
 - `GET /api/products/:id` - Get product details
 - `POST /api/products` - Create product (Seller only)
 - `PATCH /api/products/:id` - Update product (Seller only)
 - `DELETE /api/products/:id` - Delete product (Seller only)
 
-### Orders (Coming Soon)
+### Orders
 - `GET /api/orders/customer/my-orders` - Get customer orders
 - `GET /api/orders/seller/shop-orders` - Get shop orders
 - `POST /api/orders` - Create order (Customer only)
 - `PATCH /api/orders/:id/status` - Update order status (Seller only)
 
-### Admin (Coming Soon)
+### Admin
 - `GET /api/admin/stats` - Platform analytics
 - `GET /api/admin/users` - List users
 - `PATCH /api/admin/users/:id/block` - Block user
