@@ -17,9 +17,9 @@ const Footer = () => {
                             </h2>
                         </Link>
                         <p className="text-[10px] font-serif tracking-widest text-gray-400 uppercase leading-relaxed">
-                            Classical Tradition <br />
-                            Modern Elegance <br />
-                            Timeless Drapery
+                            Quality Clothing <br />
+                            Modern Comfort <br />
+                            Made with Care
                         </p>
                     </div>
 
@@ -29,7 +29,7 @@ const Footer = () => {
                             Explore
                         </h3>
                         <ul className="space-y-4">
-                            {['Collections', 'New Arrivals', 'The Atelier', 'Boutiques', 'Our Story'].map((item) => (
+                            {['Products', 'New Arrivals', 'Our Story', 'Shops', 'Contact Us'].map((item) => (
                                 <li key={item}>
                                     <Link to="#" className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-400 hover:text-[var(--athenic-gold)] transition-colors">
                                         {item}
@@ -58,10 +58,10 @@ const Footer = () => {
                     {/* Newsletter */}
                     <div>
                         <h3 className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-gold)] uppercase mb-8">
-                            The Newsletter
+                            Join Our Newsletter
                         </h3>
                         <p className="text-[10px] font-serif text-gray-400 uppercase tracking-widest mb-6 leading-relaxed">
-                            Subscribe to receive updates on new collections and atelier events.
+                            Subscribe to get updates on new products and special offers from local shops.
                         </p>
                         <form className="relative">
                             <input
@@ -79,7 +79,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="pt-12 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
                     <p className="text-[9px] font-serif uppercase tracking-[0.2em] text-gray-500">
-                        © 2024 ATHENIG TRADITION. ALL RIGHTS RESERVED.
+                        © 2024 ATHENIG MARKETPLACE. ALL RIGHTS RESERVED.
                     </p>
                     <div className="flex space-x-8">
                         {['Instagram', 'Pinterest', 'LinkedIn'].map((social) => (

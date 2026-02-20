@@ -1,0 +1,445 @@
+================================================================================
+        ATHENIC WEAR — E-COMMERCE PLATFORM
+        HACKATHON FEATURES DOCUMENTATION
+================================================================================
+
+Platform Name  : Athenic Wear
+Project Type   : Full-Stack Multi-Role E-Commerce Web Application
+Tech Stack     : React.js (Frontend) | Node.js + Express.js (Backend) | MongoDB (Database)
+AI Integration : Groq API (LLaMA 3.3-70B) + Smart Rule-Based NLP Parser
+Theme          : Premium Indian Fashion — Luxury Meets Tradition
+
+================================================================================
+  INDEX
+================================================================================
+  1. Customer Panel Features
+  2. Seller Panel Features
+  3. Admin Panel Features
+  4. AI Features (Cross-Panel)
+  5. Technical Highlights
+  6. Security Features
+================================================================================
+
+
+================================================================================
+  1. CUSTOMER PANEL
+================================================================================
+
+  A. AUTHENTICATION & ONBOARDING
+  ─────────────────────────────────────────────────────────────────────────────
+  • Full Sign Up / Login with Email & Password (JWT-based)
+  • Google OAuth 2.0 — One-click login with Google account
+  • Secure session management with auto-refresh tokens
+  • Password validation with real-time feedback
+  • Premium "Athenic" themed Login & Register UI (dark luxury design)
+  • Role-based routing — customers auto-redirected to customer panel
+
+  B. HOME PAGE
+  ─────────────────────────────────────────────────────────────────────────────
+  • Hero Section with brand storytelling and CTA buttons
+  • "Our Story" section highlighting Athenic's Indian heritage
+  • Trending Collections — dynamically loaded product cards
+  • Nearby Boutiques — location-based shop discovery using Geolocation API
+  • Real-time location display in navbar (reverse geocoded using BigDataCloud API)
+  • Category-based browsing sections
+  • Festive / promotional banners
+
+  C. PRODUCT DISCOVERY
+  ─────────────────────────────────────────────────────────────────────────────
+  • All Products Page — browse complete catalog with filters
+  • Filter by: Category, Price Range, Color, Size, Sort Order
+  • Product Search — keyword-based search across name, description, tags
+  • Search Results Page — dedicated results view with query highlights
+  • Pagination support for large catalogs
+  • Product card hover animations with quick-view options
+
+  D. PRODUCT DETAIL PAGE
+  ─────────────────────────────────────────────────────────────────────────────
+  • Full product image gallery (multiple images, zoom support)
+  • Discounted price display with original MRP strikethrough
+  • Size selector with availability indication
+  • Color variant selector
+  • Quantity selector with stock-based max limit
+  • Add to Cart button with real-time cart count update in Navbar
+  • Shop information section (shop name, rating, location)
+  • Product comparisons — similar products from other sellers shown side-by-side
+  • Product description, tags, and specifications
+  • Floating "Back to Shop" navigation
+
+  E. SHOP DISCOVERY & SHOP PAGE
+  ─────────────────────────────────────────────────────────────────────────────
+  • Shops List — browse all approved boutiques/shops
+  • Location-based nearby shops (within 5km radius using Geospatial query)
+  • Shop Detail Page with:
+      - Hero banner with shop branding
+      - Shop name, description, category, address
+      - Star rating display
+      - Contact information
+      - All products from that shop (paginated)
+  • Filter shop products by category, price, size
+
+  F. CART
+  ─────────────────────────────────────────────────────────────────────────────
+  • Persistent cart (saved to database, accessible across sessions)
+  • Add / Remove / Update quantity of items
+  • Real-time price calculation
+  • Discount applied automatically on discountedPrice
+  • Cart item count badge in Navbar
+  • Coupon code input field
+  • Coupon validation — checks active coupons, minimum order, shop restrictions
+  • Cart total, savings calculation, delivery fee display
+  • "Proceed to Checkout" flow
+
+  G. CHECKOUT
+  ─────────────────────────────────────────────────────────────────────────────
+  • Delivery Address form (Name, Phone, Street, City, State, PIN Code)
+  • Order summary with itemized breakdown
+  • Applied coupon discount reflected in total
+  • Payment integration (Razorpay / COD options)
+  • Order placement confirmation
+  • Redirect to Orders page after successful order
+
+  H. ORDERS
+  ─────────────────────────────────────────────────────────────────────────────
+  • My Orders page — full order history
+  • Order status tracking: Pending → Confirmed → Shipped → Delivered
+  • Filter orders by status
+  • Order detail view with product list, quantities, prices
+  • Delivery address display per order
+  • Order cancellation (for pending orders)
+  • Real-time order status updates
+
+  I. PROFILE MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • Profile page with avatar, name, email display
+  • Edit profile — update name, phone number, bio
+  • Change password functionality
+  • Account deletion option
+  • View order summary stats on profile
+  • Logout with session cleanup
+
+  J. AI SHOPPING ASSISTANT (✨ Floating Widget)
+  ─────────────────────────────────────────────────────────────────────────────
+  (See Section 4 for detailed AI features)
+  • Natural language product search: "silk kurta under ₹2000 in red"
+  • Voice input support (Web Speech API — Indian English accent)
+  • Product cards displayed directly inside the chat
+  • Click any result to go to product detail page
+  • No page reload — conversational experience
+
+
+================================================================================
+  2. SELLER PANEL
+================================================================================
+
+  A. SELLER AUTHENTICATION & SETUP
+  ─────────────────────────────────────────────────────────────────────────────
+  • Separate Seller Login (same auth system, role-based access)
+  • Seller-exclusive routes protected from customer/admin access
+  • Seller onboarding flow — guided through shop creation
+
+  B. SHOP REGISTRATION
+  ─────────────────────────────────────────────────────────────────────────────
+  • Register a new boutique/shop with:
+      - Shop Name
+      - Category (Ethnic Wear, Western, Fusion, Accessories, etc.)
+      - Description
+      - Address (Street, City, State, PIN)
+      - GPS Location capture (auto-detect via browser Geolocation)
+      - Phone Number
+      - Shop banner/logo image upload
+  • Submission → Pending admin approval workflow
+  • Status display: Pending / Approved / Rejected
+  • Cannot list products until shop is approved
+
+  C. SELLER DASHBOARD
+  ─────────────────────────────────────────────────────────────────────────────
+  • Clean dark-sidebar layout with navigation
+  • Key Metrics Cards:
+      - Total Revenue (₹)
+      - Total Orders
+      - Total Products Listed
+      - Pending Orders count
+  • Revenue & Orders Chart (bar/line chart using Recharts)
+  • Recent Orders table with status badges
+  • Quick Action Buttons:
+      - Add New Product
+      - View All Orders
+      - Manage Inventory
+  • Low Stock Alerts — products with stock < 5 highlighted
+  • AI Business Advisor Widget (right sidebar)
+
+  D. PRODUCT MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • My Products page — list all products with images, prices, stock
+  • Add New Product form:
+      - Name, Description, Category, Sub-category
+      - Original Price (MRP) & Discounted Price
+      - Stock quantity
+      - Available Sizes (multi-select: XS, S, M, L, XL, XXL)
+      - Colors (multi-select)
+      - Tags (for search optimization)
+      - Brand name
+      - Style (Casual, Formal, Ethnic, etc.)
+      - Multiple image upload (up to 5 images)
+  • Edit existing product — all fields editable
+  • Delete product with confirmation
+  • Toggle product availability (Active / Inactive)
+  • Auto-disable product when stock reaches 0
+  • Image preview before upload
+
+  E. ORDER MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • Seller Orders page — all orders for their shop
+  • Filter by order status: Pending, Confirmed, Shipped, Delivered, Cancelled
+  • Order detail view with:
+      - Customer info (name, delivery address)
+      - Ordered items, quantities, sizes, colors
+      - Order total and payment status
+  • Update order status (Confirm → Ship → Deliver)
+  • Real-time status badge colors (color-coded per status)
+  • Pagination for order history
+
+  F. ANALYTICS PAGE
+  ─────────────────────────────────────────────────────────────────────────────
+  • Revenue over time chart (weekly/monthly view)
+  • Orders over time chart
+  • Top selling products list
+  • Category-wise sales breakdown
+  • Performance metrics comparison
+  • Data-driven insights for inventory planning
+
+  G. SHOP PROFILE MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • View shop profile as customers see it
+  • Edit shop information:
+      - Update shop name, description, category
+      - Change contact number
+      - Update address
+      - Re-upload shop banner/logo
+      - Update GPS location
+  • Shop status display (Approved/Pending)
+
+  H. AI BUSINESS ADVISOR (Seller Dashboard Widget)
+  ─────────────────────────────────────────────────────────────────────────────
+  (See Section 4 for detailed AI features)
+  • 3 Tabs: Insights | Trends | Ask AI
+  • Real-time data-driven business insights
+  • Market trend analysis for Indian fashion
+  • Voice-enabled Q&A about store performance
+
+
+================================================================================
+  3. ADMIN PANEL
+================================================================================
+
+  A. ADMIN AUTHENTICATION
+  ─────────────────────────────────────────────────────────────────────────────
+  • Admin-only login (role: admin)
+  • Full access to platform management
+  • Protected routes — no customer/seller can access admin panel
+
+  B. ADMIN DASHBOARD
+  ─────────────────────────────────────────────────────────────────────────────
+  • Platform-wide Statistics Cards:
+      - Total Users (Customers + Sellers)
+      - Total Shops (Pending + Approved)
+      - Total Products on Platform
+      - Total Orders placed
+      - Total Revenue generated across all shops
+  • Platform Growth Chart (monthly revenue trend)
+  • Recent Activity Feed
+  • Pending shop approvals counter with quick action
+
+  C. SHOP MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • View all shops with full details
+  • Filter shops by status: All / Pending / Approved / Rejected
+  • Approve pending shops — seller gets notified, can now list products
+  • Reject shop application with reason
+  • Suspend/Ban a shop (removes it from public listing)
+  • View shop details: owner info, location, products count, revenue
+  • Search shops by name or seller email
+
+  D. USER MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • View all registered users (customers + sellers)
+  • Filter by role: Customer / Seller / Admin
+  • Search users by name or email
+  • View user details: join date, orders count, role
+  • Ban / Unban a user account
+  • View user's associated shop (for sellers)
+
+  E. PRODUCT MANAGEMENT (Admin)
+  ─────────────────────────────────────────────────────────────────────────────
+  • View all products across all shops
+  • Ban a product (removes from public listing — policy violation)
+  • Unban a product
+  • Filter by: banned status, shop, category
+  • Product details with shop owner information
+
+  F. COUPON MANAGEMENT
+  ─────────────────────────────────────────────────────────────────────────────
+  • Create discount coupons:
+      - Coupon code (custom string, e.g. "SAVE20")
+      - Discount type: Percentage (%) or Fixed Amount (₹)
+      - Discount value
+      - Minimum order amount
+      - Maximum discount cap
+      - Expiry date
+      - Shop-specific or platform-wide
+      - Usage limit per user
+  • View all active and expired coupons
+  • Activate / Deactivate coupons
+  • Delete coupons
+  • Track coupon usage statistics
+
+
+================================================================================
+  4. AI FEATURES (Powered by Groq API — LLaMA 3.3-70B)
+================================================================================
+
+  A. CUSTOMER AI SHOPPING ASSISTANT
+  ─────────────────────────────────────────────────────────────────────────────
+  • Floating chat widget (✨ gold button, bottom-right)
+  • Dual-layer AI engine:
+      1. Smart Rule-Based Parser (instant, works offline)
+         - Extracts: category, price range, color, size from natural language
+         - Handles 30+ colors, 20+ product types (Indian + Western)
+         - Filler word removal: "find me", "I need", "show me" → clean keywords
+      2. Groq AI Enhancement (LLaMA 3.3-70B, ~300ms response)
+         - Improves accuracy for complex, mixed queries
+         - Understands context and intent
+         - Silent fallback if API unavailable
+
+  • Natural Language Examples Supported:
+      - "show me silk kurtas under ₹2000 in red"
+      - "find blazer for office under 3000"
+      - "I want a blue saree between 1500 and 5000"
+      - "cotton kurta XL size"
+      - "embroidered lehenga for wedding"
+
+  • 3-Pass Search Strategy (ensures results always found):
+      Pass 1: Filtered search (search + price + color + size)
+      Pass 2: Keyword-only search via dedicated /search endpoint
+      Pass 3: Broader word-based fallback search
+
+  • Voice Input — speak your query in Indian English
+  • Product cards shown directly inside chat (click → product page)
+  • Smart "no results" messaging with helpful suggestions
+
+  B. SELLER AI BUSINESS ADVISOR
+  ─────────────────────────────────────────────────────────────────────────────
+  • Built into Seller Dashboard (right sidebar widget)
+  • 3 Tabs:
+
+    [INSIGHTS TAB]
+    • Real-time business analysis of seller's data
+    • 4 AI-generated insights per session:
+        - Revenue performance analysis
+        - Pending orders urgency alerts
+        - Inventory gap identification
+        - Growth recommendations
+    • Insight types: Success / Warning / Info / Tip (color-coded)
+
+    [TRENDS TAB]
+    • Platform-wide trending category analysis
+    • Compares seller's current categories vs trending
+    • 3 trend recommendations with:
+        - Trend score (1-10)
+        - Why it's trending now
+        - Specific action to take (e.g., "Add 5 more kurtas")
+
+    [ASK AI TAB]
+    • Free-form Q&A about seller's business
+    • Voice input supported
+    • Example questions:
+        - "What is my total revenue this month?"
+        - "Which is my best selling product?"
+        - "How many orders are pending?"
+        - "Should I offer a discount this week?"
+    • Uses actual seller data for specific, accurate answers
+    • Friendly, encouraging tone in responses
+
+
+================================================================================
+  5. TECHNICAL HIGHLIGHTS
+================================================================================
+
+  FRONTEND
+  ─────────────────────────────────────────────────────────────────────────────
+  • React.js with Vite (lightning fast HMR)
+  • React Router v6 — multi-page SPA with protected routes
+  • Custom CSS Design System (Athenic theme variables)
+  • Recharts — interactive analytics charts
+  • Web Speech API — voice input for AI assistants
+  • Axios with interceptors for API calls
+  • Context API for global state (Auth, Cart)
+
+  BACKEND
+  ─────────────────────────────────────────────────────────────────────────────
+  • Node.js + Express.js REST API
+  • MongoDB + Mongoose (ODM)
+  • Redis caching — product listings cached for 5 minutes
+  • JWT Authentication (access token)
+  • Passport.js — Google OAuth 2.0
+  • Multer + Cloudinary — image upload and storage
+  • MongoDB Geospatial Queries — $near for location-based shop discovery
+  • Rate Limiting (express-rate-limit) — API protection
+  • Role-based middleware (customer, seller, admin guards)
+  • Regex-based full-text search across multiple product fields
+
+  DATABASE DESIGN
+  ─────────────────────────────────────────────────────────────────────────────
+  • Users collection (roles: customer | seller | admin)
+  • Shops collection (geospatial indexed, approval workflow)
+  • Products collection (text + geospatial indexes, multi-image)
+  • Orders collection (multi-item, status tracking)
+  • Cart collection (per user, persistent)
+  • Coupons collection (flexible discount rules)
+
+  AI ARCHITECTURE
+  ─────────────────────────────────────────────────────────────────────────────
+  • Primary: Groq API (LLaMA 3.3-70B Versatile) — OpenAI-compatible
+  • Fallback: Smart Rule-Based NLP Parser (always works, 0ms)
+  • Response caching: Same query cached 5 minutes (no duplicate API calls)
+  • Graceful degradation: App fully functional even without API key
+
+
+================================================================================
+  6. SECURITY FEATURES
+================================================================================
+
+  • JWT token authentication (stateless, secure)
+  • HTTP-only cookie for token storage (XSS protection)
+  • bcrypt password hashing (salt rounds: 12)
+  • Route-level role guards (customer/seller/admin middleware)
+  • Rate limiting on all endpoints (read: 100/min, write: 20/min)
+  • Google OAuth 2.0 (no password stored for OAuth users)
+  • Input validation and sanitization
+  • MongoDB injection prevention via Mongoose
+  • CORS configured for specific frontend origins
+  • Image upload validation (type + size checks)
+  • Admin-only endpoints protected at both route and controller level
+
+
+================================================================================
+  SUMMARY STATS
+================================================================================
+
+  Total Pages Built         : 25+
+  Customer Pages            : 10
+  Seller Pages              : 8
+  Admin Pages               : 5
+  Auth Pages                : 2
+  API Endpoints             : 50+
+  AI Features               : 2 (Customer Assistant + Seller Advisor)
+  Database Collections      : 6
+  Supported Product Types   : 20+ (Indian & Western fashion)
+  Color Recognition         : 30+ colors in AI parser
+  Languages / Frameworks    : React, Node.js, Express, MongoDB, Redis
+
+================================================================================
+  BUILT WITH ❤️ FOR HACKATHON 2025
+  Team: Athenic Wear Development Team
+================================================================================

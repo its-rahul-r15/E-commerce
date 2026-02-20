@@ -1,9 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { productService, shopService, couponService } from '../../services/api';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import ShopCard from '../../components/customer/ShopCard';
 import ProductCard from '../../components/customer/ProductCard';
+
+const HOME_CATEGORIES = [
+    { name: 'Kurta', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?fit=crop&w=200&h=200', path: '/products?categories=Kurta' },
+    { name: 'Saree', image: 'https://images.unsplash.com/photo-1610030469668-93514219c939?fit=crop&w=200&h=200', path: '/products?categories=Saree' },
+    { name: 'Lehenga', image: 'https://images.unsplash.com/photo-1589156191108-c762ff4b96ab?fit=crop&w=200&h=200', path: '/products?categories=Lehenga' },
+    { name: 'Shirt', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?fit=crop&w=200&h=200', path: '/products?categories=Shirt' },
+    { name: 'Dress', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?fit=crop&w=200&h=200', path: '/products?categories=Dress' },
+    { name: 'Accessories', image: 'https://images.unsplash.com/photo-1611085583191-a3b134c06203?fit=crop&w=200&h=200', path: '/products?categories=Accessories' },
+    { name: 'Ethnic', image: 'https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?fit=crop&w=200&h=200', path: '/products?categories=Ethnic%20Wear' },
+];
 
 const Home = () => {
     const navigate = useNavigate();
@@ -88,11 +98,11 @@ const Home = () => {
 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
                     <h1 className="text-4xl md:text-7xl font-serif tracking-[0.1em] text-[var(--athenic-blue)] mb-6 leading-tight uppercase">
-                        MODERN DRAPERY,<br />
-                        <span className="italic font-playfair lowercase font-normal">Ancient Soul</span>
+                        MODERN STYLE,<br />
+                        <span className="italic font-playfair lowercase font-normal">Local Heart</span>
                     </h1>
                     <p className="text-[10px] md:text-xs font-serif tracking-[0.4em] uppercase text-[var(--athenic-gold)] mb-12">
-                        High Fashion - Classical Aesthetics
+                        Quality Clothing - From Local Shops
                     </p>
 
                     <div className="group relative inline-block">
@@ -102,21 +112,47 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Floating Luxury Card */}
+                {/* Floating Local Shop Card */}
                 <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[600px] athenic-card text-center py-10 px-8 athenic-shadow">
                     <h2 className="text-2xl font-serif tracking-[0.15em] uppercase text-[var(--athenic-blue)] mb-4">
-                        Luxury Fashion
+                        Local Picks
                     </h2>
                     <p className="text-xs font-serif leading-relaxed text-gray-500 opacity-80 uppercase tracking-widest px-4">
-                        Discover the epitome of elegance through our curated collection of classical silhouettes reimagined for the modern world.
+                        Discover the best quality clothes from trusted shops in your area, brought to you with care and tradition.
                     </p>
                 </div>
             </section>
 
             <div className="h-20"></div> {/* Spacer for floating card */}
 
+            {/* Rounded Categories Section */}
+            <section className="max-w-7xl mx-auto px-4 py-12">
+                <div className="flex items-center justify-between space-x-4 overflow-x-auto pb-4 no-scrollbar">
+                    {HOME_CATEGORIES.map((cat) => (
+                        <Link
+                            key={cat.name}
+                            to={cat.path}
+                            className="flex flex-col items-center flex-shrink-0 group"
+                        >
+                            <div className="w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-[var(--athenic-gold)] border-opacity-20 mb-3 group-hover:border-opacity-100 transition-all duration-500 p-1">
+                                <div className="w-full h-full rounded-full overflow-hidden shadow-inner">
+                                    <img
+                                        src={cat.image}
+                                        alt={cat.name}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    />
+                                </div>
+                            </div>
+                            <span className="text-[10px] md:text-xs font-serif uppercase tracking-widest text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-colors">
+                                {cat.name}
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
             {/* Meander Divider */}
-            <div className="meander-border opacity-30 my-10"></div>
+            <div className="meander-border opacity-10 my-6"></div>
 
             {/* Specialized Categories */}
             <section className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -124,7 +160,7 @@ const Home = () => {
                     Personalized Experience
                 </p>
                 <h2 className="text-3xl font-serif tracking-widest text-[var(--athenic-blue)] mb-12 uppercase">
-                    NEARBY BOUTIQUES
+                    SHOPS NEAR YOU
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -149,7 +185,7 @@ const Home = () => {
                     <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>
                     <div className="flex items-center space-x-4">
                         <span className="text-2xl">🎓</span>
-                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-gray-600">15% OFF ON YOUR FIRST ATELIER VISIT</p>
+                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-gray-600">15% OFF ON YOUR FIRST SHOP VISIT</p>
                     </div>
                 </div>
             </section>
@@ -182,10 +218,10 @@ const Home = () => {
                     <span className="text-4xl text-[var(--athenic-gold)]">⚜️</span>
                 </div>
                 <h2 className="text-4xl md:text-6xl font-serif tracking-[0.2em] text-[var(--athenic-blue)] mb-8 leading-tight uppercase">
-                    The Art of The Fold
+                    Quality You Can Trust
                 </h2>
                 <p className="max-w-3xl text-xs md:text-sm font-serif italic text-gray-600 leading-[2em] mb-12 px-6">
-                    Our garments are not merely sewn; they are sculpted. Using hand-woven Persian linen and mulberry silk, we recreate the rhythmic weight of classical drapery for the modern silhouette.
+                    Our clothes are made with care by local artisans. We use traditional techniques and high-quality fabrics to bring you comfortable and stylish clothing.
                 </p>
 
                 <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-20">

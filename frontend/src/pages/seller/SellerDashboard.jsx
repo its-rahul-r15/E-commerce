@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SellerLayout from '../../components/layout/SellerLayout';
 import { shopService, productService, orderService } from '../../services/api';
+import SellerAIAdvisor from '../../components/seller/SellerAIAdvisor';
 import {
     HomeIcon,
     ShoppingBagIcon,
@@ -340,16 +341,60 @@ const SellerDashboard = () => {
                         </div>
                     </div>
 
-                    {/* Grow Your Shop */}
-                    <div className="bg-gradient-to-br from-emerald-600 to-cyan-600 rounded-xl p-6 text-white">
-                        <h3 className="text-lg font-bold mb-2">Grow Your Shop</h3>
-                        <p className="text-sm text-emerald-100 mb-4">
-                            You're in the top 15% of sellers this month!
-                        </p>
-                        <button className="bg-white text-emerald-600 px-4 py-2.5 rounded-lg font-semibold hover:bg-emerald-50 transition-colors w-full">
-                            Create Campaign
-                        </button>
-                    </div>
+                    {/* 🤖 AI Business Advisor */}
+                    <SellerAIAdvisor sellerData={{
+                        // Shop identity
+                        shopName: shop?.name || 'Your Shop',
+                        shopCategory: shop?.category || '',
+                        rating: shop?.rating || 0,
+
+                        // Stats
+                        totalOrders: stats.totalOrders,
+                        todayOrders: stats.todayOrders,
+                        totalRevenue: stats.revenue,
+                        pendingOrders: stats.pendingOrders,
+                        totalProducts: stats.totalProducts,
+                        activeProducts: stats.activeProducts,
+                        outOfStock: stats.outOfStock,
+                        revenueGrowth: stats.revenueGrowth,
+                        lastMonthRevenue: stats.lastMonthRevenue,
+
+                        // Full product list with all details
+                        allProducts: products.map(p => ({
+                            name: p.name,
+                            category: p.category,
+                            subCategory: p.subCategory || '',
+                            stock: p.stock,
+                            price: p.price,
+                            discountedPrice: p.discountedPrice || null,
+                            colors: p.colors || [],
+                            sizes: p.sizes || [],
+                            isAvailable: p.isAvailable,
+                            brand: p.brand || '',
+                        })),
+
+                        // Full order list for analysis
+                        allOrders: recentOrders.map(o => ({
+                            status: o.status,
+                            amount: o.totalAmount,
+                            date: o.createdAt,
+                            items: o.items?.length || 1,
+                        })),
+
+                        // Legacy aliases for backward compat
+                        topProducts: products.slice(0, 5).map(p => ({
+                            name: p.name,
+                            category: p.category,
+                            stock: p.stock,
+                            price: p.price,
+                            discountedPrice: p.discountedPrice,
+                        })),
+                        recentOrders: recentOrders.slice(0, 5).map(o => ({
+                            status: o.status,
+                            amount: o.totalAmount,
+                            date: o.createdAt,
+                        })),
+                    }} />
                 </div>
             </div>
         </SellerLayout>

@@ -35,33 +35,27 @@ const Navbar = () => {
                     const { latitude, longitude } = position.coords;
                     try {
                         const response = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-                            {
-                                headers: {
-                                    'Accept-Language': 'en'
-                                }
-                            }
+                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
                         );
-                        if (!response.ok) throw new Error('CORS or Network Error');
+                        if (!response.ok) throw new Error('Geocoding failed');
                         const data = await response.json();
-                        const address = data.address || {};
-                        const city = address.city || address.town || address.village || address.neighborhood || address.county;
-                        const area = address.suburb || address.neighbourhood || address.road || city;
+                        const city = data.city || data.locality || data.principalSubdivision || '';
+                        const area = data.localityInfo?.administrative?.[3]?.name || data.localityInfo?.administrative?.[2]?.name || city;
 
                         if (area || city) {
-                            setLocation(`${area}${city ? ', ' + city : ''}`);
+                            setLocation(`${area}${city && area !== city ? ', ' + city : ''}`);
                         } else {
-                            setLocation('Classical District, Athens');
+                            setLocation('Local Neighborhood');
                         }
                     } catch (error) {
-                        setLocation('Explore Our Nearby Boutiques');
+                        setLocation('Find shops near you');
                     }
                 },
-                () => setLocation('Explore Our Nearby Boutiques'),
+                () => setLocation('Find shops near you'),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         } else {
-            setLocation('Explore Our Nearby Boutiques');
+            setLocation('Find shops near you');
         }
     };
 
@@ -89,7 +83,7 @@ const Navbar = () => {
                     <button className="flex items-center space-x-2 text-[#F5E0A3] hover:text-white transition-colors group">
                         <MapPinIcon className="w-4 h-4" />
                         <span className="text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em]">
-                            Our Boutique: <span className="font-bold">{location}</span>
+                            Your Location: <span className="font-bold">{location}</span>
                         </span>
                     </button>
                 </div>
@@ -103,13 +97,13 @@ const Navbar = () => {
                         {/* Left: Navigation Links */}
                         <div className="hidden lg:flex items-center space-x-8">
                             <Link to="/products" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                Collections
+                                Products
                             </Link>
                             <Link to="/shops" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                Boutiques
+                                Shops
                             </Link>
                             <Link to="/about" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                The Atelier
+                                About Us
                             </Link>
                         </div>
 
@@ -129,7 +123,7 @@ const Navbar = () => {
                             <form onSubmit={handleSearch} className="hidden md:block relative">
                                 <input
                                     type="text"
-                                    placeholder="Search the collection..."
+                                    placeholder="Search for products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-48 lg:w-64 bg-transparent border-b border-[var(--athenic-blue)] border-opacity-20 py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] placeholder:italic placeholder:opacity-50 transition-all"
@@ -175,6 +169,9 @@ const Navbar = () => {
                                                 <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)]">Profile</button>
                                                 {user.role === 'seller' && (
                                                     <button onClick={() => navigate('/seller/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)] text-[var(--athenic-teal)]">Seller Hub</button>
+                                                )}
+                                                {user.role === 'admin' && (
+                                                    <button onClick={() => navigate('/admin/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-red-50 text-red-600 font-bold">🛡️ Admin Panel</button>
                                                 )}
                                                 <div className="border-t border-gray-100 mt-2">
                                                     <button onClick={logout} className="w-full text-left px-4 py-2 text-xs font-serif text-red-500 hover:bg-red-50">Logout</button>

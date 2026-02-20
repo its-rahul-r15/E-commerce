@@ -66,26 +66,25 @@ export const shopService = {
 export const productService = {
     // Get products with filters
     getProducts: async (filters = {}) => {
-        console.log('Original filters:', filters);
-        // Convert categories array to comma-separated string if it's an array
         const processedFilters = { ...filters };
-        if (Array.isArray(processedFilters.categories)) {
-            console.log('Converting categories array:', processedFilters.categories);
-            processedFilters.categories = processedFilters.categories.join(',');
-            console.log('After conversion:', processedFilters.categories);
-        }
-        // Remove empty values
+
+        // Ensure all arrays are comma-separated strings for the backend
+        ['categories', 'sizes', 'colors'].forEach(key => {
+            if (Array.isArray(processedFilters[key])) {
+                processedFilters[key] = processedFilters[key].join(',');
+            }
+        });
+
+        // Remove empty/null values
         Object.keys(processedFilters).forEach(key => {
             if (processedFilters[key] === '' || processedFilters[key] === undefined || processedFilters[key] === null) {
                 delete processedFilters[key];
             }
         });
 
-        console.log('Final processed filters:', processedFilters);
         const params = new URLSearchParams(processedFilters);
-        console.log('URL params:', params.toString());
         const response = await axios.get(`/products?${params}`);
-        return response.data; // Return full response object (contains data and pagination)
+        return response.data;
     },
 
     // Search products

@@ -28,6 +28,22 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Product category is required'],
         enum: {
             values: [
+                // Indian Fashion Categories
+                'Kurta',
+                'Saree',
+                'Lehenga',
+                'Salwar Suit',
+                'Dupatta',
+                'Shirt',
+                'Top',
+                'Dress',
+                'Jacket',
+                'Trouser',
+                'Sherwani',
+                'Accessories',
+                'Ethnic Wear',
+                'Western Wear',
+                // Legacy / Generic Categories (kept for backward compat)
                 'Groceries',
                 'Electronics',
                 'Clothing',
@@ -37,9 +53,10 @@ const productSchema = new mongoose.Schema({
                 'Books & Stationery',
                 'Toys & Games',
                 'Food & Beverages',
+                'Fashion',
                 'Other',
             ],
-            message: 'Invalid product category',
+            message: 'Invalid product category: {VALUE}',
         },
     },
     subCategory: {

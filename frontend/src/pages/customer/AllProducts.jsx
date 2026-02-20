@@ -5,7 +5,7 @@ import ProductCard from '../../components/customer/ProductCard';
 import FilterPanel from '../../components/common/FilterPanel';
 
 const AllProducts = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({});
@@ -33,7 +33,28 @@ const AllProducts = () => {
     };
 
     useEffect(() => {
-        // Pre-fill filters from URL if needed (optional enhancement)
+        // Sync filters from URL on component mount
+        const urlCategories = searchParams.get('categories') || searchParams.get('category');
+        const urlMinPrice = searchParams.get('minPrice');
+        const urlMaxPrice = searchParams.get('maxPrice');
+        const urlSort = searchParams.get('sort');
+        const urlStyle = searchParams.get('style');
+        const urlSizes = searchParams.get('sizes');
+        const urlColors = searchParams.get('colors');
+
+        const initialFilters = {};
+        if (urlCategories) initialFilters.categories = urlCategories.split(',');
+        if (urlMinPrice) initialFilters.minPrice = urlMinPrice;
+        if (urlMaxPrice) initialFilters.maxPrice = urlMaxPrice;
+        if (urlSort) initialFilters.sort = urlSort;
+        if (urlStyle) initialFilters.style = urlStyle;
+        if (urlSizes) initialFilters.sizes = urlSizes.split(',');
+        if (urlColors) initialFilters.colors = urlColors.split(',');
+
+        setFilters(initialFilters);
+    }, [searchParams]);
+
+    useEffect(() => {
         fetchProducts();
     }, [page, filters]);
 
@@ -56,9 +77,19 @@ const AllProducts = () => {
     };
 
     const handleFilterChange = (newFilters) => {
-        console.log('Filter changed in AllProducts:', newFilters);
-        setFilters(newFilters);
-        setPage(1); // Reset to first page on filter change
+        const nextParams = new URLSearchParams();
+
+        // Sync new filters to URL
+        if (newFilters.categories?.length) nextParams.set('categories', newFilters.categories.join(','));
+        if (newFilters.minPrice) nextParams.set('minPrice', newFilters.minPrice);
+        if (newFilters.maxPrice) nextParams.set('maxPrice', newFilters.maxPrice);
+        if (newFilters.sort) nextParams.set('sort', newFilters.sort);
+        if (newFilters.style) nextParams.set('style', newFilters.style);
+        if (newFilters.sizes?.length) nextParams.set('sizes', newFilters.sizes.join(','));
+        if (newFilters.colors?.length) nextParams.set('colors', newFilters.colors.join(','));
+
+        setSearchParams(nextParams);
+        setPage(1); // Reset to first page
     };
 
     return (
@@ -70,6 +101,7 @@ const AllProducts = () => {
                         <FilterPanel
                             onFilterChange={handleFilterChange}
                             onClearFilters={() => setFilters({})}
+                            initialFilters={filters}
                         />
                     </div>
 
