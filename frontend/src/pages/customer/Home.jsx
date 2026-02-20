@@ -1,49 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { productService, shopService, couponService } from '../../services/api';
-import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, GiftIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
-import CouponBanner from '../../components/customer/CouponBanner';
-import BannerCarousel from '../../components/customer/BannerCarousel';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import ShopCard from '../../components/customer/ShopCard';
+import ProductCard from '../../components/customer/ProductCard';
 
 const Home = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [nearbyShops, setNearbyShops] = useState([]);
-    const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [shopsLoading, setShopsLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [userLocation, setUserLocation] = useState(null);
-
 
     useEffect(() => {
         getUserLocation();
-        fetchCoupons();
-        const query = searchParams.get('q');
-        if (query) {
-            setSearchQuery(query);
-            handleSearchProducts(query);
-        } else {
-            fetchData();
-        }
-    }, [selectedCategory]);
-
+        fetchData();
+    }, []);
 
     const getUserLocation = useCallback(() => {
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    setUserLocation({ latitude, longitude });
                     fetchNearbyShops(latitude, longitude);
                 },
-                (error) => {
-                    console.error('Location error:', error);
-                    fetchAllShops();
-                }
+                () => fetchAllShops()
             );
         } else {
             fetchAllShops();
@@ -56,7 +37,6 @@ const Home = () => {
             const data = await shopService.getNearbyShops(lat, lng);
             setNearbyShops(data?.shops || []);
         } catch (error) {
-            console.error('Error fetching nearby shops:', error);
             setNearbyShops([]);
         } finally {
             setShopsLoading(false);
@@ -66,242 +46,160 @@ const Home = () => {
     const fetchAllShops = async () => {
         try {
             setShopsLoading(true);
-            const data = await shopService.getAllShops();
-            setNearbyShops((data.shops || []).slice(0, 4));
+            const data = await shopService.getPublicShops(1, 10);
+            setNearbyShops((data.shops || []).slice(0, 3));
         } catch (error) {
-            console.error('Error fetching shops:', error);
+            console.error(error);
         } finally {
             setShopsLoading(false);
         }
     };
 
-    const fetchCoupons = async () => {
-        try {
-            const data = await couponService.getActiveCoupons();
-            setCoupons((data || []).slice(0, 3)); // Get top 3 active coupons
-        } catch (error) {
-            console.error('Error fetching coupons:', error);
-            setCoupons([]);
-        }
-    };
-
-
     const fetchData = async () => {
         try {
-            const params = selectedCategory === 'All' ? {} : { category: selectedCategory };
-            const data = await productService.getProducts({ ...params, limit: 20 });
+            setLoading(true);
+            const data = await productService.getProducts({ limit: 10 });
             setProducts(data?.data || []);
         } catch (error) {
-            console.error('Error:', error);
             setProducts([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSearchProducts = async (query) => {
-        try {
-            setLoading(true);
-            const data = await productService.searchProducts(query, 1, 20);
-            const productsArray = Array.isArray(data) ? data : (data.products || []);
-            setProducts(productsArray);
-        } catch (error) {
-            console.error('Error searching:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const valentineCategories = [
-        { name: 'For Her', icon: '💝', color: 'from-amber-300 to-orange-300', categories: ['Clothing', 'Health & Beauty'] },
-        { name: 'For Him', icon: '🎁', color: 'from-blue-400 to-indigo-400', categories: ['Electronics', 'Sports & Fitness'] },
-        { name: 'Gifts', icon: '🎀', color: 'from-amber-400 to-yellow-400', categories: ['Other'] },
-        { name: 'Chocolates', icon: '🍫', color: 'from-amber-400 to-orange-400', categories: ['Food & Beverages'] },
-        { name: 'Flowers', icon: '🌹', color: 'from-rose-400 to-red-400', categories: ['Other'] },
-        { name: 'Jewelry', icon: '💍', color: 'from-yellow-400 to-amber-400', categories: ['Other'] },
-    ];
-
-    if (loading) {
+    if (loading && products.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="relative">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
-                </div>
+            <div className="min-h-screen flex items-center justify-center bg-[var(--athenic-bg)]">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--athenic-gold)] border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-beige-50">
-            {/* Remove floating hearts for professional look */}
+        <div className="min-h-screen bg-[var(--athenic-bg)] selection:bg-[var(--athenic-gold)] selection:text-white">
 
+            {/* Hero Section */}
+            <section className="relative h-[80vh] flex flex-col items-center justify-center overflow-hidden bg-athenic-gradient">
+                {/* Background Columns (Decorative) */}
+                <div className="absolute inset-0 flex justify-between px-20 opacity-5 pointer-events-none">
+                    <div className="w-1 bg-[var(--athenic-blue)] h-full"></div>
+                    <div className="w-1 bg-[var(--athenic-blue)] h-full"></div>
+                </div>
 
+                <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+                    <h1 className="text-4xl md:text-7xl font-serif tracking-[0.1em] text-[var(--athenic-blue)] mb-6 leading-tight uppercase">
+                        MODERN DRAPERY,<br />
+                        <span className="italic font-playfair lowercase font-normal">Ancient Soul</span>
+                    </h1>
+                    <p className="text-[10px] md:text-xs font-serif tracking-[0.4em] uppercase text-[var(--athenic-gold)] mb-12">
+                        High Fashion - Classical Aesthetics
+                    </p>
 
-
-            {/* Banner Carousel Section */}
-            <div className="max-w-7xl mx-auto px-4 pt-8">
-                <BannerCarousel />
-            </div>
-
-            {/* Nearby Shops */}
-            <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-900">
-                            Nearby <span className="text-emerald-600">Shops</span>
-                        </h2>
-                        <p className="text-gray-600 mt-1">
-                            {nearbyShops.length > 0 ? `${nearbyShops.length} shops near you` : 'Discover shops around your neighborhood'}
-                        </p>
+                    <div className="group relative inline-block">
+                        <button className="btn-athenic-gold px-12 py-4 text-sm tracking-widest uppercase">
+                            Explore the Suit
+                        </button>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Floating Luxury Card */}
+                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[600px] athenic-card text-center py-10 px-8 athenic-shadow">
+                    <h2 className="text-2xl font-serif tracking-[0.15em] uppercase text-[var(--athenic-blue)] mb-4">
+                        Luxury Fashion
+                    </h2>
+                    <p className="text-xs font-serif leading-relaxed text-gray-500 opacity-80 uppercase tracking-widest px-4">
+                        Discover the epitome of elegance through our curated collection of classical silhouettes reimagined for the modern world.
+                    </p>
+                </div>
+            </section>
+
+            <div className="h-20"></div> {/* Spacer for floating card */}
+
+            {/* Meander Divider */}
+            <div className="meander-border opacity-30 my-10"></div>
+
+            {/* Specialized Categories */}
+            <section className="max-w-7xl mx-auto px-4 py-16 text-center">
+                <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] mb-4">
+                    Personalized Experience
+                </p>
+                <h2 className="text-3xl font-serif tracking-widest text-[var(--athenic-blue)] mb-12 uppercase">
+                    NEARBY BOUTIQUES
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {shopsLoading ? (
-                        [1, 2, 3, 4].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
-                                <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200"></div>
-                                <div className="p-5">
-                                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                                </div>
-                            </div>
-                        ))
-                    ) : nearbyShops.length > 0 ? (
-                        nearbyShops.slice(0, 4).map((shop) => (
-                            <div
-                                key={shop._id}
-                                onClick={() => navigate(`/shop/${shop._id}`)}
-                                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
-                            >
-                                <div className="h-48 bg-gradient-to-br from-emerald-400 to-blue-500 relative overflow-hidden">
-                                    {shop.images?.[0] && (
-                                        <img
-                                            src={shop.images[0]}
-                                            alt={shop.shopName}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                        />
-                                    )}
-                                    <div className="absolute top-3 right-3">
-                                        <button className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition">
-                                            <HeartIcon className="w-5 h-5 text-gray-400 hover:text-red-500 transition" />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="p-5">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{shop.shopName}</h3>
-                                        {shop.distance && (
-                                            <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-1 rounded-full">
-                                                {shop.distance.toFixed(1)} km
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-sm text-gray-500 mb-3">{shop.location?.city || 'Local Shop'}</p>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-1">
-                                            <span className="text-yellow-400">⭐</span>
-                                            <span className="text-sm font-semibold text-gray-900">{shop.rating || 4.5}</span>
-                                        </div>
-                                        <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
-                                            Open Now
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        [1, 2, 3, 4].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg">
-                                <div className="h-48 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
-                                <div className="p-5">
-                                    <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                        [1, 2, 3].map(i => <div key={i} className="h-64 bg-white animate-pulse border border-gray-100"></div>)
+                    ) : nearbyShops.map(shop => (
+                        <ShopCard key={shop._id} shop={shop} />
+                    ))}
                 </div>
-            </div>
+            </section>
 
-            {/* Trending Valentine's Products */}
-            <div className="max-w-7xl mx-auto px-4 py-8 pb-16 relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-900">
-                            Trending <span className="text-emerald-600">Products</span>
-                        </h2>
-                        <p className="text-gray-600 mt-1">Most popular items this season</p>
+            {/* Promotion / Coupon Bar */}
+            <section className="bg-gradient-to-r from-[#FDEFEF] to-[#F5E6E6] py-4 border-y border-[var(--athenic-gold)] border-opacity-20 my-10">
+                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
+                    <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                        <span className="text-2xl">🏷️</span>
+                        <div>
+                            <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-500">For our Exclusive</p>
+                            <p className="text-sm font-serif italic text-red-800">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">ATHENIG15</span></p>
+                        </div>
                     </div>
-                    <button
-                        onClick={() => navigate('/products')}
-                        className="text-emerald-600 font-semibold hover:text-emerald-700 flex items-center space-x-1"
-                    >
-                        <span>View All</span>
-                        <ChevronRightIcon className="w-5 h-5" />
+                    <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>
+                    <div className="flex items-center space-x-4">
+                        <span className="text-2xl">🎓</span>
+                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-gray-600">15% OFF ON YOUR FIRST ATELIER VISIT</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Trending Collection */}
+            <section className="max-w-7xl mx-auto px-4 py-20">
+                <div className="flex flex-col md:flex-row items-baseline justify-between mb-12">
+                    <div>
+                        <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] mb-2">Curated for you</p>
+                        <h2 className="text-4xl font-serif tracking-widest text-[var(--athenic-blue)] uppercase">TRENDING COLLECTION</h2>
+                    </div>
+                    <button onClick={() => navigate('/products')} className="text-[10px] font-serif font-bold uppercase tracking-widest border-b border-[var(--athenic-gold)] pb-1 hover:text-[var(--athenic-gold)] transition-colors">
+                        Shop All Trending
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    {products.slice(0, 10).map((product) => (
-                        <div
-                            key={product._id}
-                            onClick={() => navigate(`/product/${product._id}`)}
-                            className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:scale-105"
-                        >
-                            <div className="relative h-52 bg-gray-100">
-                                <img
-                                    src={product.images?.[0] || '/placeholder.png'}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                />
-                                <button className="absolute top-3 right-3 bg-white p-2 rounded-full hover:bg-gray-50 transition-colors shadow-md">
-                                    <HeartIcon className="w-5 h-5 text-gray-400 hover:text-red-500 transition-all" />
-                                </button>
-                                {product.discountedPrice && (
-                                    <div className="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
-                                        {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                                    </div>
-                                )}
-                            </div>
-                            <div className="p-4">
-                                <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                                    {product.name}
-                                </h3>
-                                <div className="flex items-center mb-3">
-                                    <span className="text-yellow-400 text-xs">★★★★★</span>
-                                    <span className="text-xs text-gray-500 ml-1">(4.5)</span>
-                                </div>
-                                <div className="flex items-baseline space-x-2">
-                                    <span className="text-lg font-bold text-emerald-600">
-                                        ₹{product.discountedPrice || product.price}
-                                    </span>
-                                    {product.discountedPrice && (
-                                        <span className="text-xs text-gray-400 line-through">
-                                            ₹{product.price}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 lg:gap-8">
+                    {products.map((product) => (
+                        <ProductCard key={product._id} product={product} />
                     ))}
                 </div>
-            </div>
+            </section>
 
-            {/* Custom CSS for animations */}
-            <style jsx>{`
-                @keyframes float-heart {
-                    0% {
-                        transform: translateY(100vh) rotate(0deg);
-                    }
-                    100% {
-                        transform: translateY(-100vh) rotate(360deg);
-                    }
-                }
-                .animate-float-heart {
-                    animation: float-heart linear infinite;
-                }
-            `}</style>
+            {/* Meander Divider */}
+            <div className="meander-border opacity-30 mt-20"></div>
+
+            {/* Brand Philosophy Section */}
+            <section className="py-32 bg-gradient-to-b from-[var(--athenic-bg)] to-[#FEEEDF] items-center flex flex-col justify-center text-center px-4 relative">
+                <div className="absolute top-10 flex justify-center w-full opacity-30">
+                    <span className="text-4xl text-[var(--athenic-gold)]">⚜️</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-serif tracking-[0.2em] text-[var(--athenic-blue)] mb-8 leading-tight uppercase">
+                    The Art of The Fold
+                </h2>
+                <p className="max-w-3xl text-xs md:text-sm font-serif italic text-gray-600 leading-[2em] mb-12 px-6">
+                    Our garments are not merely sewn; they are sculpted. Using hand-woven Persian linen and mulberry silk, we recreate the rhythmic weight of classical drapery for the modern silhouette.
+                </p>
+
+                <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-20">
+                    <div className="text-center">
+                        <p className="text-2xl font-serif text-[var(--athenic-gold)] mb-1">100%</p>
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500">Pure Silk</p>
+                    </div>
+                    <div className="h-px w-20 md:w-px md:h-12 bg-[var(--athenic-gold)] opacity-30"></div>
+                    <div className="text-center">
+                        <p className="text-2xl font-serif text-[var(--athenic-gold)] mb-1">ETHICAL</p>
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500">Production</p>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };

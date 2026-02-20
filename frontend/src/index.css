@@ -1,84 +1,107 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700;800;900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --athenic-bg: #fbfbeb;
+  --athenic-gold: #D4AF37;
+  --athenic-gold-light: #E5C369;
+  --athenic-blue: #001F3F;
+  --athenic-blue-light: #003366;
+  --athenic-teal: #2C5D63;
+  --athenic-marble: #F5F5F0;
+  --athenic-parchment: #fdfdfa;
+}
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-[var(--athenic-bg)] text-[var(--athenic-blue)] antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
+    font-family: 'Cinzel', serif;
+  }
+
+  .font-serif-decorative {
+    font-family: 'Cinzel Decorative', serif;
+  }
+
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
   }
 
   * {
-    @apply transition-colors duration-150;
+    @apply transition-all duration-300;
   }
 }
 
 @layer components {
 
-  /* Button styles */
-  .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  /* Athenic Buttons */
+  .btn-athenic-primary {
+    @apply bg-[var(--athenic-blue)] text-white font-medium px-8 py-3 rounded-none shadow-md hover:bg-[var(--athenic-blue-light)] hover:shadow-lg transition-all border border-[var(--athenic-gold)];
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
   }
 
-  .btn-secondary {
-    @apply bg-white border border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-900 font-medium px-6 py-2.5 rounded-lg transition-all duration-200 shadow-sm hover:shadow active:scale-[0.98];
+  .btn-athenic-outline {
+    @apply border border-[var(--athenic-gold)] text-[var(--athenic-blue)] font-medium px-8 py-3 rounded-none hover:bg-[var(--athenic-gold)] hover:text-white transition-all;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
   }
 
-  .btn-outline {
-    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-2.5 rounded-lg transition-all duration-200 active:scale-[0.98];
-  }
-
-  .btn-danger {
-    @apply bg-red-500 hover:bg-red-600 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.98];
+  .btn-athenic-gold {
+    @apply bg-[var(--athenic-gold)] text-white font-medium px-8 py-3 rounded-none hover:bg-[var(--athenic-gold-light)] shadow-sm transition-all;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
   }
 
   /* Card styles */
-  .card {
-    @apply bg-white rounded-xl shadow-md border border-gray-100 p-6 transition-all duration-200;
+  .athenic-card {
+    @apply bg-white border border-[var(--athenic-gold)] p-6 shadow-sm hover:shadow-md transition-all;
   }
 
-  .card-hover {
-    @apply bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer;
+  .athenic-boutique-card {
+    @apply bg-white border border-[var(--athenic-gold)] p-8 shadow-md hover:shadow-xl transition-all relative overflow-hidden;
   }
 
-  /* Input styles */
-  .input-field {
-    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-gray-400 transition-all duration-200;
+  /* Meander Utility */
+  .meander-border {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath d='M0 0h10v10H0V0zm2 2h6v6H2V2zm10-2h10v10H12V0zm2 2h6v6h-6V2zm10-2h10v10H24V0zm2 2h6v6h-6V2zm10-2h10v10H36V0zm2 2h6v6h-6V2z' fill='%23D4AF37' fill-opacity='0.1'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    height: 10px;
+    width: 100%;
   }
 
-  /* Search bar */
-  .search-bar {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary pl-12 transition-all duration-200;
+  .meander-pattern {
+    @apply relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[var(--athenic-gold)] after:opacity-20;
+  }
+}
+
+@layer utilities {
+  .text-luxury-gold {
+    @apply text-[var(--athenic-gold)];
+    background: linear-gradient(135deg, #D4AF37 0%, #F5E0A3 50%, #D4AF37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  /* Badge styles */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  .bg-athenic-gradient {
+    background: linear-gradient(135deg, #fbfbeb 0%, #F5F5F0 100%);
   }
 
-  .badge-primary {
-    @apply badge bg-primary/10 text-primary-dark;
-  }
-
-  .badge-success {
-    @apply badge bg-green-100 text-green-700;
-  }
-
-  .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-700;
-  }
-
-  .badge-danger {
-    @apply badge bg-red-100 text-red-700;
-  }
-
-  /* Product card specific */
-  .product-card {
-    @apply bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer;
-  }
-
-  .product-card img {
-    @apply transform hover:scale-105 transition-transform duration-300;
+  .athenic-shadow {
+    box-shadow: 0 10px 30px -10px rgba(0, 31, 63, 0.1);
   }
 }
