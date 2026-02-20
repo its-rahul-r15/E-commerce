@@ -16,7 +16,7 @@ const ImageUpload = ({
         const files = Array.from(e.target.files);
         setError('');
 
-        // Validate file count
+        
         if (previews.length + files.length > maxImages) {
             setError(`Maximum ${maxImages} images allowed`);
             return;

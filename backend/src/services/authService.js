@@ -4,11 +4,6 @@ import { generateTokenPair, verifyRefreshToken } from '../utils/tokenUtils.js';
 import { setCache, getCache, deleteCache } from './cacheService.js';
 
 /**
- * Authentication Service
- * Business logic for user authentication
- */
-
-/**
  * Register a new user
  * @param {Object} userData - User data (name, email, password, phone, role)
  * @returns {Promise<Object>} User object and tokens
