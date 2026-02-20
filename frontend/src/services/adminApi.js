@@ -52,12 +52,12 @@ export const adminService = {
     },
 
     blockShop: async (shopId) => {
-        const response = await axios.patch(`/shops/admin/${shopId}/block`);
+        const response = await axios.patch(`/shops/admin/${shopId}/block`, { blocked: true });
         return response.data;
     },
 
     unblockShop: async (shopId) => {
-        const response = await axios.patch(`/shops/admin/${shopId}/unblock`);
+        const response = await axios.patch(`/shops/admin/${shopId}/block`, { blocked: false });
         return response.data;
     },
 

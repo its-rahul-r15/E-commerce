@@ -104,4 +104,14 @@
   .athenic-shadow {
     box-shadow: 0 10px 30px -10px rgba(0, 31, 63, 0.1);
   }
+
+  /* Hide scrollbar for most browsers */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

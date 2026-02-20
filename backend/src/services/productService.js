@@ -53,9 +53,13 @@ export const inspectQuery = (filters = {}) => {
     }
 
     if (sizes) {
-        query.sizes = { $in: sizes.split(',') };
+        const sizeList = Array.isArray(sizes) ? sizes : sizes.split(',').filter(s => s.trim());
+        if (sizeList.length > 0) query.sizes = { $in: sizeList };
     }
-    if (colors) query.colors = { $in: colors.split(',') };
+    if (colors) {
+        const colorList = Array.isArray(colors) ? colors : colors.split(',').filter(c => c.trim());
+        if (colorList.length > 0) query.colors = { $in: colorList };
+    }
     if (shopId) query.shopId = shopId;
     if (search) query.$text = { $search: search };
 
@@ -127,48 +131,59 @@ export const getProducts = async (filters = {}) => {
     if (brand) query.brand = brand;
     if (style) query.style = style; // Current UI uses 'style' as regex/exact match
 
-    // Price Filter
+    // Price Filter — check discountedPrice (selling price) first, fallback to original price
+    let priceFilter = null;
     if (minPrice || maxPrice) {
-        query.discountedPrice = {}; // Filter on discountedPrice (effective price)
-        if (minPrice) query.discountedPrice.$gte = Number(minPrice);
-        if (maxPrice) query.discountedPrice.$lte = Number(maxPrice);
-        // Fallback to price if discountedPrice logic is complex, 
-        // but typically e-commerce filters on the 'selling price'.
-        // Simplified: assuming all products have discountedPrice set (or equal to price).
-        // If your schema only has 'price' and 'discountedPrice' is optional, strict query needed.
-        // For Hackathon, let's assume filtering on 'price' field itself might be safer if discountedPrice is not guaranteed.
-        // Re-evaluating: Most products have price. discountedPrice is optional.
-        // Better implementation:
-        // $expr might be needed to compare effectively, OR just filter 'price' for simplicity now.
-        // Let's filter 'price' for now to be safe and simple.
-        delete query.discountedPrice;
-        query.price = {};
-        if (minPrice) query.price.$gte = Number(minPrice);
-        if (maxPrice) query.price.$lte = Number(maxPrice);
+        const discountedCond = {};
+        const priceCond = {};
+        if (minPrice) { discountedCond.$gte = Number(minPrice); priceCond.$gte = Number(minPrice); }
+        if (maxPrice) { discountedCond.$lte = Number(maxPrice); priceCond.$lte = Number(maxPrice); }
+        priceFilter = { $or: [{ discountedPrice: discountedCond }, { price: priceCond }] };
     }
 
-    // Array filters (if product has ANY of the specified values)
-    if (sizes) {
-        const sizeList = sizes.split(',');
-        query.sizes = { $in: sizeList };
-    }
-
-    if (colors) {
-        const colorList = colors.split(',');
-        query.colors = { $in: colorList };
-    }
-
-    if (shopId) {
-        query.shopId = shopId;
-    }
-
-    // Full-text search if search term provided
+    // Full-text search — multi-word AND logic (all words must match in name/category/tags)
+    // Does NOT search description to avoid false matches
     if (search) {
-        query.$text = { $search: search };
+        const words = search.trim().split(/\s+/).filter(w => w.length > 1);
+        const wordConditions = words.map(word => ({
+            $or: [
+                { name: { $regex: word, $options: 'i' } },
+                { category: { $regex: word, $options: 'i' } },
+                { subCategory: { $regex: word, $options: 'i' } },
+                { tags: { $in: [new RegExp(word, 'i')] } },
+                { brand: { $regex: word, $options: 'i' } },
+            ],
+        }));
+
+        // Combine search AND price into $and array
+        const andConditions = [...wordConditions];
+        if (priceFilter) andConditions.push(priceFilter);
+
+        if (andConditions.length === 1) {
+            // Single word, no price: merge $or directly into query
+            Object.assign(query, andConditions[0]);
+        } else {
+            query.$and = andConditions;
+        }
+    } else if (priceFilter) {
+        // Price filter only (no search term)
+        query.$or = priceFilter.$or;
     }
+
+    // Array filters
+    // Array filters (Sizes and Colors)
+    if (sizes) {
+        const sizeList = Array.isArray(sizes) ? sizes : sizes.split(',').filter(s => s.trim());
+        if (sizeList.length > 0) query.sizes = { $in: sizeList };
+    }
+    if (colors) {
+        const colorList = Array.isArray(colors) ? colors : colors.split(',').filter(c => c.trim());
+        if (colorList.length > 0) query.colors = { $in: colorList };
+    }
+    if (shopId) query.shopId = shopId;
 
     // Try cache (only for non-search queries)
-    const cacheKey = `products:${JSON.stringify({ category, subCategory, brand, sizes, colors, style, shopId, page, limit, sort })}`;
+    const cacheKey = `products:${JSON.stringify({ categories, subCategory, brand, sizes, colors, style, shopId, page, limit, sort })}`;
 
     if (!search) {
         const cached = await getCache(cacheKey);

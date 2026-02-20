@@ -24,15 +24,21 @@ const Login = () => {
         const detailsParam = searchParams.get('details');
 
         if (errorParam === 'oauth_failed') {
-            setError(detailsParam ? `Divine Access Failed: ${detailsParam}` : 'Divine Access Failed. Please try again.');
+            setError(detailsParam ? `Login Failed: ${detailsParam}` : 'Login Failed. Please try again.');
         } else if (errorParam === 'missing_tokens') {
-            setError('Authentication failed: The scroll was incomplete.');
+            setError('Authentication failed: Registration was incomplete.');
         }
     }, [searchParams]);
 
     useEffect(() => {
         if (user) {
-            navigate('/');
+            if (user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else if (user.role === 'seller') {
+                navigate('/seller/dashboard');
+            } else {
+                navigate('/');
+            }
         }
     }, [user, navigate]);
 
@@ -57,7 +63,7 @@ const Login = () => {
             }
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.error || 'Something went wrong in the temple');
+            setError(err.response?.data?.error || 'Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -90,11 +96,11 @@ const Login = () => {
                         </div>
 
                         <h1 className="text-5xl md:text-6xl font-serif tracking-[0.2em] text-[var(--athenic-blue)] uppercase leading-[1.2]">
-                            THE <br /> ROYAL <br /> ACCESS
+                            WELCOME <br /> BACK <br /> FRIEND
                         </h1>
 
                         <p className="text-sm font-serif italic text-gray-400 tracking-widest max-w-sm leading-loose">
-                            "Join the tradition of timeless elegance. Access the curated treasures of modern Athens."
+                            "Support your favorite local shops. Log in to explore quality products from your neighborhood."
                         </p>
                     </div>
 
@@ -118,19 +124,19 @@ const Login = () => {
                                 onClick={() => setIsLogin(true)}
                                 className={`text-[10px] font-serif uppercase tracking-[0.3em] transition-all pb-2 border-b-2 ${isLogin ? 'text-[var(--athenic-blue)] border-[var(--athenic-gold)]' : 'text-gray-300 border-transparent hover:text-gray-400'}`}
                             >
-                                Enter the Palace
+                                Login
                             </button>
                             <span className="h-4 w-[1px] bg-gray-100 mb-2"></span>
                             <button
                                 onClick={() => setIsLogin(false)}
                                 className={`text-[10px] font-serif uppercase tracking-[0.3em] transition-all pb-2 border-b-2 ${!isLogin ? 'text-[var(--athenic-blue)] border-[var(--athenic-gold)]' : 'text-gray-300 border-transparent hover:text-gray-400'}`}
                             >
-                                Join the Dynasty
+                                Create Account
                             </button>
                         </div>
 
                         <h2 className="text-3xl font-serif tracking-[0.1em] text-[var(--athenic-blue)] uppercase">
-                            {isLogin ? 'Presence Requested' : 'Enshrine Yourself'}
+                            {isLogin ? 'Welcome Back' : 'Join Us'}
                         </h2>
                         <div className="h-0.5 w-12 bg-[var(--athenic-gold)] mx-auto mt-4 opacity-40"></div>
                     </div>
@@ -147,7 +153,7 @@ const Login = () => {
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                         </svg>
                         <span className="text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 group-hover:text-[var(--athenic-blue)]">
-                            Continue with Divine Link
+                            Continue with Google
                         </span>
                     </button>
 
@@ -158,7 +164,7 @@ const Login = () => {
                         </div>
                         <div className="relative flex justify-center">
                             <span className="px-6 bg-white text-[9px] font-serif uppercase tracking-widest text-gray-300 italic">
-                                Or use ancient paths
+                                Or use your account
                             </span>
                         </div>
                     </div>
@@ -196,7 +202,7 @@ const Login = () => {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         className="w-full bg-transparent border-b border-gray-200 py-3 text-sm font-serif focus:border-[var(--athenic-gold)] outline-none transition-all placeholder:text-gray-200"
-                                        placeholder="Ancient Dial"
+                                        placeholder="Phone Number"
                                         pattern="[6-9][0-9]{9}"
                                     />
                                 </div>
@@ -209,15 +215,15 @@ const Login = () => {
                                         onChange={handleChange}
                                         className="w-full bg-transparent border-b border-gray-200 py-3 text-[10px] font-serif uppercase tracking-widest focus:border-[var(--athenic-gold)] outline-none transition-all"
                                     >
-                                        <option value="customer">Worshipper (Shopper)</option>
-                                        <option value="seller">Artisan (Seller)</option>
+                                        <option value="customer">I am a Customer</option>
+                                        <option value="seller">I am a Seller</option>
                                     </select>
                                 </div>
                             </>
                         )}
 
                         <div className="space-y-1">
-                            <label className="block text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)] opacity-60">Enscribed Email</label>
+                            <label className="block text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)] opacity-60">Email Address</label>
                             <input
                                 type="email"
                                 name="email"
@@ -225,12 +231,12 @@ const Login = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className="w-full bg-transparent border-b border-gray-200 py-3 text-sm font-serif focus:border-[var(--athenic-gold)] outline-none transition-all placeholder:text-gray-200"
-                                placeholder="name@olympus.com"
+                                placeholder="name@email.com"
                             />
                         </div>
 
                         <div className="space-y-1 relative">
-                            <label className="block text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)] opacity-60">Secret Cipher</label>
+                            <label className="block text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)] opacity-60">Password</label>
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 name="password"
@@ -254,10 +260,13 @@ const Login = () => {
                             <div className="flex items-center justify-between">
                                 <label className="flex items-center space-x-2 cursor-pointer group">
                                     <input type="checkbox" className="w-3 h-3 border border-gray-200 focus:ring-0 checked:bg-[var(--athenic-gold)] transition-all" />
-                                    <span className="text-[9px] font-serif uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition-colors">Stay Enshrined</span>
+                                    <span className="text-[9px] font-serif uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition-colors">Remember Me</span>
                                 </label>
-                                <Link to="/forgot-password" size="xs" className="text-[9px] font-serif uppercase tracking-widest text-[var(--athenic-gold)] hover:opacity-70 transition-opacity italic underline-offset-4 underline">
-                                    Lost Cipher?
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-[9px] font-serif uppercase tracking-widest text-[var(--athenic-gold)] hover:opacity-70 transition-opacity italic underline-offset-4 underline"
+                                >
+                                    Forgot Password?
                                 </Link>
                             </div>
                         )}
@@ -267,7 +276,7 @@ const Login = () => {
                             disabled={loading}
                             className="w-full bg-[var(--athenic-blue)] text-white font-serif text-[11px] uppercase tracking-[0.3em] py-5 shadow-athenic hover:bg-opacity-90 disabled:opacity-50 transition-all flex items-center justify-center space-x-3 overflow-hidden relative group"
                         >
-                            <span className="relative z-10">{loading ? 'Transcending...' : (isLogin ? 'Grant Access' : 'Create Legacy')}</span>
+                            <span className="relative z-10">{loading ? 'Loading...' : (isLogin ? 'Login' : 'Create Account')}</span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                         </button>
                     </form>
@@ -275,7 +284,7 @@ const Login = () => {
                     {/* Footer Links */}
                     <div className="mt-12 pt-8 border-t border-gray-50 text-center">
                         <Link to="/" className="text-[9px] font-serif uppercase tracking-[0.4em] text-gray-300 hover:text-[var(--athenic-gold)] transition-colors">
-                            Return to the Agora
+                            Return to Homepage
                         </Link>
                     </div>
                 </div>

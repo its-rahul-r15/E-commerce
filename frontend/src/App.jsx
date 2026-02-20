@@ -28,6 +28,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
+import CustomerAIAssistant from './components/customer/CustomerAIAssistant';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -36,11 +37,16 @@ function Layout({ children }) {
   const hideNavAndFooter = location.pathname.startsWith('/seller') ||
     location.pathname.startsWith('/admin');
 
+  // Show AI assistant on customer routes only
+  const isAuthPage = location.pathname === '/login' || location.pathname.startsWith('/auth');
+  const showAIAssistant = !hideNavAndFooter && !isAuthPage;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {!hideNavAndFooter && <Navbar />}
       {children}
       {!hideNavAndFooter && <Footer />}
+      {showAIAssistant && <CustomerAIAssistant />}
     </div>
   );
 }
@@ -82,7 +88,7 @@ function App() {
             <Route path="/admin/coupons" element={<ProtectedRoute allowedRoles={['admin']}><AdminCoupons /></ProtectedRoute>} />
             <Route path="/admin/shops" element={<ProtectedRoute allowedRoles={['admin']}><AdminShops /></ProtectedRoute>} />
             <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
-           
+
           </Routes>
         </Layout>
       </AuthProvider>

@@ -53,12 +53,12 @@ const ShopPage = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--athenic-bg)]">
                 <div className="text-center font-serif uppercase tracking-widest">
-                    <h2 className="text-2xl text-[var(--athenic-blue)] mb-6">Boutique Not Found</h2>
+                    <h2 className="text-2xl text-[var(--athenic-blue)] mb-6">Shop Not Found</h2>
                     <button
                         onClick={() => navigate('/')}
                         className="btn-athenic-outline px-8 py-3 text-[10px]"
                     >
-                        Return to Collections
+                        Return to Shops
                     </button>
                 </div>
             </div>
@@ -67,7 +67,7 @@ const ShopPage = () => {
 
     return (
         <div className="min-h-screen bg-[var(--athenic-bg)] selection:bg-[var(--athenic-gold)] selection:text-white pb-32">
-            {/* The Temple Portal (Hero) */}
+            {/* Welcome Section (Hero) */}
             <div className="relative pt-24 pb-32 overflow-hidden border-b border-[var(--athenic-gold)] border-opacity-20 animate-fade-in">
                 {/* Marble texture background overlay */}
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/marble-white.png')]"></div>
@@ -91,7 +91,7 @@ const ShopPage = () => {
                     <div className="max-w-3xl mx-auto">
                         <div className="flex items-center justify-center space-x-2 mb-4">
                             <span className="h-[1px] w-8 bg-[var(--athenic-gold)] opacity-50"></span>
-                            <span className="text-[10px] font-serif uppercase tracking-[0.4em] text-[var(--athenic-gold)]">Verified Boutique</span>
+                            <span className="text-[10px] font-serif uppercase tracking-[0.4em] text-[var(--athenic-gold)]">Verified Local Shop</span>
                             <span className="h-[1px] w-8 bg-[var(--athenic-gold)] opacity-50"></span>
                         </div>
 
@@ -100,7 +100,7 @@ const ShopPage = () => {
                         </h1>
 
                         <p className="text-xs md:text-sm font-serif italic text-gray-500 leading-relaxed tracking-wide mb-10 opacity-80 animate-fade-in-delayed">
-                            "{shop.description || 'Curating pieces of ancient soul for the modern wardrobe.'}"
+                            "{shop.description || 'Quality products from our local shop to your doorstep.'}"
                         </p>
 
                         <div className="flex flex-wrap justify-center items-center gap-8 text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--athenic-blue)]">
@@ -117,19 +117,19 @@ const ShopPage = () => {
                             <div className="hidden sm:block h-4 w-[1px] bg-gray-200"></div>
                             <div className="flex items-center space-x-2">
                                 <span className="text-[var(--athenic-gold)]">📍</span>
-                                <span className="font-bold">{shop.address?.city || 'Athens'}</span>
+                                <span className="font-bold">{shop.address?.city || 'Local Area'}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Museum Gallery Divider */}
+            {/* Shop Product Gallery */}
             <div className="max-w-7xl mx-auto px-4 py-20">
                 <div className="text-center mb-16">
                     <div className="meander-border opacity-20 mb-10"></div>
                     <h2 className="text-3xl font-serif tracking-[0.2em] text-[var(--athenic-blue)] uppercase">
-                        The Curated Collection
+                        Our Products
                     </h2>
                     <p className="text-[8px] font-serif tracking-[0.3em] text-gray-400 uppercase mt-4">
                         Hand-selected pieces from {shop.shopName}
@@ -139,11 +139,11 @@ const ShopPage = () => {
                 {productsLoading ? (
                     <div className="flex flex-col items-center justify-center py-20 space-y-4">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--athenic-gold)] border-t-transparent"></div>
-                        <p className="text-[10px] font-serif uppercase tracking-widest text-gray-400">Unveiling the treasures...</p>
+                        <p className="text-[10px] font-serif uppercase tracking-widest text-gray-400">Loading products...</p>
                     </div>
                 ) : products.length === 0 ? (
                     <div className="text-center py-32 border border-[var(--athenic-gold)] border-opacity-10 bg-white">
-                        <p className="text-[11px] font-serif uppercase tracking-[0.2em] text-gray-400">The atelier is currently preparing its next collection.</p>
+                        <p className="text-[11px] font-serif uppercase tracking-[0.2em] text-gray-400">The shop is currently preparing its next collection.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-16">
@@ -154,9 +154,9 @@ const ShopPage = () => {
                 )}
             </div>
 
-            {/* Boutique Contact Information (Classical Footer Style) */}
+            {/* Shop Contact Information */}
             <div className="max-w-4xl mx-auto px-4 mt-20 pt-20 border-t border-[var(--athenic-gold)] border-opacity-20 text-center">
-                <h3 className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-blue)] mb-8">Personal Assistance</h3>
+                <h3 className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-blue)] mb-8">Customer Assistance</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-3">
                         <p className="text-[9px] font-serif uppercase tracking-widest text-gray-400 italic">Location</p>
@@ -166,7 +166,7 @@ const ShopPage = () => {
                         </p>
                     </div>
                     <div className="space-y-3">
-                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-400 italic">Call the Atelier</p>
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-400 italic">Call the Shop</p>
                         <p className="text-xs font-serif text-[var(--athenic-blue)] tracking-[0.1em]">
                             {shop.phone}
                         </p>

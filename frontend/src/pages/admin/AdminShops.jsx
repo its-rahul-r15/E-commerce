@@ -175,7 +175,7 @@ const AdminShops = () => {
                                     </div>
                                 </div>
                                 <span className={`px-3 py-1 ${getStatusColor(shop.status)} text-white text-xs font-bold rounded-full`}>
-                                    {getStatusText(shop.status)}}
+                                    {getStatusText(shop.status)}
                                 </span>
                             </div>
 
@@ -202,54 +202,51 @@ const AdminShops = () => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex space-x-2">
-                                {shop.approvalStatus === 'pending' && (
-                                    <>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleApprove(shop._id);
-                                            }}
-                                            disabled={updating}
-                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleReject(shop._id);
-                                            }}
-                                            disabled={updating}
-                                            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
-                                        >
-                                            Reject
-                                        </button>
-                                    </>
-                                )}
-                                {shop.approvalStatus === 'approved' && (
+                            {/* Action Buttons — always visible based on current status */}
+                            <div className="flex gap-2 mt-1" onClick={e => e.stopPropagation()}>
+                                {(shop.status === 'pending' || shop.status === 'rejected') && (
                                     <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBlock(shop._id);
-                                        }}
+                                        onClick={() => handleApprove(shop._id)}
                                         disabled={updating}
-                                        className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
                                     >
-                                        Block
+                                        ✓ Approve
                                     </button>
                                 )}
-                                {shop.approvalStatus === 'blocked' && (
+                                {shop.status === 'pending' && (
                                     <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleUnblock(shop._id);
-                                        }}
+                                        onClick={() => handleReject(shop._id)}
                                         disabled={updating}
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                                        className="flex-1 bg-red-700 hover:bg-red-600 text-white py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
                                     >
-                                        Unblock
+                                        ✗ Reject
+                                    </button>
+                                )}
+                                {shop.status === 'approved' && (
+                                    <button
+                                        onClick={() => handleBlock(shop._id)}
+                                        disabled={updating}
+                                        className="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                                    >
+                                        🚫 Block
+                                    </button>
+                                )}
+                                {shop.status === 'blocked' && (
+                                    <button
+                                        onClick={() => handleUnblock(shop._id)}
+                                        disabled={updating}
+                                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                                    >
+                                        ✓ Unblock
+                                    </button>
+                                )}
+                                {shop.status === 'rejected' && (
+                                    <button
+                                        onClick={() => handleBlock(shop._id)}
+                                        disabled={updating}
+                                        className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                                    >
+                                        🚫 Block
                                     </button>
                                 )}
                             </div>
@@ -265,8 +262,8 @@ const AdminShops = () => {
                         <div className="flex items-start justify-between mb-6">
                             <div>
                                 <h2 className="text-2xl font-bold mb-2">{selectedShop.shopName}</h2>
-                                <span className={`px-3 py-1 ${getStatusColor(selectedShop.approvalStatus)} text-white text-xs font-bold rounded-full`}>
-                                    {getStatusText(selectedShop.approvalStatus)}
+                                <span className={`px-3 py-1 ${getStatusColor(selectedShop.status)} text-white text-xs font-bold rounded-full`}>
+                                    {getStatusText(selectedShop.status)}
                                 </span>
                             </div>
                             <button onClick={() => setSelectedShop(null)} className="text-slate-400 hover:text-white">
@@ -304,6 +301,52 @@ const AdminShops = () => {
                                     <p className="text-white">{selectedShop.description}</p>
                                 </div>
                             )}
+                        </div>
+
+                        {/* Modal Action Buttons */}
+                        <div className="flex gap-3 mt-6 pt-6 border-t border-slate-700">
+                            {(selectedShop.status === 'pending' || selectedShop.status === 'rejected') && (
+                                <button
+                                    onClick={() => handleApprove(selectedShop._id)}
+                                    disabled={updating}
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-sm"
+                                >
+                                    ✓ Approve Shop
+                                </button>
+                            )}
+                            {selectedShop.status === 'pending' && (
+                                <button
+                                    onClick={() => handleReject(selectedShop._id)}
+                                    disabled={updating}
+                                    className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-sm"
+                                >
+                                    ✗ Reject
+                                </button>
+                            )}
+                            {selectedShop.status === 'approved' && (
+                                <button
+                                    onClick={() => handleBlock(selectedShop._id)}
+                                    disabled={updating}
+                                    className="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-sm"
+                                >
+                                    🚫 Block Shop
+                                </button>
+                            )}
+                            {selectedShop.status === 'blocked' && (
+                                <button
+                                    onClick={() => handleUnblock(selectedShop._id)}
+                                    disabled={updating}
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 text-sm"
+                                >
+                                    ✓ Unblock Shop
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setSelectedShop(null)}
+                                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-semibold transition-all text-sm"
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>

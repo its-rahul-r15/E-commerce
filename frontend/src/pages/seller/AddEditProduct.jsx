@@ -21,14 +21,15 @@ const AddEditProduct = () => {
         price: '',
         discountedPrice: '',
         category: '',
+        subCategory: '',
+        style: '',
         stock: '',
         tags: '',
         brand: '',
-        subCategory: '',
-        style: '',
-        sizes: '',
-        colors: '',
+        sizes: [],
+        colors: [],
     });
+
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loading, setLoading] = useState(isEdit);
     const [submitting, setSubmitting] = useState(false);
@@ -54,8 +55,8 @@ const AddEditProduct = () => {
                 brand: product.brand || '',
                 subCategory: product.subCategory || '',
                 style: product.style || '',
-                sizes: product.sizes?.join(', ') || '',
-                colors: product.colors?.join(', ') || '',
+                sizes: product.sizes || [],
+                colors: product.colors || [],
             });
             setImagePreviews(product.images || []);
         } catch (error) {
@@ -66,6 +67,63 @@ const AddEditProduct = () => {
             setLoading(false);
         }
     };
+
+    // Fashion-specific constants
+    const FASHION_CATEGORIES = [
+        { value: 'Kurta', label: '🥻 Kurta / Kurti', sub: ['Straight Cut', 'A-Line', 'Anarkali', 'Pathani', 'Printed', 'Embroidered', 'Plain'] },
+        { value: 'Saree', label: '🥻 Saree', sub: ['Silk', 'Cotton', 'Georgette', 'Chiffon', 'Banarasi', 'Kanjivaram', 'Linen'] },
+        { value: 'Lehenga', label: '👗 Lehenga', sub: ['Bridal', 'Party Wear', 'Casual', 'Embroidered', 'Printed'] },
+        { value: 'Salwar Suit', label: '👘 Salwar Suit', sub: ['Punjabi', 'Patiala', 'Churidar', 'Straight', 'Palazzo'] },
+        { value: 'Dupatta', label: '🧣 Dupatta / Stole', sub: ['Silk', 'Cotton', 'Chiffon', 'Embroidered', 'Printed'] },
+        { value: 'Shirt', label: '👔 Shirt / Top', sub: ['Casual', 'Formal', 'Party Wear', 'Printed', 'Solid'] },
+        { value: 'Top', label: '👕 Top / Blouse', sub: ['Crop Top', 'Off Shoulder', 'Full Sleeve', 'Halter Neck', 'Tank Top'] },
+        { value: 'Dress', label: '👗 Dress / Gown', sub: ['Maxi', 'Midi', 'Mini', 'A-Line', 'Bodycon', 'Flared'] },
+        { value: 'Jacket', label: '🧥 Jacket / Blazer', sub: ['Casual', 'Formal', 'Denim', 'Leather', 'Woolen'] },
+        { value: 'Trouser', label: '👖 Trouser / Jeans', sub: ['Formal', 'Casual', 'Slim Fit', 'Wide Leg', 'Palazzos'] },
+        { value: 'Sherwani', label: '🎩 Sherwani', sub: ['Wedding', 'Party Wear', 'Casual', 'Embroidered'] },
+        { value: 'Accessories', label: '💍 Accessories', sub: ['Jewelry', 'Belt', 'Bag', 'Scarf', 'Sunglasses', 'Watch'] },
+        { value: 'Ethnic Wear', label: '🪡 Ethnic Wear (Other)', sub: ['Dhoti', 'Lungi', 'Chudidar', 'Indo-Western', 'Fusion'] },
+        { value: 'Western Wear', label: '🌟 Western Wear (Other)', sub: ['Co-ord Set', 'Jumpsuit', 'Romper', 'Shorts', 'Skirt'] },
+    ];
+
+    const SIZES_CLOTHING = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'];
+    const SIZES_NUMERIC = ['26', '28', '30', '32', '34', '36', '38', '40', '42', '44'];
+    const STYLES = ['Casual', 'Formal', 'Party Wear', 'Festive', 'Bridal', 'Wedding', 'Office Wear', 'Streetwear', 'Boho', 'Traditional', 'Indo-Western', 'Fusion'];
+    const COLORS = [
+        { name: 'Red', hex: '#DC2626' }, { name: 'Maroon', hex: '#7F1D1D' },
+        { name: 'Pink', hex: '#EC4899' }, { name: 'Hot Pink', hex: '#FF1493' },
+        { name: 'Peach', hex: '#FFCBA4' }, { name: 'Orange', hex: '#F97316' },
+        { name: 'Yellow', hex: '#EAB308' }, { name: 'Mustard', hex: '#CA8A04' },
+        { name: 'Green', hex: '#16A34A' }, { name: 'Mint', hex: '#6EE7B7' },
+        { name: 'Teal', hex: '#0D9488' }, { name: 'Blue', hex: '#2563EB' },
+        { name: 'Navy', hex: '#1E3A5F' }, { name: 'Indigo', hex: '#4338CA' },
+        { name: 'Purple', hex: '#9333EA' }, { name: 'Lavender', hex: '#C4B5FD' },
+        { name: 'Black', hex: '#000000' }, { name: 'White', hex: '#FFFFFF' },
+        { name: 'Grey', hex: '#9CA3AF' }, { name: 'Beige', hex: '#D4B896' },
+        { name: 'Cream', hex: '#FFFDD0' }, { name: 'Brown', hex: '#92400E' },
+        { name: 'Gold', hex: '#D4AF37' }, { name: 'Silver', hex: '#C0C0C0' },
+    ];
+
+    const toggleSize = (size) => {
+        setFormData(prev => ({
+            ...prev,
+            sizes: prev.sizes.includes(size)
+                ? prev.sizes.filter(s => s !== size)
+                : [...prev.sizes, size],
+        }));
+    };
+
+    const toggleColor = (colorName) => {
+        setFormData(prev => ({
+            ...prev,
+            colors: prev.colors.includes(colorName)
+                ? prev.colors.filter(c => c !== colorName)
+                : [...prev.colors, colorName],
+        }));
+    };
+
+    const selectedCategoryData = FASHION_CATEGORIES.find(c => c.value === formData.category);
+
 
     const handleChange = (e) => {
         setFormData({
@@ -105,15 +163,10 @@ const AddEditProduct = () => {
             if (formData.subCategory) data.append('subCategory', formData.subCategory);
             if (formData.style) data.append('style', formData.style);
 
-            if (formData.sizes) {
-                const sizesArray = formData.sizes.split(',').map(size => size.trim()).filter(size => size);
-                sizesArray.forEach(size => data.append('sizes', size));
-            }
+            // sizes and colors are now arrays
+            formData.sizes.forEach(size => data.append('sizes', size));
+            formData.colors.forEach(color => data.append('colors', color));
 
-            if (formData.colors) {
-                const colorsArray = formData.colors.split(',').map(color => color.trim()).filter(color => color);
-                colorsArray.forEach(color => data.append('colors', color));
-            }
 
             imagePreviews.forEach(preview => {
                 if (preview.file) {
@@ -221,23 +274,35 @@ const AddEditProduct = () => {
                                     name="category"
                                     required
                                     value={formData.category}
-                                    onChange={handleChange}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value, subCategory: '' })}
                                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-white"
                                 >
-                                    <option value="">Select a category</option>
-                                    <option value="Electronics">📱 Electronics</option>
-                                    <option value="Fashion">👗 Fashion</option>
-                                    <option value="Home & Kitchen">🏠 Home & Kitchen</option>
-                                    <option value="Books">📚 Books</option>
-                                    <option value="Sports">⚽ Sports</option>
-                                    <option value="Toys">🧸 Toys</option>
-                                    <option value="Beauty">💄 Beauty</option>
-                                    <option value="Grocery">🛒 Grocery</option>
-                                    <option value="Other">📦 Other</option>
+                                    <option value="">Select clothing category</option>
+                                    {FASHION_CATEGORIES.map(cat => (
+                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                    ))}
                                 </select>
                             </div>
-                        </div>
-                    </div>
+
+                            {/* Sub Category — updates based on selected category */}
+                            {selectedCategoryData && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sub Category</label>
+                                    <select
+                                        name="subCategory"
+                                        value={formData.subCategory}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-white"
+                                    >
+                                        <option value="">Select sub-category</option>
+                                        {selectedCategoryData.sub.map(s => (
+                                            <option key={s} value={s}>{s}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div> {/* Closes p-6 space-y-5 */}
+                    </div> {/* Closes Basic Information Card */}
 
 
                     {/* Detailed Information */}
@@ -248,74 +313,109 @@ const AddEditProduct = () => {
                                 Product Details & Variants
                             </h2>
                         </div>
-                        <div className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                                {/* Brand */}
+                        <div className="p-6 space-y-6">
+                            {/* Brand & Style */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Brand / Label Name</label>
                                     <input
                                         type="text"
                                         name="brand"
                                         value={formData.brand}
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
-                                        placeholder="e.g., Nike, Samsung"
+                                        placeholder="e.g., Fabindia, W for Woman, Local Brand"
                                     />
                                 </div>
-                                {/* Sub Category */}
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sub Category</label>
-                                    <input
-                                        type="text"
-                                        name="subCategory"
-                                        value={formData.subCategory}
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
-                                        placeholder="e.g., Wireless, Running Shoes"
-                                    />
-                                </div>
-                                {/* Style */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Style</label>
-                                    <input
-                                        type="text"
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Style / Occasion</label>
+                                    <select
                                         name="style"
                                         value={formData.style}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
-                                        placeholder="e.g., Casual, Formal"
-                                    />
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-white"
+                                    >
+                                        <option value="">Select occasion</option>
+                                        {STYLES.map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                {/* Sizes */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sizes (comma separated)</label>
-                                    <input
-                                        type="text"
-                                        name="sizes"
-                                        value={formData.sizes}
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
-                                        placeholder="e.g., S, M, L, XL or 7, 8, 9"
-                                    />
+                            {/* Sizes — Clothing chips + Numeric chips */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                    Sizes Available
+                                    {formData.sizes.length > 0 && (
+                                        <span className="ml-2 text-emerald-600 text-xs">({formData.sizes.join(', ')} selected)</span>
+                                    )}
+                                </label>
+                                <p className="text-xs text-gray-500 mb-2">Clothing Sizes</p>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {SIZES_CLOTHING.map(size => (
+                                        <button
+                                            key={size}
+                                            type="button"
+                                            onClick={() => toggleSize(size)}
+                                            className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${formData.sizes.includes(size)
+                                                ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300'
+                                                }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
                                 </div>
-                                {/* Colors */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Colors (comma separated)</label>
-                                    <input
-                                        type="text"
-                                        name="colors"
-                                        value={formData.colors}
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
-                                        placeholder="e.g., Red, Blue, Black"
-                                    />
+                                <p className="text-xs text-gray-500 mb-2">Numeric Sizes (Trousers/Jeans)</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {SIZES_NUMERIC.map(size => (
+                                        <button
+                                            key={size}
+                                            type="button"
+                                            onClick={() => toggleSize(size)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold border-2 transition-all ${formData.sizes.includes(size)
+                                                ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300'
+                                                }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Colors — Visual swatches */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                    Available Colors
+                                    {formData.colors.length > 0 && (
+                                        <span className="ml-2 text-emerald-600 text-xs">({formData.colors.join(', ')} selected)</span>
+                                    )}
+                                </label>
+                                <div className="flex flex-wrap gap-3">
+                                    {COLORS.map(color => (
+                                        <button
+                                            key={color.name}
+                                            type="button"
+                                            onClick={() => toggleColor(color.name)}
+                                            title={color.name}
+                                            className={`flex flex-col items-center gap-1 group transition-all`}
+                                        >
+                                            <div
+                                                className={`w-9 h-9 rounded-full border-4 transition-all ${formData.colors.includes(color.name)
+                                                    ? 'border-emerald-500 scale-110 shadow-md'
+                                                    : 'border-gray-200 hover:border-gray-400'
+                                                    }`}
+                                                style={{ backgroundColor: color.hex }}
+                                            />
+                                            <span className={`text-[10px] font-medium ${formData.colors.includes(color.name) ? 'text-emerald-600' : 'text-gray-500'
+                                                }`}>{color.name}</span>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     {/* Pricing & Stock Card */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -470,9 +570,9 @@ const AddEditProduct = () => {
                             )}
                         </button>
                     </div>
-                </form >
-            </div >
-        </div >
+                </form>
+            </div>
+        </div>
     );
 };
 
