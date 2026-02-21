@@ -120,8 +120,8 @@ const SellerAIAdvisor = ({ sellerData }) => {
                         <div className="flex items-center space-x-3">
                             <span className="text-xl">🤖</span>
                             <div>
-                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Klyra Ai</h3>
-                                <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Klyra Business Strategist</p>
+                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Naitri Ai</h3>
+                                <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Your Private Business Strategist</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -171,7 +171,7 @@ const SellerAIAdvisor = ({ sellerData }) => {
                                     </div>
                                 ) : insights.length === 0 ? (
                                     <div className="text-center py-8">
-                                        <p className="text-[10px] font-serif text-gray-400 uppercase tracking-widest">No insights yet. Klyra Ai is analysing your store data.</p>
+                                        <p className="text-[10px] font-serif text-gray-400 uppercase tracking-widest">No insights yet. Naitri Ai is analysing your store data.</p>
                                         <button onClick={loadInsights} className="mt-4 text-[9px] font-serif uppercase tracking-widest text-[var(--athenic-gold)] underline">
                                             Try again
                                         </button>
@@ -329,7 +329,7 @@ const SellerAIAdvisor = ({ sellerData }) => {
                         />
                         <div className="absolute -top-12 right-0 bg-white px-3 py-1.5 rounded-lg shadow-lg border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             <p className="text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)]">
-                                Need help? <span className="text-[var(--athenic-gold)] font-bold">Klyra Ai</span>
+                                Need help? <span className="text-[var(--athenic-gold)] font-bold">Naitri Ai</span>
                             </p>
                             <div className="absolute -bottom-1 right-5 w-2 h-2 bg-white border-r border-b border-gray-100 rotate-45"></div>
                         </div>

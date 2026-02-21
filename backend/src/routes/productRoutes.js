@@ -2,7 +2,7 @@ import express from 'express';
 import * as productController from '../controllers/productController.js';
 import auth from '../middlewares/auth.js';
 import { requireSeller, requireAdmin } from '../middlewares/roleCheck.js';
-import { createProductValidator, mongoIdValidator, shopIdValidator, paginationValidator } from '../middlewares/validator.js';
+import { createProductValidator, mongoIdValidator, shopIdValidator, paginationValidator, updateProductValidator } from '../middlewares/validator.js';
 import { apiRateLimiter, readRateLimiter } from '../middlewares/rateLimiter.js';
 import { upload } from '../utils/cloudinaryUpload.js';
 
@@ -46,6 +46,7 @@ router.patch(
     apiRateLimiter,
     upload.array('images', 5),
     mongoIdValidator,
+    updateProductValidator,
     productController.updateProduct
 );
 

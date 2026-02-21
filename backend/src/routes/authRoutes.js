@@ -2,7 +2,7 @@ import express from 'express';
 import * as authController from '../controllers/authController.js';
 import * as googleOAuthController from '../controllers/googleOAuthController.js';
 import auth from '../middlewares/auth.js';
-import { registerValidator, loginValidator } from '../middlewares/validator.js';
+import { registerValidator, loginValidator, updateProfileValidator } from '../middlewares/validator.js';
 import { authRateLimiter } from '../middlewares/rateLimiter.js';
 
 /**
@@ -24,6 +24,6 @@ router.get('/google/callback', googleOAuthController.googleCallback);
 // Protected routes
 router.post('/logout', auth, authController.logout);
 router.get('/me', auth, authController.getProfile);
-router.patch('/me', auth, authController.updateProfile);
+router.patch('/me', auth, updateProfileValidator, authController.updateProfile);
 
 export default router;

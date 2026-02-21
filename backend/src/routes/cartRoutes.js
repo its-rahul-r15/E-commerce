@@ -3,7 +3,7 @@ import * as cartController from '../controllers/cartController.js';
 import auth from '../middlewares/auth.js';
 import { requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
-import { productIdValidator } from '../middlewares/validator.js';
+import { productIdValidator, addToCartValidator } from '../middlewares/validator.js';
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.use(auth, requireCustomerOrSeller);
 
 router.get('/', cartController.getCart);
 
-router.post('/items', apiRateLimiter, cartController.addToCart);
+router.post('/items', apiRateLimiter, addToCartValidator, cartController.addToCart);
 
 router.patch(
     '/items/:productId',

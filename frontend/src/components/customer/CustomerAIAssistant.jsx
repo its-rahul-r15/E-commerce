@@ -12,7 +12,7 @@ const CustomerAIAssistant = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            text: 'Namaste! 🙏 I am Klyra Ai, your Personal Shopping Guide. Ask me anything like:\n\n"Show me silk kurtas under ₹2000"\n"Find red sarees"\n"I need office wear under ₹3000"',
+            text: 'Namaste! 🙏 I am Naitri Ai, your Personal Shopping Guide. Ask me anything like:\n\n"Show me silk kurtas under ₹2000"\n"Find red sarees"\n"I need office wear under ₹3000"',
             products: []
         }
     ]);
@@ -176,7 +176,7 @@ const CustomerAIAssistant = () => {
                         <div className="flex items-center space-x-3">
                             <span className="text-2xl" style={{ filter: 'drop-shadow(0 0 6px gold)' }}>⚜️</span>
                             <div>
-                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Klyra Ai</h3>
+                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Naitri Ai</h3>
                                 <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Ask me anything</p>
                             </div>
                         </div>
