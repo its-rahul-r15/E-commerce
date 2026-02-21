@@ -179,7 +179,7 @@ const Home = () => {
                         <span className="text-2xl">🏷️</span>
                         <div>
                             <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-500">For our Exclusive</p>
-                            <p className="text-sm font-serif italic text-[var(--mehron)]">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">ATHENIG15</span></p>
+                            <p className="text-sm font-serif italic text-[var(--mehron)]">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">KLYRA15</span></p>
                         </div>
                     </div>
                     <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>

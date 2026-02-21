@@ -13,7 +13,7 @@ const Footer = () => {
                     <div className="md:col-span-1">
                         <Link to="/" className="inline-block mb-8">
                             <h2 className="text-3xl font-serif-decorative tracking-[0.3em] text-[var(--gold)]">
-                                ATHENIG
+                                KLYRA
                             </h2>
                         </Link>
                         <p className="text-[10px] font-serif tracking-widest text-gray-400 uppercase leading-relaxed">
@@ -79,7 +79,7 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className="pt-12 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
                     <p className="text-[9px] font-serif uppercase tracking-[0.2em] text-gray-500">
-                        © 2024 ATHENIG MARKETPLACE. ALL RIGHTS RESERVED.
+                        © 2024 KLYRA MARKETPLACE. ALL RIGHTS RESERVED.
                     </p>
                     <div className="flex space-x-8">
                         {['Instagram', 'Pinterest', 'LinkedIn'].map((social) => (
