@@ -12,7 +12,7 @@ const CustomerAIAssistant = () => {
     const [messages, setMessages] = useState([
         {
             role: 'assistant',
-            text: 'Namaste! 🙏 I am Naitri Ai, your Athenic Shopping Guide. Ask me anything like:\n\n"Show me silk kurtas under ₹2000"\n"Find red sarees"\n"I need office wear under ₹3000"',
+            text: 'Namaste! 🙏 I am Klyra Ai, your Personal Shopping Guide. Ask me anything like:\n\n"Show me silk kurtas under ₹2000"\n"Find red sarees"\n"I need office wear under ₹3000"',
             products: []
         }
     ]);
@@ -143,9 +143,9 @@ const CustomerAIAssistant = () => {
             {/* Floating Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 focus:outline-none ${isOpen
-                    ? 'bg-[var(--athenic-blue)] text-white scale-90'
-                    : 'bg-[var(--athenic-gold)] text-[var(--athenic-blue)] hover:scale-110'
+                className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 border-2 border-[var(--athenic-gold)] focus:outline-none ${isOpen
+                    ? 'bg-white text-black scale-90'
+                    : 'bg-white hover:scale-110'
                     }`}
                 aria-label="AI Shopping Assistant"
             >
@@ -154,7 +154,11 @@ const CustomerAIAssistant = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 ) : (
-                    <span className="text-2xl">✨</span>
+                    <img
+                        src="https://res.cloudinary.com/dpfls0d1n/image/upload/v1771658235/WhatsApp_Image_2026-02-21_at_11.53.16_AM-removebg-preview_zdwbkr.png"
+                        alt="AI Assistant"
+                        className="w-full h-full object-contain p-2"
+                    />
                 )}
             </button>
 
@@ -172,7 +176,7 @@ const CustomerAIAssistant = () => {
                         <div className="flex items-center space-x-3">
                             <span className="text-2xl" style={{ filter: 'drop-shadow(0 0 6px gold)' }}>⚜️</span>
                             <div>
-                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Naitri Ai</h3>
+                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Klyra Ai</h3>
                                 <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Ask me anything</p>
                             </div>
                         </div>

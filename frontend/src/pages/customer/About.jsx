@@ -94,7 +94,7 @@ const About = () => {
                         A Commitment to the <br />
                         Art of the Boutique
                     </h2>
-                    <p className="text-sm font-serif italic text-gray-600 leading-relaxed italic">
+                    <p className="text-sm font-serif italic text-gray-600 leading-relaxed">
                         "At Klyra, we don't just sell clothes; we provide a canvas for self-expression. Our philosophy is rooted in the belief that the things we wear should reflect the depth of our identity and the excellence of our local communities."
                     </p>
                     <div className="pt-4">
