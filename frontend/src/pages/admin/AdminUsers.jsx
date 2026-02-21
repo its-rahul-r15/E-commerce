@@ -75,19 +75,19 @@ const AdminUsers = () => {
     return (
         <AdminLayout>
             {/* Page Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 meander-pattern pb-1">
                 <div>
-                    <h1 className="text-3xl font-bold">User Management</h1>
-                    <p className="text-slate-400 mt-2">Manage platform users and permissions</p>
+                    <h1 className="text-3xl font-bold uppercase tracking-widest text-white">User Management</h1>
+                    <p className="text-[var(--gold)] mt-2 text-[10px] uppercase tracking-[0.2em] font-bold">Manage user roles, status, and permissions</p>
                 </div>
-                <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                    <span className="text-slate-400 text-sm">Total Users: </span>
+                <div className="bg-[var(--mehron)] px-6 py-2 rounded-none border border-[var(--gold)] shadow-lg">
+                    <span className="text-[var(--gold)]/70 text-[10px] uppercase tracking-widest font-bold">Total Users: </span>
                     <span className="text-white font-bold text-lg">{users.length}</span>
                 </div>
             </div>
 
             {/* Filter Tabs */}
-            <div className="bg-slate-800 rounded-2xl p-2 mb-6 inline-flex space-x-2 border border-slate-700">
+            <div className="bg-white rounded-none p-2 mb-6 inline-flex space-x-2 border border-[var(--border-mehron)] shadow-sm">
                 {[
                     { value: '', label: 'All Users' },
                     { value: 'customer', label: 'Customers' },
@@ -97,9 +97,9 @@ const AdminUsers = () => {
                     <button
                         key={filter.value}
                         onClick={() => setRoleFilter(filter.value)}
-                        className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${roleFilter === filter.value
-                            ? 'bg-blue-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                        className={`px-6 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${roleFilter === filter.value
+                            ? 'bg-[var(--mehron)] text-white shadow-lg border border-[var(--gold)]'
+                            : 'text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
                             }`}
                     >
                         {filter.label}
@@ -109,88 +109,97 @@ const AdminUsers = () => {
 
             {/* Users Table */}
             {loading ? (
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div className="flex items-center justify-center h-64 bg-white/5 border border-[var(--border-mehron)]/10">
+                    <div className="animate-spin rounded-none h-10 w-10 border-2 border-[var(--gold)] border-t-transparent"></div>
                 </div>
             ) : users.length === 0 ? (
-                <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">
-                    <svg className="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                <div className="bg-white rounded-none p-12 text-center border border-[var(--border-mehron)] shadow-sm">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-[var(--gold)]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <p className="text-slate-400 text-lg">No users found</p>
+                    <p className="text-[var(--mehron)] text-sm uppercase tracking-widest font-bold">No users found in this role</p>
                 </div>
             ) : (
-                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-                    <table className="min-w-full divide-y divide-slate-700">
-                        <thead className="bg-slate-700/50">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">User</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Email</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Joined</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-700">
-                            {users.map((user) => (
-                                <tr key={user._id} className="hover:bg-slate-700/30 transition-colors">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold">
-                                                {user.name?.charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="ml-3">
-                                                <p className="font-semibold text-white">{user.name}</p>
-                                                <p className="text-sm text-slate-400">{user.phone || 'No phone'}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-slate-300">{user.email}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)} text-white`}>
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${user.isBlocked ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
-                                            }`}>
-                                            {user.isBlocked ? 'Blocked' : 'Active'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-slate-400">
-                                        {new Date(user.createdAt).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 text-right space-x-2">
-                                        {user.isBlocked ? (
-                                            <button
-                                                onClick={() => handleUnblockUser(user._id)}
-                                                disabled={updating}
-                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
-                                            >
-                                                Unblock
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleBlockUser(user._id)}
-                                                disabled={updating}
-                                                className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
-                                            >
-                                                Block
-                                            </button>
-                                        )}
-                                        <button
-                                            onClick={() => handleDeleteUser(user._id)}
-                                            disabled={updating}
-                                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                <div className="bg-white rounded-none border border-[var(--border-mehron)] overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-[var(--border-mehron)]/10">
+                            <thead className="bg-[var(--mehron)]/5">
+                                <tr>
+                                    <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">User Name</th>
+                                    <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Email Address</th>
+                                    <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Role</th>
+                                    <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Status</th>
+                                    <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Joined On</th>
+                                    <th className="px-6 py-4 text-right text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-mehron)]/10">
+                                {users.map((user) => (
+                                    <tr key={user._id} className="hover:bg-[var(--mehron)]/[0.02] transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center">
+                                                <div className="w-10 h-10 bg-[var(--mehron)] text-[var(--gold)] rounded-none flex items-center justify-center font-bold text-sm border border-[var(--gold)]/20 shadow-inner">
+                                                    {user.name?.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="ml-3">
+                                                    <p className="font-bold text-[var(--mehron)] uppercase tracking-wider text-sm">{user.name}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold">{user.phone || 'No direct link'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">{user.email}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-none border ${user.role === 'admin'
+                                                ? 'bg-[var(--mehron)] text-white border-[var(--gold)]'
+                                                : user.role === 'seller'
+                                                    ? 'bg-[var(--gold-pale)] text-[var(--mehron)] border-[var(--gold)]/30'
+                                                    : 'bg-gray-100 text-gray-600 border-gray-200'
+                                                }`}>
+                                                {user.role === 'customer' ? 'Customer' : user.role === 'seller' ? 'Seller' : user.role}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-none border ${user.isBlocked
+                                                ? 'bg-red-900 text-white border-red-700'
+                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                }`}>
+                                                {user.isBlocked ? 'Blocked' : 'Active'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                            {new Date(user.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4 text-right space-x-2">
+                                            {user.isBlocked ? (
+                                                <button
+                                                    onClick={() => handleUnblockUser(user._id)}
+                                                    disabled={updating}
+                                                    className="px-3 py-1 bg-[var(--mehron)] hover:bg-[var(--mehron-deep)] text-white text-[9px] font-bold uppercase tracking-widest border border-[var(--gold)] rounded-none transition-all disabled:opacity-50"
+                                                >
+                                                    Unblock
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleBlockUser(user._id)}
+                                                    disabled={updating}
+                                                    className="px-3 py-1 bg-[var(--charcoal)] hover:bg-black text-[var(--gold)] text-[9px] font-bold uppercase tracking-widest border border-white/20 rounded-none transition-all disabled:opacity-50"
+                                                >
+                                                    Block
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteUser(user._id)}
+                                                disabled={updating}
+                                                className="px-3 py-1 bg-white hover:bg-red-50 text-red-600 text-[9px] font-bold uppercase tracking-widest border border-red-200 rounded-none transition-all disabled:opacity-50"
+                                            >
+                                                Expunge
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </AdminLayout>

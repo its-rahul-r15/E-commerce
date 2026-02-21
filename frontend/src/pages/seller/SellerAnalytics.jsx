@@ -190,8 +190,8 @@ const SellerAnalytics = () => {
             <SellerLayout>
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center">
-                        <ArrowPathIcon className="h-12 w-12 text-emerald-600 animate-spin mx-auto" />
-                        <p className="mt-4 text-gray-600 font-medium">Loading analytics...</p>
+                        <ArrowPathIcon className="h-10 w-10 text-[var(--gold)] animate-spin mx-auto" />
+                        <p className="mt-4 text-gray-600 font-serif uppercase tracking-[0.2em] text-[10px]">Analyzing boutique records...</p>
                     </div>
                 </div>
             </SellerLayout>
@@ -205,8 +205,8 @@ const SellerAnalytics = () => {
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-                    <p className="text-gray-600 mt-1">Track your shop's performance and insights</p>
+                    <h1 className="text-3xl font-serif font-bold text-[var(--mehron)] uppercase tracking-wider meander-pattern pb-1">Analytics Repository</h1>
+                    <p className="text-gray-600 mt-1 font-serif text-[10px] uppercase tracking-widest">Observe the growth of your boutique's legacy</p>
                 </div>
 
                 {/* Time Range Selector */}
@@ -219,9 +219,9 @@ const SellerAnalytics = () => {
                         <button
                             key={range.value}
                             onClick={() => setTimeRange(range.value)}
-                            className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${timeRange === range.value
-                                ? 'bg-emerald-600 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
+                            className={`px-4 py-2 rounded-none font-serif text-[10px] uppercase tracking-widest transition-all ${timeRange === range.value
+                                ? 'bg-[var(--mehron)] text-white border border-[var(--gold)] shadow-md'
+                                : 'text-gray-600 hover:bg-[var(--gold-pale)]'
                                 }`}
                         >
                             {range.label}
@@ -233,12 +233,12 @@ const SellerAnalytics = () => {
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* Revenue */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="bg-white border border-[var(--border-mehron)] rounded-none p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-emerald-50 rounded-lg">
-                            <CurrencyRupeeIcon className="h-6 w-6 text-emerald-600" />
+                        <div className="p-3 bg-[var(--mehron-soft)] rounded-none border border-[var(--border-mehron)]">
+                            <CurrencyRupeeIcon className="h-6 w-6 text-[var(--mehron)]" />
                         </div>
-                        <div className={`flex items-center text-sm font-semibold ${analytics.revenue.change >= 0 ? 'text-emerald-600' : 'text-red-600'
+                        <div className={`flex items-center text-[10px] font-serif font-bold uppercase tracking-widest ${analytics.revenue.change >= 0 ? 'text-[var(--mehron)]' : 'text-red-600'
                             }`}>
                             {analytics.revenue.change >= 0 ? (
                                 <ArrowUpIcon className="h-4 w-4 mr-1" />
@@ -248,20 +248,20 @@ const SellerAnalytics = () => {
                             {Math.abs(analytics.revenue.change).toFixed(1)}%
                         </div>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-600 mb-1">Total Revenue</h3>
-                    <p className="text-3xl font-bold text-gray-900">
+                    <h3 className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Total Revenue</h3>
+                    <p className="text-3xl font-serif font-bold text-[var(--mehron)]">
                         ₹{analytics.revenue.total.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-500 mt-2">Completed orders only</p>
                 </div>
 
                 {/* Orders */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="bg-white border border-[var(--border-mehron)] rounded-none p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-blue-50 rounded-lg">
-                            <ShoppingCartIcon className="h-6 w-6 text-blue-600" />
+                        <div className="p-3 bg-[var(--gold-pale)] rounded-none">
+                            <ShoppingCartIcon className="h-6 w-6 text-[var(--gold)]" />
                         </div>
-                        <div className={`flex items-center text-sm font-semibold ${analytics.orders.change >= 0 ? 'text-emerald-600' : 'text-red-600'
+                        <div className={`flex items-center text-[10px] font-serif font-bold uppercase tracking-widest ${analytics.orders.change >= 0 ? 'text-[var(--mehron)]' : 'text-red-600'
                             }`}>
                             {analytics.orders.change >= 0 ? (
                                 <ArrowUpIcon className="h-4 w-4 mr-1" />
@@ -309,13 +309,13 @@ const SellerAnalytics = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Revenue Chart */}
-                <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
+                <div className="lg:col-span-2 bg-white border border-[var(--border-mehron)] rounded-none p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">Revenue Trend</h3>
-                            <p className="text-sm text-gray-600">Daily revenue over selected period</p>
+                            <h3 className="text-lg font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">Revenue Trend</h3>
+                            <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500">Daily boutique yields</p>
                         </div>
-                        <CalendarIcon className="h-5 w-5 text-gray-400" />
+                        <CalendarIcon className="h-5 w-5 text-[var(--gold)]" />
                     </div>
 
                     <div className="flex items-end justify-between h-64 gap-2">
@@ -323,10 +323,10 @@ const SellerAnalytics = () => {
                             <div key={i} className="flex-1 flex flex-col items-center group">
                                 <div className="relative w-full">
                                     <div
-                                        className="w-full bg-emerald-600 rounded-t-lg transition-all duration-300 hover:bg-emerald-700 cursor-pointer"
+                                        className="w-full bg-gradient-to-t from-[var(--mehron)] to-[var(--gold)] rounded-none transition-all duration-300 hover:from-[var(--mehron-deep)] hover:to-[var(--mehron)] cursor-pointer"
                                         style={{
                                             height: `${(data.value / maxChartValue) * 200}px`,
-                                            minHeight: data.value > 0 ? '4px' : '0px',
+                                            minHeight: data.value > 0 ? '4px' : '2px',
                                         }}
                                     ></div>
                                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -340,8 +340,8 @@ const SellerAnalytics = () => {
                 </div>
 
                 {/* Order Breakdown */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6">Order Breakdown</h3>
+                <div className="bg-white border border-[var(--border-mehron)] rounded-none p-6 shadow-sm">
+                    <h3 className="text-lg font-serif font-bold text-[var(--mehron)] mb-6 uppercase tracking-wider">Order Breakdown</h3>
                     <div className="space-y-4">
                         <div>
                             <div className="flex items-center justify-between mb-2">
@@ -350,9 +350,9 @@ const SellerAnalytics = () => {
                                     {analytics.orders.completed}
                                 </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-[var(--cream)] rounded-none h-1.5 border border-[var(--border-mehron)]">
                                 <div
-                                    className="bg-emerald-600 h-2 rounded-full"
+                                    className="bg-[var(--mehron)] h-1.5 rounded-none"
                                     style={{
                                         width: `${(analytics.orders.completed / analytics.orders.total) * 100}%`,
                                     }}
@@ -426,7 +426,7 @@ const SellerAnalytics = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-lg font-bold text-emerald-600">
+                                    <p className="text-lg font-serif font-bold text-[var(--mehron)]">
                                         ₹{product.revenue.toLocaleString()}
                                     </p>
                                 </div>
@@ -441,8 +441,8 @@ const SellerAnalytics = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-6">Customer Insights</h3>
                     <div className="space-y-6">
-                        <div className="text-center p-6 bg-emerald-50 rounded-lg border border-emerald-200">
-                            <p className="text-4xl font-bold text-emerald-600 mb-2">
+                        <div className="text-center p-6 bg-[var(--mehron-soft)] rounded-none border border-[var(--border-mehron)] shadow-inner">
+                            <p className="text-4xl font-serif font-bold text-[var(--mehron)] mb-2">
                                 {analytics.customers.total > 0
                                     ? ((analytics.customers.returning / analytics.customers.total) * 100).toFixed(0)
                                     : 0}%

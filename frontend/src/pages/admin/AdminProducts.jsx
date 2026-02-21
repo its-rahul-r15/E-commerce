@@ -59,103 +59,107 @@ const AdminProducts = () => {
     return (
         <AdminLayout>
             {/* Page Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 meander-pattern pb-1">
                 <div>
-                    <h1 className="text-3xl font-bold">Product Moderation</h1>
-                    <p className="text-slate-400 mt-2">Monitor and manage platform products</p>
+                    <h1 className="text-3xl font-bold uppercase tracking-widest text-white">Product Moderation</h1>
+                    <p className="text-[var(--gold)] mt-2 text-[10px] uppercase tracking-[0.2em] font-bold">Manage product visibility, categories, and inventory</p>
                 </div>
-                <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-                    <span className="text-slate-400 text-sm">Total Products: </span>
+                <div className="bg-[var(--mehron)] px-6 py-2 rounded-none border border-[var(--gold)] shadow-lg">
+                    <span className="text-[var(--gold)]/70 text-[10px] uppercase tracking-widest font-bold">Total Products: </span>
                     <span className="text-white font-bold text-lg">{products.length}</span>
                 </div>
             </div>
 
             {/* Filter Tabs */}
-            <div className="bg-slate-800 rounded-2xl p-2 mb-6 inline-flex space-x-2 border border-slate-700">
+            <div className="bg-white rounded-none p-2 mb-6 inline-flex space-x-2 border border-[var(--border-mehron)] shadow-sm">
                 {['all', 'active', 'banned'].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setFilter(tab)}
-                        className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${filter === tab
-                            ? 'bg-blue-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                        className={`px-6 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${filter === tab
+                            ? 'bg-[var(--mehron)] text-white shadow-lg border border-[var(--gold)]'
+                            : 'text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
                             }`}
                     >
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === 'active' ? 'Active' : tab === 'banned' ? 'Banned' : 'All Products'}
                     </button>
                 ))}
             </div>
 
             {/* Products Table */}
             {loading ? (
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div className="flex items-center justify-center h-64 bg-white/5 border border-[var(--border-mehron)]/10">
+                    <div className="animate-spin rounded-none h-10 w-10 border-2 border-[var(--gold)] border-t-transparent"></div>
                 </div>
             ) : filteredProducts.length === 0 ? (
-                <div className="bg-slate-800 rounded-2xl p-12 text-center border border-slate-700">
-                    <svg className="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                <div className="bg-white rounded-none p-12 text-center border border-[var(--border-mehron)] shadow-sm">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-[var(--gold)]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    <p className="text-slate-400 text-lg">No products found</p>
+                    <p className="text-[var(--mehron)] text-sm uppercase tracking-widest font-bold">No products found in this domain</p>
                 </div>
             ) : (
-                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-                    <table className="min-w-full divide-y divide-slate-700">
-                        <thead className="bg-slate-700/50">
+                <div className="bg-white rounded-none border border-[var(--border-mehron)] overflow-hidden shadow-sm">
+                    <table className="min-w-full divide-y divide-[var(--border-mehron)]/10">
+                        <thead className="bg-[var(--mehron)]/5">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Product</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Shop</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Category</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Price</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Stock</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-slate-300 uppercase tracking-wider">Actions</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Product Name</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Shop</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Category</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Price</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Stock</th>
+                                <th className="px-6 py-4 text-left text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Status</th>
+                                <th className="px-6 py-4 text-right text-[9px] font-bold text-[var(--mehron)] uppercase tracking-[0.2em]">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-700">
+                        <tbody className="divide-y divide-[var(--border-mehron)]/10">
                             {filteredProducts.map((product) => (
-                                <tr key={product._id} className="hover:bg-slate-700/30 transition-colors">
+                                <tr key={product._id} className="hover:bg-[var(--mehron)]/[0.02] transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-3">
-                                            <img
-                                                src={product.images?.[0] || '/placeholder.png'}
-                                                alt={product.name}
-                                                className="w-14 h-14 object-cover rounded-lg"
-                                            />
+                                            <div className="w-14 h-14 border border-[var(--gold)]/20 shadow-sm overflow-hidden flex-shrink-0">
+                                                <img
+                                                    src={product.images?.[0] || '/placeholder.png'}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
                                             <div>
-                                                <p className="font-semibold text-white">{product.name}</p>
-                                                <p className="text-sm text-slate-400 truncate max-w-xs">{product.description}</p>
+                                                <p className="font-bold text-[var(--mehron)] uppercase tracking-wider text-sm">{product.name}</p>
+                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate max-w-[200px]">{product.description}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-300">
+                                    <td className="px-6 py-4 text-[10px] font-bold text-[var(--mehron)] uppercase tracking-wider italic">
                                         {product.shopId?.shopName || 'Unknown'}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-300">{product.category}</td>
+                                    <td className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">{product.category}</td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm">
-                                            <p className="font-semibold text-white">₹{product.discountedPrice || product.price}</p>
+                                        <div className="text-[11px] font-bold">
+                                            <p className="text-[var(--mehron)]">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
                                             {product.discountedPrice && (
-                                                <p className="text-slate-400 line-through text-xs">₹{product.price}</p>
+                                                <p className="text-gray-400 line-through text-[9px]">₹{product.price.toLocaleString()}</p>
                                             )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${product.stock === 0 ? 'bg-red-600 text-white' :
-                                            product.stock < 10 ? 'bg-yellow-600 text-white' :
-                                                'bg-emerald-600 text-white'
+                                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-none border shadow-sm ${product.stock === 0
+                                            ? 'bg-red-50 text-red-600 border-red-200'
+                                            : product.stock < 10
+                                                ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                             }`}>
                                             {product.stock}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${product.isBanned
-                                            ? 'bg-red-600 text-white'
+                                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-none border ${product.isBanned
+                                            ? 'bg-red-900 text-white border-red-700'
                                             : product.isAvailable
-                                                ? 'bg-emerald-600 text-white'
-                                                : 'bg-slate-600 text-white'
+                                                ? 'bg-[var(--gold-pale)] text-[var(--mehron)] border-[var(--gold)]/20'
+                                                : 'bg-gray-100 text-gray-500 border-gray-200'
                                             }`}>
-                                            {product.isBanned ? 'Banned' : product.isAvailable ? 'Active' : 'Inactive'}
+                                            {product.isBanned ? 'Banned' : product.isAvailable ? 'Active' : 'Hidden'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
@@ -163,15 +167,15 @@ const AdminProducts = () => {
                                             <button
                                                 onClick={() => handleUnban(product._id)}
                                                 disabled={updating}
-                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                                className="px-3 py-1 bg-[var(--mehron)] hover:bg-[var(--mehron-deep)] text-white text-[9px] font-bold uppercase tracking-widest border border-[var(--gold)] rounded-none transition-all disabled:opacity-50"
                                             >
-                                                Unban
+                                                Restore
                                             </button>
                                         ) : (
                                             <button
                                                 onClick={() => handleBan(product._id)}
                                                 disabled={updating}
-                                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                                className="px-3 py-1 bg-[var(--charcoal)] hover:bg-black text-[var(--gold)] text-[9px] font-bold uppercase tracking-widest border border-white/20 rounded-none transition-all disabled:opacity-50"
                                             >
                                                 Ban
                                             </button>

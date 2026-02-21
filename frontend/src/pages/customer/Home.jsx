@@ -7,11 +7,11 @@ import ProductCard from '../../components/customer/ProductCard';
 
 const HOME_CATEGORIES = [
     { name: 'Kurta', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?fit=crop&w=200&h=200', path: '/products?categories=Kurta' },
-    { name: 'Saree', image: 'https://images.unsplash.com/photo-1610030469668-93514219c939?fit=crop&w=200&h=200', path: '/products?categories=Saree' },
+    { name: 'Saree', image: 'https://res.cloudinary.com/dpfls0d1n/image/upload/v1771648885/813vHDLsKVL._SY741__ccfa9b.jpg', path: '/products?categories=Saree' },
     { name: 'Lehenga', image: 'https://images.unsplash.com/photo-1589156191108-c762ff4b96ab?fit=crop&w=200&h=200', path: '/products?categories=Lehenga' },
     { name: 'Shirt', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?fit=crop&w=200&h=200', path: '/products?categories=Shirt' },
     { name: 'Dress', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?fit=crop&w=200&h=200', path: '/products?categories=Dress' },
-    { name: 'Accessories', image: 'https://images.unsplash.com/photo-1611085583191-a3b134c06203?fit=crop&w=200&h=200', path: '/products?categories=Accessories' },
+    { name: 'Accessories', image: 'https://res.cloudinary.com/dpfls0d1n/image/upload/v1771649060/martin-de-arriba-uf_IDewI6iQ-unsplash_mayt5i.jpg', path: '/products?categories=Accessories' },
     { name: 'Ethnic', image: 'https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?fit=crop&w=200&h=200', path: '/products?categories=Ethnic%20Wear' },
 ];
 
@@ -173,13 +173,13 @@ const Home = () => {
             </section>
 
             {/* Promotion / Coupon Bar */}
-            <section className="bg-gradient-to-r from-[#FDEFEF] to-[#F5E6E6] py-4 border-y border-[var(--athenic-gold)] border-opacity-20 my-10">
+            <section className="bg-gradient-to-r from-[var(--mehron-blush)] to-[var(--mehron-soft)] py-4 border-y border-[var(--athenic-gold)] border-opacity-20 my-10">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
                     <div className="flex items-center space-x-4 mb-4 md:mb-0">
                         <span className="text-2xl">🏷️</span>
                         <div>
                             <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-500">For our Exclusive</p>
-                            <p className="text-sm font-serif italic text-red-800">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">ATHENIG15</span></p>
+                            <p className="text-sm font-serif italic text-[var(--mehron)]">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">ATHENIG15</span></p>
                         </div>
                     </div>
                     <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>
@@ -213,7 +213,7 @@ const Home = () => {
             <div className="meander-border opacity-30 mt-20"></div>
 
             {/* Brand Philosophy Section */}
-            <section className="py-32 bg-gradient-to-b from-[var(--athenic-bg)] to-[#FEEEDF] items-center flex flex-col justify-center text-center px-4 relative">
+            <section className="py-32 bg-gradient-to-b from-[var(--athenic-bg)] to-[var(--gold-pale)] items-center flex flex-col justify-center text-center px-4 relative">
                 <div className="absolute top-10 flex justify-center w-full opacity-30">
                     <span className="text-4xl text-[var(--athenic-gold)]">⚜️</span>
                 </div>

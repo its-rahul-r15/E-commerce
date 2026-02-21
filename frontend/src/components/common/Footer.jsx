@@ -12,7 +12,7 @@ const Footer = () => {
                     {/* Brand Info */}
                     <div className="md:col-span-1">
                         <Link to="/" className="inline-block mb-8">
-                            <h2 className="text-3xl font-serif-decorative tracking-[0.3em] text-[var(--athenic-gold)]">
+                            <h2 className="text-3xl font-serif-decorative tracking-[0.3em] text-[var(--gold)]">
                                 ATHENIG
                             </h2>
                         </Link>

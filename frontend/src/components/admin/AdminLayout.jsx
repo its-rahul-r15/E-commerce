@@ -17,12 +17,12 @@ const AdminLayout = ({ children }) => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white">
+        <div className="min-h-screen bg-[var(--charcoal)] text-white font-serif">
             {/* Sidebar */}
-            <div className="fixed left-0 top-0 h-full w-20 bg-slate-800 flex flex-col items-center py-6 space-y-8 border-r border-slate-700 z-50">
+            <div className="fixed left-0 top-0 h-full w-20 bg-[var(--mehron)] flex flex-col items-center py-6 space-y-8 border-r border-[var(--gold)]/30 z-50 shadow-2xl">
                 {/* Logo */}
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center cursor-pointer" onClick={() => navigate('/admin/dashboard')}>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-white rounded-none flex items-center justify-center cursor-pointer border border-[var(--gold)]" onClick={() => navigate('/admin/dashboard')}>
+                    <svg className="w-8 h-8 text-[var(--mehron)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
@@ -33,9 +33,9 @@ const AdminLayout = ({ children }) => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${isActive(item.path)
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-white'
+                            className={`w-12 h-12 rounded-none flex items-center justify-center transition-all border ${isActive(item.path)
+                                ? 'bg-[var(--gold)] text-[var(--mehron)] border-[var(--gold)] shadow-lg scale-110'
+                                : 'bg-[var(--mehron-deep)] text-[var(--gold)] border-[var(--gold)]/20 hover:border-[var(--gold)]/50 hover:bg-[var(--mehron)] shadow-sm'
                                 }`}
                             title={item.label}
                         >
@@ -46,11 +46,10 @@ const AdminLayout = ({ children }) => {
                     ))}
                 </nav>
 
-                {/* Settings at bottom */}
                 <div className="mt-auto">
                     <button
                         onClick={() => logout()}
-                        className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center hover:bg-red-600 transition-colors"
+                        className="w-12 h-12 bg-[var(--mehron-deep)] text-[var(--gold)] border border-[var(--gold)]/20 rounded-none flex items-center justify-center hover:bg-black transition-colors"
                         title="Logout"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,31 +62,31 @@ const AdminLayout = ({ children }) => {
             {/* Main Content */}
             <div className="ml-20 min-h-screen">
                 {/* Top Header */}
-                <div className="bg-slate-800 border-b border-slate-700 px-8 py-4 flex items-center justify-between sticky top-0 z-40">
+                <div className="bg-[var(--mehron)] border-b border-[var(--gold)]/30 px-8 py-4 flex items-center justify-between sticky top-0 z-40 meander-pattern">
                     <div>
-                        <h1 className="text-2xl font-bold">Admin Panel</h1>
+                        <h1 className="text-2xl font-bold uppercase tracking-widest text-[var(--gold)]">Admin Panel</h1>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-6">
                         {/* Search */}
                         <div className="relative">
                             <input
                                 type="text"
-                                placeholder="Search data, shops, users..."
-                                className="bg-slate-700 text-white pl-10 pr-4 py-2 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none w-80"
+                                placeholder="Search products, shops, users..."
+                                className="bg-[var(--mehron-deep)] text-white pl-10 pr-4 py-2 rounded-none border border-[var(--gold)]/30 focus:border-[var(--gold)] focus:outline-none w-80 text-sm font-serif"
                             />
-                            <svg className="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 absolute left-3 top-2.5 text-[var(--gold)]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
 
                         {/* User Profile */}
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-3 border-l border-[var(--gold)]/30 pl-6">
                             <div className="text-right">
-                                <p className="text-sm font-semibold">{user?.name || 'Admin'}</p>
-                                <p className="text-xs text-slate-400">Super Admin</p>
+                                <p className="text-xs font-bold text-white uppercase tracking-widest">{user?.name || 'Administrator'}</p>
+                                <p className="text-[9px] text-[var(--gold)] uppercase tracking-[0.2em]">Sovereign Authority</p>
                             </div>
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold">
-                                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                            <div className="w-10 h-10 bg-[var(--gold)] text-[var(--mehron)] rounded-none flex items-center justify-center font-bold border border-[var(--mehron-deep)] shadow-inner">
+                                {user?.name?.charAt(0)?.toUpperCase() || 'C'}
                             </div>
                         </div>
                     </div>
