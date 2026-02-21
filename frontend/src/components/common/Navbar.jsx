@@ -111,7 +111,7 @@ const Navbar = () => {
                         <div className="flex-1 flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2">
                             <Link to="/" className="flex flex-col items-center group">
                                 <span className="text-3xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
-                                    ATHENIG
+                                    KLYRA
                                 </span>
                                 <div className="h-[1px] w-0 group-hover:w-full bg-[var(--athenic-gold)] transition-all duration-500"></div>
                             </Link>
