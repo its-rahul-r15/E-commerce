@@ -13,6 +13,7 @@ import Orders from './pages/customer/Orders';
 import SearchResults from './pages/customer/SearchResults';
 import ShopsList from './pages/customer/ShopsList';
 import AllProducts from './pages/customer/AllProducts';
+import About from './pages/customer/About';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SellerProducts from './pages/seller/SellerProducts';
 import AddEditProduct from './pages/seller/AddEditProduct';
@@ -67,6 +68,7 @@ function App() {
             <Route path="/shops" element={<ShopsList />} />
             <Route path="/products" element={<AllProducts />} />
             <Route path="/shop/:id" element={<ShopPage />} />
+            <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
