@@ -120,8 +120,8 @@ const SellerAIAdvisor = ({ sellerData }) => {
                         <div className="flex items-center space-x-3">
                             <span className="text-xl">🤖</span>
                             <div>
-                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Naitri Ai</h3>
-                                <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Your Private Business Strategist</p>
+                                <h3 className="text-xs font-serif uppercase tracking-[0.2em] text-white">Klyra Ai</h3>
+                                <p className="text-[9px] font-serif text-white opacity-50 tracking-widest">Klyra Business Strategist</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -171,7 +171,7 @@ const SellerAIAdvisor = ({ sellerData }) => {
                                     </div>
                                 ) : insights.length === 0 ? (
                                     <div className="text-center py-8">
-                                        <p className="text-[10px] font-serif text-gray-400 uppercase tracking-widest">No insights yet. Trinetri Ai is analysing your store data.</p>
+                                        <p className="text-[10px] font-serif text-gray-400 uppercase tracking-widest">No insights yet. Klyra Ai is analysing your store data.</p>
                                         <button onClick={loadInsights} className="mt-4 text-[9px] font-serif uppercase tracking-widest text-[var(--athenic-gold)] underline">
                                             Try again
                                         </button>
@@ -305,10 +305,15 @@ const SellerAIAdvisor = ({ sellerData }) => {
                 </div>
             )}
 
+            {/* Pulse Indicator */}
+            {!isOpen && (
+                <div className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[var(--athenic-gold)] opacity-30 animate-ping pointer-events-none"></div>
+            )}
+
             {/* Toggle Bubble */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${isOpen ? 'bg-red-500 rotate-90' : 'bg-[var(--athenic-blue)] hover:scale-110'
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 border-2 border-[var(--athenic-gold)] ${isOpen ? 'bg-white text-black rotate-90' : 'bg-white hover:scale-110'
                     } group relative`}
             >
                 {isOpen ? (
@@ -317,10 +322,14 @@ const SellerAIAdvisor = ({ sellerData }) => {
                     </svg>
                 ) : (
                     <>
-                        <span className="text-2xl group-hover:animate-bounce">🤖</span>
+                        <img
+                            src="https://res.cloudinary.com/dpfls0d1n/image/upload/v1771658235/WhatsApp_Image_2026-02-21_at_11.53.16_AM-removebg-preview_zdwbkr.png"
+                            alt="AI Advisor"
+                            className="w-full h-full object-contain p-2"
+                        />
                         <div className="absolute -top-12 right-0 bg-white px-3 py-1.5 rounded-lg shadow-lg border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             <p className="text-[10px] font-serif uppercase tracking-widest text-[var(--athenic-blue)]">
-                                Need help? <span className="text-[var(--athenic-gold)] font-bold">Naitri Ai</span>
+                                Need help? <span className="text-[var(--athenic-gold)] font-bold">Klyra Ai</span>
                             </p>
                             <div className="absolute -bottom-1 right-5 w-2 h-2 bg-white border-r border-b border-gray-100 rotate-45"></div>
                         </div>

@@ -89,38 +89,45 @@ const Home = () => {
         <div className="min-h-screen bg-[var(--athenic-bg)] selection:bg-[var(--athenic-gold)] selection:text-white">
 
             {/* Hero Section */}
-            <section className="relative h-[80vh] flex flex-col items-center justify-center overflow-hidden bg-athenic-gradient">
-                {/* Background Columns (Decorative) */}
-                <div className="absolute inset-0 flex justify-between px-20 opacity-5 pointer-events-none">
+            <section className="relative h-[80vh] flex flex-col items-center justify-center overflow-hidden">
+                {/* Background Image with Overlay */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2000"
+                        alt="Klyra Luxury"
+                        className="w-full h-full object-cover opacity-50 grayscale-[0.2] blur-[2px]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--athenic-bg)]/10 to-[var(--athenic-bg)]"></div>
+                    <div className="absolute inset-0 bg-black/5"></div>
+                </div>
+
+                {/* Background Columns (Decorative) - Moved below image for subtle effect */}
+                <div className="absolute inset-0 flex justify-between px-20 opacity-5 pointer-events-none z-10">
                     <div className="w-1 bg-[var(--athenic-blue)] h-full"></div>
                     <div className="w-1 bg-[var(--athenic-blue)] h-full"></div>
                 </div>
 
-                <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-                    <h1 className="text-4xl md:text-7xl font-serif tracking-[0.1em] text-[var(--athenic-blue)] mb-6 leading-tight uppercase">
+                <div className="relative z-20 text-center px-4 max-w-4xl mx-auto">
+                    <h1 className="text-4xl md:text-7xl font-serif tracking-[0.1em] text-[var(--athenic-blue)] mb-6 leading-tight uppercase drop-shadow-sm">
                         MODERN STYLE,<br />
                         <span className="italic font-playfair lowercase font-normal">Local Heart</span>
                     </h1>
-                    <p className="text-[10px] md:text-xs font-serif tracking-[0.4em] uppercase text-[var(--athenic-gold)] mb-12">
+                    <p className="text-[10px] md:text-xs font-serif tracking-[0.4em] uppercase text-[var(--athenic-gold)] mb-12 drop-shadow-sm">
                         Quality Clothing - From Local Shops
                     </p>
 
                     <div className="group relative inline-block">
-                        <button className="btn-athenic-gold px-12 py-4 text-sm tracking-widest uppercase">
-                            Explore the Suit
+                        <button
+                            onClick={() => navigate('/products')}
+                            className="btn-athenic-gold px-12 py-4 text-sm tracking-widest uppercase"
+                        >
+                            Explore
                         </button>
                     </div>
                 </div>
 
                 {/* Floating Local Shop Card */}
-                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90%] md:w-[600px] athenic-card text-center py-10 px-8 athenic-shadow">
-                    <h2 className="text-2xl font-serif tracking-[0.15em] uppercase text-[var(--athenic-blue)] mb-4">
-                        Local Picks
-                    </h2>
-                    <p className="text-xs font-serif leading-relaxed text-gray-500 opacity-80 uppercase tracking-widest px-4">
-                        Discover the best quality clothes from trusted shops in your area, brought to you with care and tradition.
-                    </p>
-                </div>
+
             </section>
 
             <div className="h-20"></div> {/* Spacer for floating card */}
