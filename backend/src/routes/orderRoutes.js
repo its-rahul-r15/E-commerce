@@ -3,7 +3,7 @@ import * as orderController from '../controllers/orderController.js';
 import auth from '../middlewares/auth.js';
 import { requireCustomer, requireSeller, requireAdmin, requireCustomerOrSeller } from '../middlewares/roleCheck.js';
 import { apiRateLimiter } from '../middlewares/rateLimiter.js';
-import { mongoIdValidator, paginationValidator } from '../middlewares/validator.js';
+import { mongoIdValidator, paginationValidator, createOrderValidator } from '../middlewares/validator.js';
 
 /**
  * Order Routes
@@ -18,6 +18,7 @@ router.post(
     auth,
     requireCustomerOrSeller,
     apiRateLimiter,
+    createOrderValidator,
     orderController.createOrder
 );
 

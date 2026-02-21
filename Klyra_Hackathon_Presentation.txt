@@ -1,0 +1,48 @@
+KLYRA: LUXURY MARKETPLACE HACKATHON PRESENTATION
+================================================
+
+1. PROJECT OVERVIEW
+-------------------
+Klyra is a premium, AI-powered e-commerce marketplace designed to connect local luxury boutiques with discerning customers. It combines a high-end "Mehron and Gold" aesthetic with advanced AI technology to transform the shopping and selling experience.
+
+2. CORE FEATURES
+----------------
+- CUSTOMER EXPERIENCE:
+  * Naitri Ai Shopping Assistant: A natural language AI guide that helps users find products, search by price, color, or category, and provides personalized recommendations.
+  * Location-Based Discovery: Automatically detects user location to highlight premium shops in their immediate neighborhood.
+  * Luxury UI/UX: Fully customized "Mehron and Gold" theme with serif typography and smooth animations.
+  * Comprehensive Search: Advanced filtering for products and local boutiques.
+
+- SELLER EMPOWERMENT:
+  * Naitri Ai Business Strategist: An AI advisor that generates sales insights, identifies market trends, and answers business-specific questions using store data.
+  * Advanced Analytics: Real-time tracking of revenue, best-sellers, and pending acquisitions.
+  * Inventory Management: Streamlined interface for manual and AI-assisted product moderation.
+
+- ADMINISTRATIVE OVERSIGHT:
+  * Shop Sovereignty: Comprehensive workflow for inducing, rejecting, or blocking boutique partners.
+  * User Moderation: Detailed control over seeker archetypes (Customer, Merchant, Admin).
+  * Decree Orchestration: Advanced coupon management system with temporal constraints and usage limits.
+
+3. SECURITY ARCHITECTURE
+-------------------------
+- Role-Based Access Control (RBAC): Strict separation of Customer, Seller, and Admin routes using ProtectedRoute components.
+- Secure Authentication: Integrated AuthContext for persistent and secure session management.
+- API Layer Security: Centralized service architecture with error handling and secure data parsing.
+- Privacy-First: Localized search and location detection designed with user privacy in mind.
+
+4. SCALABILITY & PERFORMANCE
+-----------------------------
+- Optimized Frontend: Built with Vite and React for lightning-fast HMR and production performance.
+- Decoupled AI Micro-services: The AI engine (aiService.js) is decoupled from the UI, allowing for easy updates to underlying LLMs (Gemini/OpenAI) without affecting the frontend.
+- Component-DRY Architecture: Reusable luxury components (athenic-card, buttons, layouts) ensure consistent scaling.
+- Modular Service Layer: Clean separation of API services (api.js) makes the backend integration horizontal-ready.
+- Theme System: Global CSS variables allow for instant, site-wide branding pivots or multi-tenant white-labeling.
+
+5. TECH STACK
+-------------
+- Frontend: React.js, Tailwind CSS (Custom Theme), HeroIcons, Framer Motion.
+- AI Engine: Gemini-powered NLP for shop discovery and strategic insights.
+- Tooling: Vite, ESLint, Git-integrated development workflow.
+
+Klyra is not just a marketplace; it is a celebration of the extraordinary found in our local streets, powered by the future of AI.
+================================================

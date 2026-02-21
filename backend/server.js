@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import mongoose from 'mongoose';
+import mongoSanitize from 'express-mongo-sanitize';
 import passport from 'passport';
 import connectDB from './src/config/db.js';
 import { connectRedis, closeRedis } from './src/config/redis.js';
@@ -44,6 +45,7 @@ app.use(cors({
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(mongoSanitize());
 
 
 app.use(passport.initialize());
