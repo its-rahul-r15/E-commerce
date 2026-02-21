@@ -48,7 +48,7 @@ const SellerLayout = ({ children }) => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-[var(--cream)] flex">
             {/* Mobile Sidebar Overlay */}
             {isMobileMenuOpen && (
                 <div
@@ -59,17 +59,17 @@ const SellerLayout = ({ children }) => {
 
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 flex flex-col transition-transform duration-300 ease-in-out
+                fixed inset-y-0 left-0 z-30 w-64 bg-[var(--charcoal)] flex flex-col transition-transform duration-300 ease-in-out border-r border-[var(--border-mehron)]
                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
                 lg:translate-x-0 lg:static lg:flex-shrink-0
             `}>
                 {/* Logo */}
-                <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+                <div className="p-6 border-b border-[var(--border-mehron)] flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                            <ShoppingBagIcon className="h-6 w-6 text-white" />
+                        <div className="w-10 h-10 bg-[var(--mehron)] rounded-lg flex items-center justify-center border border-[var(--gold)]">
+                            <ShoppingBagIcon className="h-6 w-6 text-[var(--gold)]" />
                         </div>
-                        <span className="text-xl font-bold text-white">ShopLocal</span>
+                        <span className="text-xl font-serif font-bold text-white tracking-widest uppercase">Athenic</span>
                     </div>
                     {/* Close button for mobile */}
                     <button
@@ -90,9 +90,9 @@ const SellerLayout = ({ children }) => {
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all group ${isActive
-                                    ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/20'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                className={`flex items-center space-x-3 px-4 py-3 rounded-none transition-all group ${isActive
+                                    ? 'bg-[var(--mehron)] text-white border border-[var(--gold)] shadow-lg'
+                                    : 'text-gray-400 hover:bg-[var(--mehron-deep)] hover:text-white'
                                     }`}
                             >
                                 <Icon className={`h-5 w-5 ${isActive ? '' : 'group-hover:scale-110 transition-transform'}`} />
@@ -103,29 +103,29 @@ const SellerLayout = ({ children }) => {
                 </nav>
 
                 {/* Back to Home */}
-                <div className="px-4 py-2 border-t border-gray-800">
+                <div className="px-4 py-2 border-t border-[var(--border-mehron)]">
                     <Link
                         to="/"
-                        className="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all group"
+                        className="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-[var(--gold)] hover:bg-[var(--mehron-deep)] rounded-none transition-all group"
                     >
                         <ArrowLeftIcon className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-medium">Back to Home</span>
+                        <span className="font-serif text-sm uppercase tracking-wider">Back to Home</span>
                     </Link>
                 </div>
 
                 {/* Shop Profile */}
-                <div className="p-4 border-t border-gray-800">
-                    <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/50">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-semibold text-sm">
+                <div className="p-4 border-t border-[var(--border-mehron)]">
+                    <div className="flex items-center space-x-3 p-3 rounded-none bg-[var(--mehron-deep)]/30 border border-[var(--border-mehron)]">
+                        <div className="w-10 h-10 bg-[var(--gold)] rounded-none flex items-center justify-center flex-shrink-0 border border-[var(--mehron)]">
+                            <span className="text-[var(--mehron)] font-serif font-bold text-sm">
                                 {shop?.shopName?.charAt(0)?.toUpperCase() || 'S'}
                             </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">
+                            <p className="text-sm font-serif font-bold text-white truncate uppercase tracking-wider">
                                 {shop?.shopName || 'My Shop'}
                             </p>
-                            <p className="text-xs text-gray-400">Seller Account</p>
+                            <p className="text-[10px] font-serif uppercase text-gray-400 tracking-widest">Athenic Boutique</p>
                         </div>
                     </div>
                 </div>
@@ -134,7 +134,7 @@ const SellerLayout = ({ children }) => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Top Bar */}
-                <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+                <div className="bg-[var(--ivory)]/80 backdrop-blur-sm border-b border-[var(--border-mehron)] sticky top-0 z-20 shadow-sm">
                     <div className="px-4 sm:px-8 py-4 flex items-center justify-between">
                         <div className="flex items-center flex-1 gap-4">
                             {/* Mobile Hamburger */}
@@ -151,8 +151,8 @@ const SellerLayout = ({ children }) => {
                                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                     <input
                                         type="text"
-                                        placeholder="Search..."
-                                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm"
+                                        placeholder="Seek your treasures..."
+                                        className="w-full pl-10 pr-4 py-2.5 bg-[var(--cream)] border border-[var(--border-mehron)] rounded-none focus:outline-none focus:ring-1 focus:ring-[var(--gold)]/30 focus:border-[var(--gold)] transition-all text-sm font-serif"
                                     />
                                 </div>
                             </div>
@@ -165,8 +165,8 @@ const SellerLayout = ({ children }) => {
                                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
                             <div className="hidden sm:block text-sm text-right">
-                                <p className="font-semibold text-gray-900">{shop?.shopName || 'Loading...'}</p>
-                                <p className="text-gray-500 text-xs">{shop?.category || 'Shop'}</p>
+                                <p className="font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">{shop?.shopName || 'Loading...'}</p>
+                                <p className="text-[var(--gold)] font-serif text-[10px] uppercase tracking-widest">{shop?.category || 'Boutique'}</p>
                             </div>
                         </div>
                     </div>

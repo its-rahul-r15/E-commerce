@@ -39,7 +39,7 @@ const ProductCard = ({ product }) => {
                 </h3>
 
                 <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-serif font-bold text-[var(--athenic-blue)] opacity-80">
+                    <p className="text-sm md:text-base font-serif font-bold text-[var(--athenic-blue)]">
                         ₹{price.toLocaleString()}
                     </p>
                     <div className="flex items-center space-x-0.5">

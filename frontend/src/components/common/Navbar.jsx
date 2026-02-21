@@ -77,10 +77,10 @@ const Navbar = () => {
 
     return (
         <div className="relative z-50">
-            {/* Top Location Bar - Teal Gradient */}
-            <div className="bg-gradient-to-r from-[#2C5D63] to-[#4A7C7C] py-2">
+            {/* Top Location Bar - Mehron Gradient */}
+            <div className="bg-gradient-to-r from-[var(--mehron-deep)] to-[var(--mehron)] py-2">
                 <div className="max-w-7xl mx-auto px-4 flex justify-center items-center">
-                    <button className="flex items-center space-x-2 text-[#F5E0A3] hover:text-white transition-colors group">
+                    <button className="flex items-center space-x-2 text-[var(--gold-pale)] hover:text-white transition-colors group">
                         <MapPinIcon className="w-4 h-4" />
                         <span className="text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em]">
                             Your Location: <span className="font-bold">{location}</span>

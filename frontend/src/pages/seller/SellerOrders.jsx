@@ -32,14 +32,14 @@ const SellerOrders = () => {
 
     const getStatusColor = (status) => {
         const colors = {
-            pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-            accepted: 'bg-blue-100 text-blue-800 border-blue-200',
-            preparing: 'bg-purple-100 text-purple-800 border-purple-200',
-            ready: 'bg-green-100 text-green-800 border-green-200',
-            completed: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-            cancelled: 'bg-red-100 text-red-800 border-red-200',
+            pending: 'bg-[var(--gold-pale)] text-[var(--gold)] border-[var(--gold)]/20',
+            accepted: 'bg-[var(--ivory)] text-[var(--mehron)] border-[var(--border-mehron)]',
+            preparing: 'bg-[var(--mehron-soft)] text-[var(--mehron)] border-[var(--border-mehron)]',
+            ready: 'bg-[var(--gold-pale)] text-[var(--mehron)] border-[var(--gold)]/20',
+            completed: 'bg-[var(--mehron)] text-white border-[var(--gold)]',
+            cancelled: 'bg-gray-100 text-gray-500 border-gray-200',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+        return colors[status] || 'bg-gray-50 text-gray-400 border-gray-100';
     };
 
     const getStatusIcon = (status) => {
@@ -99,8 +99,8 @@ const SellerOrders = () => {
             <SellerLayout>
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading orders...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--gold)] border-t-transparent mx-auto"></div>
+                        <p className="mt-4 text-gray-600 font-serif uppercase tracking-widest text-xs">Retrieving boutique orders...</p>
                     </div>
                 </div>
             </SellerLayout>
@@ -110,35 +110,35 @@ const SellerOrders = () => {
     return (
         <SellerLayout>
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    Shop Orders
+            <div className="mb-8 meander-pattern pb-1">
+                <h1 className="text-3xl font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">
+                    Boutique Orders
                 </h1>
-                <p className="text-gray-600 mt-1">Manage and track your customer orders</p>
+                <p className="text-gray-600 mt-1 font-serif text-[10px] uppercase tracking-widest font-bold">Manage and orchestrate your customer acquisitions</p>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <p className="text-sm text-gray-600 font-medium mb-1">Total Orders</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
+                    <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Total Orders</p>
+                    <p className="text-3xl font-serif font-bold text-[var(--mehron)]">{stats.total}</p>
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <p className="text-sm text-gray-600 font-medium mb-1">Pending</p>
-                    <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
+                    <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Pending</p>
+                    <p className="text-3xl font-serif font-bold text-[var(--gold)]">{stats.pending}</p>
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <p className="text-sm text-gray-600 font-medium mb-1">In Progress</p>
-                    <p className="text-3xl font-bold text-blue-600">{stats.active}</p>
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
+                    <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">In Progress</p>
+                    <p className="text-3xl font-serif font-bold text-[var(--mehron-deep)]">{stats.active}</p>
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <p className="text-sm text-gray-600 font-medium mb-1">Completed</p>
-                    <p className="text-3xl font-bold text-emerald-600">{stats.completed}</p>
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
+                    <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Completed</p>
+                    <p className="text-3xl font-serif font-bold text-[var(--mehron)]">{stats.completed}</p>
                 </div>
             </div>
 
             {/* Filter Tabs */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+            <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)] mb-6 overflow-hidden">
                 <div className="flex overflow-x-auto">
                     {[
                         { key: '', label: 'All Orders' },
@@ -152,9 +152,9 @@ const SellerOrders = () => {
                         <button
                             key={status.key}
                             onClick={() => setFilter(status.key)}
-                            className={`px-6 py-3 font-medium whitespace-nowrap border-b-2 transition-colors ${filter === status.key
-                                    ? 'border-emerald-500 text-emerald-600 bg-emerald-50/50'
-                                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            className={`px-6 py-4 font-serif text-[10px] uppercase tracking-widest border-b-2 transition-all font-bold ${filter === status.key
+                                ? 'border-[var(--mehron)] text-[var(--mehron)] bg-[var(--gold-pale)]/30'
+                                : 'border-transparent text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
                                 }`}
                         >
                             {status.label}
@@ -186,34 +186,32 @@ const SellerOrders = () => {
                                 <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-b border-gray-100">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4">
-                                            <div className={`p-2 rounded-lg border ${getStatusColor(order.status)}`}>
-                                                <StatusIcon className="h-5 w-5" />
+                                            <div className={`p-2 rounded-none border ${getStatusColor(order.status)}`}>
+                                                <StatusIcon className="h-4 w-4" />
                                             </div>
                                             <div>
                                                 <div className="flex items-center space-x-3 mb-1">
-                                                    <h3 className="text-lg font-bold text-gray-900">
+                                                    <h3 className="text-sm font-serif font-bold text-gray-900 uppercase tracking-widest">
                                                         Order #{order._id.slice(-8).toUpperCase()}
                                                     </h3>
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.status)}`}>
+                                                    <span className={`px-2 py-0.5 rounded-none text-[9px] font-serif font-bold border uppercase tracking-widest ${getStatusColor(order.status)}`}>
                                                         {order.status.toUpperCase()}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-[10px] font-serif text-gray-500 uppercase tracking-widest font-bold">
                                                     {new Date(order.createdAt).toLocaleDateString('en-IN', {
                                                         day: 'numeric',
                                                         month: 'long',
                                                         year: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
                                                     })}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-2xl font-bold text-gray-900">
+                                            <p className="text-xl font-serif font-bold text-[var(--mehron)]">
                                                 ₹{order.totalAmount.toFixed(2)}
                                             </p>
-                                            <p className="text-sm text-gray-600">{order.items.length} items</p>
+                                            <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500 font-bold">{order.items.length} items</p>
                                         </div>
                                     </div>
                                 </div>
@@ -223,18 +221,18 @@ const SellerOrders = () => {
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                         {/* Order Items */}
                                         <div>
-                                            <h4 className="font-bold text-gray-900 mb-4 flex items-center">
-                                                <ArchiveBoxIcon className="h-5 w-5 mr-2 text-gray-600" />
-                                                Order Items
+                                            <h4 className="text-[10px] font-serif font-bold text-[var(--mehron)] mb-3 flex items-center uppercase tracking-widest">
+                                                <ArchiveBoxIcon className="h-4 w-4 mr-2 text-[var(--gold)]" />
+                                                Acquisitions
                                             </h4>
-                                            <div className="space-y-3">
+                                            <div className="space-y-2">
                                                 {order.items.map((item, index) => (
-                                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                    <div key={index} className="flex items-center justify-between p-3 bg-[var(--cream)]/30 border border-[var(--border-mehron)] rounded-none">
                                                         <div className="flex-1">
-                                                            <p className="font-medium text-gray-900">{item.name}</p>
-                                                            <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                                                            <p className="text-xs font-serif font-bold text-gray-900 uppercase tracking-wider">{item.name}</p>
+                                                            <p className="text-[9px] font-serif text-gray-500 uppercase tracking-widest">Qty: {item.quantity}</p>
                                                         </div>
-                                                        <p className="font-bold text-gray-900">
+                                                        <p className="text-sm font-serif font-bold text-[var(--mehron)]">
                                                             ₹{(item.price * item.quantity).toFixed(2)}
                                                         </p>
                                                     </div>
@@ -272,14 +270,14 @@ const SellerOrders = () => {
 
                                     {/* Actions */}
                                     {order.status !== 'completed' && order.status !== 'cancelled' && (
-                                        <div className="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between">
-                                            <p className="text-sm text-gray-600">
-                                                Update order status to proceed
+                                        <div className="mt-6 pt-6 border-t border-[var(--border-mehron)] flex items-center justify-between">
+                                            <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 font-bold">
+                                                Orchestrate the next step...
                                             </p>
                                             <button
                                                 onClick={() => handleUpdateStatus(order._id, getNextStatus(order.status))}
                                                 disabled={updating}
-                                                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40"
+                                                className="px-6 py-3 bg-[var(--mehron)] text-white font-serif text-[10px] uppercase tracking-[0.2em] rounded-none hover:bg-[var(--mehron-deep)] border border-[var(--gold)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
                                             >
                                                 {getStatusButtonText(order.status)}
                                             </button>

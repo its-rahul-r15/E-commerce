@@ -149,7 +149,7 @@ function ruleBasedParser(input) {
 
 /**
  * CUSTOMER: Parse natural language → product filter object
- * Uses rule-based parser first; Trinetri AI enhances if available.
+ * Uses rule-based parser first; Naitri Ai enhances if available.
  */
 export async function parseCustomerQuery(userInput) {
     // Always parse with rules first (instant, reliable)
@@ -207,7 +207,7 @@ export async function generateSellerInsights(sellerData) {
     if (revenueGrowth > 0) ruleInsights.push({ type: 'success', title: 'Revenue Growing!', message: `Your revenue grew by ${revenueGrowth}% compared to last month. Keep maintaining product quality and timely delivery to sustain this growth.`, icon: '📈' });
     ruleInsights.push({ type: 'info', title: 'Total Revenue Summary', message: `Your store has earned ₹${totalRevenue.toLocaleString('en-IN')} from ${totalOrders} orders. Focus on high-margin products to increase revenue per order.`, icon: '💰' });
 
-    // Try Trinetri AI for enhanced insights
+    // Try Naitri Ai for enhanced insights
     const prompt = `You are a business advisor for an Indian e-commerce seller.
 Store data: total orders: ${totalOrders}, revenue: ₹${totalRevenue}, pending: ${pendingOrders}, products: ${totalProducts}, growth: ${revenueGrowth}%
 Generate exactly 4 business insights as JSON array: [{"type":"success|warning|info|tip","title":"max 6 words","message":"2-3 sentences","icon":"emoji"}]
@@ -360,7 +360,7 @@ export async function generateTrendInsights(trendingCategories = [], sellerCateg
         action: missing.includes(cat) ? `Add ${cat} products to your store` : `Expand your ${cat} collection with 5+ new items`,
     }));
 
-    // Try Trinetri AI for better insights
+    // Try Naitri Ai for better insights
     const prompt = `Market trend analyst for Indian fashion marketplace.
 Trending: ${JSON.stringify(trendingCategories)}. Seller has: ${JSON.stringify(sellerCategories)}
 Generate 3 trend recommendations as JSON array: [{"category":"name","trendScore":1-10,"message":"2 sentences","action":"specific action"}]

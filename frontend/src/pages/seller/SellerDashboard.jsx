@@ -112,7 +112,7 @@ const SellerDashboard = () => {
         return (
             <SellerLayout>
                 <div className="min-h-screen flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--gold)] border-t-transparent"></div>
                 </div>
             </SellerLayout>
         );
@@ -123,12 +123,12 @@ const SellerDashboard = () => {
             <SellerLayout>
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-gray-100">
-                        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <HomeIcon className="h-10 w-10 text-emerald-600" />
+                        <div className="w-20 h-20 bg-[var(--mehron-soft)] rounded-full flex items-center justify-center mx-auto mb-4 border border-[var(--border-mehron)]">
+                            <HomeIcon className="h-10 w-10 text-[var(--mehron)]" />
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">No Shop Registered</h2>
-                        <p className="text-gray-500 mb-6">Register your shop to start selling</p>
-                        <Link to="/seller/register-shop" className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors">
+                        <h2 className="text-2xl font-serif font-bold text-[var(--mehron)] mb-2 uppercase">No Shop Registered</h2>
+                        <p className="text-gray-500 mb-6 font-serif text-sm uppercase tracking-widest">Register your boutique to start selling</p>
+                        <Link to="/seller/register-shop" className="btn-athenic-primary">
                             Register Shop
                         </Link>
                     </div>
@@ -144,10 +144,10 @@ const SellerDashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* Revenue */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600 font-medium">Total Revenue</span>
-                        <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-semibold">
+                        <span className="text-xs font-serif uppercase tracking-widest text-gray-600">Total Revenue</span>
+                        <span className="text-xs text-[var(--mehron)] bg-[var(--mehron-soft)] px-2 py-1 rounded-none border border-[var(--border-mehron)] font-bold">
                             +{stats.revenueGrowth}%
                         </span>
                     </div>
@@ -158,17 +158,17 @@ const SellerDashboard = () => {
                         </div>
                         <div className="flex space-x-1">
                             {[40, 60, 50, 80, 70, 90, 75].map((height, i) => (
-                                <div key={i} className="w-1.5 bg-emerald-200 rounded-full" style={{ height: `${height}%` }}></div>
+                                <div key={i} className="w-1.5 bg-[var(--gold)]/30 rounded-none" style={{ height: `${height}%` }}></div>
                             ))}
                         </div>
                     </div>
                 </div>
 
                 {/* Orders */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600 font-medium">Total Orders</span>
-                        <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-semibold">
+                        <span className="text-xs font-serif uppercase tracking-widest text-gray-600">Total Orders</span>
+                        <span className="text-xs text-[var(--gold)] bg-[var(--gold-pale)] px-2 py-1 rounded-none font-bold">
                             +8.2%
                         </span>
                     </div>
@@ -179,10 +179,10 @@ const SellerDashboard = () => {
                 </div>
 
                 {/* Products */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600 font-medium">Total Products</span>
-                        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full font-semibold">
+                        <span className="text-xs font-serif uppercase tracking-widest text-gray-600">Total Products</span>
+                        <span className="text-xs text-gray-600 bg-[var(--ivory)] px-2 py-1 rounded-none font-bold border border-gray-200">
                             {stats.activeProducts} Active
                         </span>
                     </div>
@@ -193,9 +193,9 @@ const SellerDashboard = () => {
                 </div>
 
                 {/* Rating */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600 font-medium">Store Rating</span>
+                        <span className="text-xs font-serif uppercase tracking-widest text-gray-600">Store Rating</span>
                     </div>
                     <div>
                         <div className="flex items-end space-x-2">
@@ -204,7 +204,7 @@ const SellerDashboard = () => {
                         </div>
                         <div className="flex items-center mt-1 space-x-1">
                             {[...Array(5)].map((_, i) => (
-                                <span key={i} className="text-yellow-400 text-lg">★</span>
+                                <span key={i} className="text-[var(--gold)] text-lg">★</span>
                             ))}
                         </div>
                     </div>
@@ -214,13 +214,13 @@ const SellerDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Sales Performance */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Sales Performance</h3>
-                                <p className="text-sm text-gray-500">Revenue tracking over time</p>
+                                <h3 className="text-lg font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">Sales Performance</h3>
+                                <p className="text-[10px] font-serif uppercase tracking-widest text-gray-400">Revenue tracking over time</p>
                             </div>
-                            <select className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
+                            <select className="px-3 py-2 bg-[var(--cream)] border border-[var(--border-mehron)] rounded-none text-xs font-serif uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-[var(--gold)]">
                                 <option>Last 7 Days</option>
                                 <option>Last 30 Days</option>
                             </select>
@@ -231,24 +231,24 @@ const SellerDashboard = () => {
                                 <div key={i} className="flex-1 flex flex-col items-center">
                                     <div className="w-full relative group">
                                         <div
-                                            className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t-lg transition-all duration-300 hover:from-emerald-700 hover:to-emerald-500 cursor-pointer"
+                                            className="w-full bg-gradient-to-t from-[var(--mehron)] to-[var(--mehron-light)] rounded-none transition-all duration-300 hover:from-[var(--mehron-deep)] hover:to-[var(--mehron)] cursor-pointer"
                                             style={{ height: `${(data.value / maxSalesValue) * 200}px` }}
                                         ></div>
                                         <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                             ₹{data.value.toLocaleString()}
                                         </div>
                                     </div>
-                                    <span className="text-xs text-gray-500 mt-2 font-medium">{data.day}</span>
+                                    <span className="text-[10px] font-serif uppercase tracking-widest text-gray-500 mt-2 font-medium">{data.day}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Recent Orders */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-8">
+                    <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)] mt-8">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-gray-900">Recent Orders</h3>
-                            <Link to="/seller/orders" className="text-sm text-emerald-600 hover:text-emerald-700 font-semibold">
+                            <h3 className="text-lg font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">Recent Orders</h3>
+                            <Link to="/seller/orders" className="text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--gold)] border-b border-[var(--gold)] pb-0.5 hover:opacity-70">
                                 View All Orders
                             </Link>
                         </div>
@@ -273,8 +273,8 @@ const SellerDashboard = () => {
                                                 {new Date(order.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="py-4 px-4">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                                    order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-none text-[10px] font-serif uppercase tracking-widest font-bold ${order.status === 'completed' ? 'bg-[var(--mehron-soft)] text-[var(--mehron)] border border-[var(--border-mehron)]' :
+                                                    order.status === 'processing' ? 'bg-[var(--gold-pale)] text-[var(--gold)] border border-[var(--gold)]/20' :
                                                         'bg-gray-100 text-gray-700'
                                                     }`}>
                                                     {order.status}
@@ -294,17 +294,17 @@ const SellerDashboard = () => {
                 {/* Right Sidebar */}
                 <div className="space-y-6">
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+                    <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
+                        <h3 className="text-lg font-serif font-bold text-[var(--mehron)] uppercase tracking-wider mb-4">Quick Actions</h3>
                         <div className="space-y-3">
                             <Link
                                 to="/seller/products"
-                                className="flex items-center justify-center space-x-2 bg-emerald-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+                                className="flex items-center justify-center space-x-2 bg-[var(--mehron)] text-white px-4 py-3 rounded-none font-serif text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--mehron-deep)] transition-colors border border-[var(--gold)] shadow-md"
                             >
                                 <PlusIcon className="h-5 w-5" />
                                 <span>Add New Product</span>
                             </Link>
-                            <button className="flex items-center justify-center space-x-2 bg-white border-2 border-gray-200 text-gray-700 px-4 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors w-full">
+                            <button className="flex items-center justify-center space-x-2 bg-white border border-[var(--gold)] text-[var(--mehron)] px-4 py-3 rounded-none font-serif text-[10px] uppercase tracking-[0.2em] hover:bg-[var(--gold-pale)] transition-colors w-full">
                                 <ArrowDownTrayIcon className="h-5 w-5" />
                                 <span>Export Report</span>
                             </button>
@@ -312,10 +312,10 @@ const SellerDashboard = () => {
                     </div>
 
                     {/* Low Stock Alerts */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-none p-6 shadow-sm border border-[var(--border-mehron)]">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">Low Stock Alerts</h3>
-                            <span className="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-bold">
+                            <h3 className="text-lg font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">Low Stock</h3>
+                            <span className="text-[10px] bg-[var(--mehron-soft)] text-[var(--mehron)] px-2.5 py-1 rounded-none font-bold border border-[var(--border-mehron)]">
                                 {stats.outOfStock} ITEMS
                             </span>
                         </div>
@@ -333,70 +333,69 @@ const SellerDashboard = () => {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                                        <p className="text-xs text-red-600 font-semibold">Only {product.stock} left</p>
+                                        <p className="text-[10px] font-serif font-bold text-[var(--mehron)] uppercase tracking-wider truncate">{product.name}</p>
+                                        <p className="text-[9px] font-serif text-[var(--gold)] uppercase tracking-widest font-bold">Only {product.stock} left</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* 🤖 AI Business Advisor */}
-                    <SellerAIAdvisor sellerData={{
-                        // Shop identity
-                        shopName: shop?.name || 'Your Shop',
-                        shopCategory: shop?.category || '',
-                        rating: shop?.rating || 0,
-
-                        // Stats
-                        totalOrders: stats.totalOrders,
-                        todayOrders: stats.todayOrders,
-                        totalRevenue: stats.revenue,
-                        pendingOrders: stats.pendingOrders,
-                        totalProducts: stats.totalProducts,
-                        activeProducts: stats.activeProducts,
-                        outOfStock: stats.outOfStock,
-                        revenueGrowth: stats.revenueGrowth,
-                        lastMonthRevenue: stats.lastMonthRevenue,
-
-                        // Full product list with all details
-                        allProducts: products.map(p => ({
-                            name: p.name,
-                            category: p.category,
-                            subCategory: p.subCategory || '',
-                            stock: p.stock,
-                            price: p.price,
-                            discountedPrice: p.discountedPrice || null,
-                            colors: p.colors || [],
-                            sizes: p.sizes || [],
-                            isAvailable: p.isAvailable,
-                            brand: p.brand || '',
-                        })),
-
-                        // Full order list for analysis
-                        allOrders: recentOrders.map(o => ({
-                            status: o.status,
-                            amount: o.totalAmount,
-                            date: o.createdAt,
-                            items: o.items?.length || 1,
-                        })),
-
-                        // Legacy aliases for backward compat
-                        topProducts: products.slice(0, 5).map(p => ({
-                            name: p.name,
-                            category: p.category,
-                            stock: p.stock,
-                            price: p.price,
-                            discountedPrice: p.discountedPrice,
-                        })),
-                        recentOrders: recentOrders.slice(0, 5).map(o => ({
-                            status: o.status,
-                            amount: o.totalAmount,
-                            date: o.createdAt,
-                        })),
-                    }} />
                 </div>
             </div>
+            <SellerAIAdvisor sellerData={{
+                // Shop identity
+                shopName: shop?.name || 'Your Shop',
+                shopCategory: shop?.category || '',
+                rating: shop?.rating || 0,
+
+                // Stats
+                totalOrders: stats.totalOrders,
+                todayOrders: stats.todayOrders,
+                totalRevenue: stats.revenue,
+                pendingOrders: stats.pendingOrders,
+                totalProducts: stats.totalProducts,
+                activeProducts: stats.activeProducts,
+                outOfStock: stats.outOfStock,
+                revenueGrowth: stats.revenueGrowth,
+                lastMonthRevenue: stats.lastMonthRevenue,
+
+                // Full product list with all details
+                allProducts: products.map(p => ({
+                    name: p.name,
+                    category: p.category,
+                    subCategory: p.subCategory || '',
+                    stock: p.stock,
+                    price: p.price,
+                    discountedPrice: p.discountedPrice || null,
+                    colors: p.colors || [],
+                    sizes: p.sizes || [],
+                    isAvailable: p.isAvailable,
+                    brand: p.brand || '',
+                })),
+
+                // Full order list for analysis
+                allOrders: recentOrders.map(o => ({
+                    status: o.status,
+                    amount: o.totalAmount,
+                    date: o.createdAt,
+                    items: o.items?.length || 1,
+                })),
+
+                // Legacy aliases for backward compat
+                topProducts: products.slice(0, 5).map(p => ({
+                    name: p.name,
+                    category: p.category,
+                    stock: p.stock,
+                    price: p.price,
+                    discountedPrice: p.discountedPrice,
+                })),
+                recentOrders: recentOrders.slice(0, 5).map(o => ({
+                    status: o.status,
+                    amount: o.totalAmount,
+                    date: o.createdAt,
+                })),
+            }} />
         </SellerLayout>
     );
 };

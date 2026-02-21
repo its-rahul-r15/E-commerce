@@ -191,42 +191,42 @@ const AddEditProduct = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-cyan-50">
+            <div className="min-h-screen flex items-center justify-center bg-[var(--charcoal)]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-500 border-t-transparent mx-auto"></div>
-                    <p className="mt-4 text-gray-600 font-medium">Loading product details...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--gold)] border-t-transparent mx-auto"></div>
+                    <p className="mt-4 text-[var(--gold)] font-serif font-bold uppercase tracking-widest text-[10px]">Summoning Details...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 py-8">
+        <div className="min-h-screen bg-[var(--charcoal)] py-8 font-serif">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-8">
+                <div className="mb-8 meander-pattern pb-1">
                     <button
                         onClick={() => navigate('/seller/products')}
-                        className="flex items-center text-emerald-600 hover:text-emerald-700 font-medium mb-4 transition-colors group"
+                        className="flex items-center text-[var(--gold)] hover:text-white font-serif text-[10px] uppercase tracking-widest font-bold mb-4 transition-colors group"
                     >
-                        <ArrowLeftIcon className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                        Back to Products
+                        <ArrowLeftIcon className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                        Back to Boutique
                     </button>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
-                        {isEdit ? 'Edit Product' : 'Add New Product'}
+                    <h1 className="text-4xl font-bold text-white uppercase tracking-widest">
+                        {isEdit ? 'Refine Creation' : 'Curate New Creation'}
                     </h1>
-                    <p className="text-gray-600 mt-2">
-                        {isEdit ? 'Update your product details below' : 'Fill in the details to list your product'}
+                    <p className="text-gray-400 mt-2 text-[10px] uppercase tracking-[0.2em] font-bold">
+                        {isEdit ? 'Polishing the essence of your exquisite piece' : 'Introducing a new masterpiece to your collection'}
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Basic Information Card */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4">
-                            <h2 className="text-xl font-bold text-white flex items-center">
-                                <InboxStackIcon className="h-6 w-6 mr-2" />
-                                Basic Information
+                    <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)] overflow-hidden">
+                        <div className="bg-[var(--mehron)] px-6 py-4 border-b border-[var(--gold)]">
+                            <h2 className="text-sm font-bold text-white flex items-center uppercase tracking-widest">
+                                <InboxStackIcon className="h-5 w-5 mr-3 text-[var(--gold)]" />
+                                Fundamental Attributes
                             </h2>
                         </div>
                         <div className="p-6 space-y-5">
@@ -275,9 +275,9 @@ const AddEditProduct = () => {
                                     required
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value, subCategory: '' })}
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-white"
+                                    className="w-full px-4 py-3 bg-[var(--cream)]/30 border border-[var(--border-mehron)] rounded-none text-gray-900 focus:ring-1 focus:ring-[var(--gold)] focus:border-[var(--gold)] transition-all outline-none bg-white font-serif text-sm"
                                 >
-                                    <option value="">Select clothing category</option>
+                                    <option value="">Select the category of elegance</option>
                                     {FASHION_CATEGORIES.map(cat => (
                                         <option key={cat.value} value={cat.value}>{cat.label}</option>
                                     ))}
@@ -548,25 +548,25 @@ const AddEditProduct = () => {
                         <button
                             type="button"
                             onClick={() => navigate('/seller/products')}
-                            className="flex-1 px-6 py-3.5 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+                            className="flex-1 px-6 py-4 border border-[var(--gold)] text-[var(--mehron)] font-serif text-[11px] uppercase tracking-[0.2em] rounded-none hover:bg-[var(--gold-pale)]/50 transition-all font-bold"
                         >
-                            Cancel
+                            Withdraw
                         </button>
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="flex-1 px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40"
+                            className="flex-1 px-6 py-4 bg-[var(--mehron)] text-white font-serif text-[11px] uppercase tracking-[0.2em] rounded-none hover:bg-[var(--mehron-deep)] border border-[var(--gold)] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[var(--mehron)]/20 font-bold"
                         >
                             {submitting ? (
                                 <span className="flex items-center justify-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[var(--gold)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Saving...
+                                    Inscribing...
                                 </span>
                             ) : (
-                                isEdit ? '✓ Update Product' : '+ Add Product'
+                                isEdit ? '✓ Refine Piece' : '+ Curate Creation'
                             )}
                         </button>
                     </div>

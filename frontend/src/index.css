@@ -5,14 +5,29 @@
 @tailwind utilities;
 
 :root {
-  --athenic-bg: #fbfbeb;
-  --athenic-gold: #D4AF37;
-  --athenic-gold-light: #E5C369;
-  --athenic-blue: #001F3F;
-  --athenic-blue-light: #003366;
-  --athenic-teal: #2C5D63;
-  --athenic-marble: #F5F5F0;
-  --athenic-parchment: #fdfdfa;
+  --mehron: #800020;
+  --mehron-deep: #5a0015;
+  --mehron-light: #c0384a;
+  --mehron-blush: #f5e6e8;
+  --mehron-soft: #fdf0f1;
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --gold-pale: #f9f0d8;
+  --cream: #faf6f0;
+  --ivory: #f5efe6;
+  --charcoal: #2a1a1f;
+  --muted: #6b4a52;
+  --border-mehron: rgba(128, 0, 32, 0.12);
+
+  /* Legacy Mapping for compatibility */
+  --athenic-bg: var(--cream);
+  --athenic-gold: var(--gold);
+  --athenic-gold-light: var(--gold-light);
+  --athenic-blue: var(--mehron);
+  --athenic-blue-light: var(--mehron-deep);
+  --athenic-teal: var(--muted);
+  --athenic-marble: var(--ivory);
+  --athenic-parchment: var(--mehron-soft);
 }
 
 @layer base {
@@ -91,14 +106,14 @@
 
 @layer utilities {
   .text-luxury-gold {
-    @apply text-[var(--athenic-gold)];
-    background: linear-gradient(135deg, #D4AF37 0%, #F5E0A3 50%, #D4AF37 100%);
+    @apply text-[var(--gold)];
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .bg-athenic-gradient {
-    background: linear-gradient(135deg, #fbfbeb 0%, #F5F5F0 100%);
+    background: linear-gradient(135deg, var(--cream) 0%, var(--mehron-soft) 100%);
   }
 
   .athenic-shadow {

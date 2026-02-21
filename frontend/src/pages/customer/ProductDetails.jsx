@@ -46,7 +46,7 @@ const ProductDetails = () => {
 
     const fetchMoreFromShop = async (shopId) => {
         try {
-            const data = await productService.getProducts({ shop: shopId, limit: 10 });
+            const data = await productService.getProducts({ shopId: shopId, limit: 10 });
             setMoreFromShop(data.products?.filter(p => p._id !== id).slice(0, 5) || []);
         } catch (error) {
             console.error('Error fetching shop products:', error);

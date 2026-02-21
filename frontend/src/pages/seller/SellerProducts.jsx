@@ -105,7 +105,7 @@ const SellerProducts = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+            <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)] mb-6 overflow-hidden">
                 <div className="flex overflow-x-auto">
                     {[
                         { key: 'all', label: 'All Products' },
@@ -117,9 +117,9 @@ const SellerProducts = () => {
                         <button
                             key={item.key}
                             onClick={() => setFilter(item.key)}
-                            className={`px-6 py-3 font-medium whitespace-nowrap border-b-2 transition-colors ${filter === item.key
-                                    ? 'border-emerald-500 text-emerald-600 bg-emerald-50/50'
-                                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            className={`px-6 py-4 font-serif text-[10px] uppercase tracking-widest border-b-2 transition-all font-bold ${filter === item.key
+                                ? 'border-[var(--mehron)] text-[var(--mehron)] bg-[var(--gold-pale)]/30'
+                                : 'border-transparent text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
                                 }`}
                         >
                             {item.label}
@@ -168,9 +168,9 @@ const SellerProducts = () => {
                                 )}
                                 {/* Status Badge */}
                                 <div className="absolute top-3 right-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${product.isAvailable && product.stock > 0
-                                            ? 'bg-emerald-100 text-emerald-700'
-                                            : 'bg-red-100 text-red-700'
+                                    <span className={`px-3 py-1 rounded-none text-[9px] font-serif font-bold uppercase tracking-widest border ${product.isAvailable && product.stock > 0
+                                        ? 'bg-[var(--mehron-soft)] text-[var(--mehron)] border-[var(--border-mehron)]'
+                                        : 'bg-red-50 text-red-700 border-red-100'
                                         }`}>
                                         {product.isAvailable && product.stock > 0 ? 'Active' : 'Inactive'}
                                     </span>
@@ -178,8 +178,8 @@ const SellerProducts = () => {
                                 {/* Stock Badge */}
                                 {product.stock < 10 && product.stock > 0 && (
                                     <div className="absolute top-3 left-3">
-                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
-                                            Low Stock
+                                        <span className="px-3 py-1 rounded-none text-[9px] font-serif font-bold uppercase tracking-widest bg-[var(--gold-pale)] text-[var(--gold)] border border-[var(--gold)]/20 shadow-sm">
+                                            Low Essence
                                         </span>
                                     </div>
                                 )}
@@ -189,31 +189,31 @@ const SellerProducts = () => {
                             <div className="p-5">
                                 <div className="flex items-start justify-between mb-2">
                                     <div className="flex-1">
-                                        <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">{product.name}</h3>
-                                        <p className="text-xs text-gray-500 mb-2">{product.category}</p>
+                                        <h3 className="text-sm font-serif font-bold text-gray-900 mb-1 line-clamp-2 uppercase tracking-wide">{product.name}</h3>
+                                        <p className="text-[9px] font-serif uppercase tracking-[0.2em] text-[var(--gold)] font-bold">{product.category}</p>
                                     </div>
                                 </div>
 
-                                <p className="text-sm text-gray-600 line-clamp-2 mb-4">{product.description}</p>
+                                <p className="text-xs font-serif text-gray-600 line-clamp-2 mb-4 italic uppercase tracking-wider">"{product.description}"</p>
 
                                 {/* Price & Stock */}
-                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-[var(--border-mehron)]">
                                     <div>
-                                        <p className="text-xs text-gray-500 mb-1">Price</p>
+                                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Investment</p>
                                         <div className="flex items-baseline space-x-2">
-                                            <p className="text-lg font-bold text-gray-900">
+                                            <p className="text-xl font-serif font-bold text-[var(--mehron)]">
                                                 ₹{product.discountedPrice || product.price}
                                             </p>
                                             {product.discountedPrice && (
-                                                <p className="text-xs text-gray-500 line-through">₹{product.price}</p>
+                                                <p className="text-[10px] font-serif text-gray-400 line-through">₹{product.price}</p>
                                             )}
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-gray-500 mb-1">Stock</p>
-                                        <p className={`text-lg font-bold ${product.stock === 0 ? 'text-red-600' :
-                                                product.stock < 10 ? 'text-orange-600' :
-                                                    'text-emerald-600'
+                                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500 mb-1 font-bold">Reserves</p>
+                                        <p className={`text-xl font-serif font-bold ${product.stock === 0 ? 'text-red-500' :
+                                            product.stock < 10 ? 'text-[var(--gold)]' :
+                                                'text-[var(--mehron)]'
                                             }`}>
                                             {product.stock}
                                         </p>

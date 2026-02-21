@@ -63,12 +63,12 @@ export const adminService = {
 
     // Product Moderation
     banProduct: async (productId) => {
-        const response = await axios.patch(`/products/${productId}/ban`);
+        const response = await axios.patch(`/products/admin/${productId}/ban`, { banned: true });
         return response.data;
     },
 
     unbanProduct: async (productId) => {
-        const response = await axios.patch(`/products/${productId}/unban`);
+        const response = await axios.patch(`/products/admin/${productId}/ban`, { banned: false });
         return response.data;
     },
 };

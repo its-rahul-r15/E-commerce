@@ -53,7 +53,7 @@ const SellerShop = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await shopService.updateShop(formData);
+            await shopService.updateShop(shop._id, formData);
             alert('Shop updated successfully');
             setEditing(false);
             fetchShop();
@@ -100,8 +100,8 @@ const SellerShop = () => {
             <SellerLayout>
                 <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading shop details...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--gold)] border-t-transparent mx-auto"></div>
+                        <p className="mt-4 text-gray-600 font-serif uppercase tracking-widest text-xs">Loading boutique details...</p>
                     </div>
                 </div>
             </SellerLayout>
@@ -136,20 +136,20 @@ const SellerShop = () => {
     return (
         <SellerLayout>
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Shop Settings</h1>
-                <p className="text-gray-600 mt-1">Manage your shop information and settings</p>
+            <div className="mb-8 meander-pattern pb-4">
+                <h1 className="text-3xl font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">Boutique Settings</h1>
+                <p className="text-gray-600 mt-1 font-serif text-xs uppercase tracking-widest">Manage your boutique information and essence</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column - Main Info */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Shop Status Card */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                        <div className="border-b border-gray-200 px-6 py-4">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                                <InformationCircleIcon className="h-5 w-5 mr-2 text-gray-600" />
-                                Shop Status
+                    <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)]">
+                        <div className="border-b border-[var(--border-mehron)] px-6 py-4">
+                            <h2 className="text-sm font-serif font-bold text-[var(--mehron)] flex items-center uppercase tracking-wider">
+                                <InformationCircleIcon className="h-4 w-4 mr-2 text-[var(--gold)]" />
+                                Boutique Status
                             </h2>
                         </div>
                         <div className="p-6">
@@ -159,32 +159,32 @@ const SellerShop = () => {
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center space-x-3 mb-2">
-                                        <h3 className="text-lg font-bold text-gray-900">
+                                        <h3 className="text-sm font-serif font-bold text-gray-900 uppercase tracking-widest">
                                             {statusConfig.label}
                                         </h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusConfig.color}`}>
+                                        <span className={`px-3 py-1 rounded-none text-[10px] font-serif font-bold border uppercase tracking-widest ${statusConfig.color}`}>
                                             {shop.status.toUpperCase()}
                                         </span>
                                     </div>
-                                    <p className="text-gray-600">{statusConfig.message}</p>
+                                    <p className="text-xs font-serif text-gray-600 uppercase tracking-wider">{statusConfig.message}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Shop Information Card */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                        <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                                <BuildingStorefrontIcon className="h-5 w-5 mr-2 text-gray-600" />
-                                Shop Information
+                    <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)]">
+                        <div className="border-b border-[var(--border-mehron)] px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-sm font-serif font-bold text-[var(--mehron)] flex items-center uppercase tracking-wider">
+                                <BuildingStorefrontIcon className="h-4 w-4 mr-2 text-[var(--gold)]" />
+                                Boutique Information
                             </h2>
                             {!editing && (
                                 <button
                                     onClick={() => setEditing(true)}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm"
+                                    className="flex items-center space-x-2 px-4 py-2 bg-[var(--mehron)] text-white rounded-none hover:bg-[var(--mehron-deep)] border border-[var(--gold)] transition-colors font-serif text-[10px] uppercase tracking-[0.2em]"
                                 >
-                                    <PencilIcon className="h-4 w-4" />
+                                    <PencilIcon className="h-3 w-3" />
                                     <span>Edit</span>
                                 </button>
                             )}
@@ -204,8 +204,8 @@ const SellerShop = () => {
                                             value={formData.shopName}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none"
-                                            placeholder="Enter shop name"
+                                            className="w-full px-4 py-3 border border-[var(--border-mehron)] rounded-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all outline-none bg-[var(--cream)]/50 font-serif text-sm"
+                                            placeholder="The name of your masterpiece..."
                                         />
                                     </div>
 
@@ -219,8 +219,8 @@ const SellerShop = () => {
                                             value={formData.description}
                                             onChange={handleChange}
                                             rows={4}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none resize-none"
-                                            placeholder="Describe your shop..."
+                                            className="w-full px-4 py-3 border border-[var(--border-mehron)] rounded-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all outline-none resize-none bg-[var(--cream)]/50 font-serif text-sm"
+                                            placeholder="The soul of your boutique..."
                                         />
                                     </div>
 
@@ -238,8 +238,8 @@ const SellerShop = () => {
                                                 onChange={handleChange}
                                                 required
                                                 pattern="[6-9]\d{9}"
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none"
-                                                placeholder="Enter phone number"
+                                                className="w-full pl-10 pr-4 py-3 border border-[var(--border-mehron)] rounded-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all outline-none bg-[var(--cream)]/50 font-serif text-sm"
+                                                placeholder="Direct connection..."
                                             />
                                         </div>
                                     </div>
@@ -254,7 +254,7 @@ const SellerShop = () => {
                                             value={formData.category}
                                             onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none bg-white"
+                                            className="w-full px-4 py-3 border border-[var(--border-mehron)] rounded-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all outline-none bg-[var(--cream)]/50 font-serif text-sm"
                                         >
                                             <option value="">Select Category</option>
                                             <option value="Grocery">🛒 Grocery</option>
@@ -275,9 +275,9 @@ const SellerShop = () => {
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="flex-1 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            className="flex-1 px-6 py-3 bg-[var(--mehron)] text-white font-serif text-[10px] uppercase tracking-[0.2em] rounded-none hover:bg-[var(--mehron-deep)] border border-[var(--gold)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
                                         >
-                                            {submitting ? 'Saving...' : 'Save Changes'}
+                                            {submitting ? 'Preserving...' : 'Save Essence'}
                                         </button>
                                         <button
                                             type="button"
@@ -290,9 +290,9 @@ const SellerShop = () => {
                                                     category: shop.category,
                                                 });
                                             }}
-                                            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                                            className="flex-1 px-6 py-3 border border-[var(--gold)] text-[var(--mehron)] font-serif text-[10px] uppercase tracking-[0.2em] rounded-none hover:bg-[var(--gold-pale)] transition-colors"
                                         >
-                                            Cancel
+                                            Withdraw
                                         </button>
                                     </div>
                                 </form>
@@ -319,12 +319,12 @@ const SellerShop = () => {
                                             <p className="font-semibold text-gray-900">{shop.phone}</p>
                                         </div>
 
-                                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                        <div className="p-4 bg-[var(--cream)]/30 rounded-none border border-[var(--border-mehron)]">
                                             <div className="flex items-center space-x-2 mb-1">
-                                                <TagIcon className="h-4 w-4 text-gray-500" />
-                                                <p className="text-xs text-gray-500 font-medium">Category</p>
+                                                <TagIcon className="h-4 w-4 text-[var(--gold)]" />
+                                                <p className="text-[10px] text-gray-500 font-serif uppercase tracking-widest font-bold">Category</p>
                                             </div>
-                                            <p className="font-semibold text-gray-900">{shop.category}</p>
+                                            <p className="font-serif font-bold text-[var(--mehron)] uppercase tracking-wider">{shop.category}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -359,15 +359,15 @@ const SellerShop = () => {
                     </div>
 
                     {/* Rating Card */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                        <div className="border-b border-gray-200 px-6 py-4">
-                            <h3 className="font-bold text-gray-900 flex items-center">
-                                <StarIcon className="h-5 w-5 mr-2 text-gray-600" />
-                                Rating
+                    <div className="bg-white rounded-none shadow-sm border border-[var(--border-mehron)]">
+                        <div className="border-b border-[var(--border-mehron)] px-6 py-4 meander-pattern">
+                            <h3 className="text-sm font-serif font-bold text-[var(--mehron)] flex items-center uppercase tracking-wider">
+                                <StarIcon className="h-4 w-4 mr-2 text-[var(--gold)]" />
+                                Boutique Rating
                             </h3>
                         </div>
                         <div className="p-6 text-center">
-                            <div className="text-5xl font-bold text-gray-900 mb-2">
+                            <div className="text-5xl font-serif font-bold text-[var(--mehron)] mb-2">
                                 {shop.rating?.toFixed(1) || '0.0'}
                             </div>
                             <div className="flex items-center justify-center space-x-1 mb-2">
@@ -375,26 +375,26 @@ const SellerShop = () => {
                                     <StarIcon
                                         key={i}
                                         className={`h-6 w-6 ${i < Math.floor(shop.rating || 0)
-                                                ? 'text-yellow-400 fill-yellow-400'
-                                                : 'text-gray-300'
+                                            ? 'text-[var(--gold)] fill-[var(--gold)]'
+                                            : 'text-gray-200'
                                             }`}
                                     />
                                 ))}
                             </div>
-                            <p className="text-sm text-gray-600">
-                                {shop.rating ? 'Customer Rating' : 'No ratings yet'}
+                            <p className="text-[10px] font-serif uppercase tracking-widest text-gray-500 font-bold">
+                                {shop.rating ? 'Excellence Rating' : 'Awaiting Reviews'}
                             </p>
                         </div>
                     </div>
 
                     {/* Shop ID */}
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
-                        <h3 className="font-bold text-emerald-900 mb-3">Shop ID</h3>
-                        <p className="text-sm font-mono bg-white px-3 py-2 rounded-lg truncate text-gray-700 border border-emerald-200">
+                    <div className="bg-[var(--mehron-soft)] border border-[var(--border-mehron)] rounded-none p-6">
+                        <h3 className="font-serif font-bold text-[var(--mehron)] uppercase tracking-wider mb-3 text-sm">Boutique ID</h3>
+                        <p className="text-[10px] font-serif font-bold bg-white px-3 py-2 rounded-none truncate text-gray-700 border border-[var(--border-mehron)] shadow-inner">
                             {shop._id}
                         </p>
-                        <p className="text-xs text-emerald-700 mt-3">
-                            Created: {new Date(shop.createdAt).toLocaleDateString()}
+                        <p className="text-[9px] font-serif uppercase tracking-[0.2em] text-[var(--gold)] mt-3 font-bold">
+                            ESTABLISHED: {new Date(shop.createdAt).toLocaleDateString()}
                         </p>
                     </div>
                 </div>
