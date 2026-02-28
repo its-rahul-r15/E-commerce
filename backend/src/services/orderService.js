@@ -18,8 +18,11 @@ import { deleteCachePattern } from './cacheService.js';
 export const createOrder = async (customerId, orderData) => {
     const { deliveryAddress } = orderData;
 
-    // Get customer's cart
-    const cart = await Cart.findOne({ customerId }).populate('items.productId');
+    // Get customer's cart — populate product AND product's shopId
+    const cart = await Cart.findOne({ customerId }).populate({
+        path: 'items.productId',
+        populate: { path: 'shopId', select: '_id' },
+    });
 
     if (!cart || cart.items.length === 0) {
         throw new Error('Cart is empty');
@@ -40,7 +43,17 @@ export const createOrder = async (customerId, orderData) => {
             throw new Error(`Insufficient stock for ${product.name}. Only ${product.stock} available`);
         }
 
-        const shopId = item.shopId.toString();
+        // Extract shopId robustly:
+        // product.shopId may be a populated object OR a raw ObjectId
+        const rawShopId = product.shopId?._id || product.shopId || item.shopId;
+        const shopId = rawShopId?.toString();
+
+        // DEBUG — will show in server terminal
+        console.log(`[ORDER DEBUG] product="${product.name}" product.shopId=${JSON.stringify(product.shopId)} item.shopId=${item.shopId} resolved shopId="${shopId}"`);
+
+        if (!shopId || shopId === 'undefined' || shopId === 'null') {
+            throw new Error(`Product "${product.name}" is not linked to a shop. Please contact support.`);
+        }
 
         if (!itemsByShop[shopId]) {
             itemsByShop[shopId] = [];

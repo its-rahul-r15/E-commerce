@@ -30,6 +30,7 @@ import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 import CustomerAIAssistant from './components/customer/CustomerAIAssistant';
+import VirtualTryOn from './pages/customer/VirtualTryOn';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -69,6 +70,7 @@ function App() {
             <Route path="/products" element={<AllProducts />} />
             <Route path="/shop/:id" element={<ShopPage />} />
             <Route path="/about" element={<About />} />
+            <Route path="/try-on" element={<VirtualTryOn />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

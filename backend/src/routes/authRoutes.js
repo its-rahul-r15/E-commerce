@@ -1,6 +1,7 @@
 import express from 'express';
 import * as authController from '../controllers/authController.js';
 import * as googleOAuthController from '../controllers/googleOAuthController.js';
+import * as addressController from '../controllers/addressController.js';
 import auth from '../middlewares/auth.js';
 import { registerValidator, loginValidator, updateProfileValidator } from '../middlewares/validator.js';
 import { authRateLimiter } from '../middlewares/rateLimiter.js';
@@ -26,4 +27,11 @@ router.post('/logout', auth, authController.logout);
 router.get('/me', auth, authController.getProfile);
 router.patch('/me', auth, updateProfileValidator, authController.updateProfile);
 
+// Saved Addresses routes (protected)
+router.get('/addresses', auth, addressController.getAddresses);
+router.post('/addresses', auth, addressController.addAddress);
+router.delete('/addresses/:index', auth, addressController.deleteAddress);
+router.patch('/addresses/:index/default', auth, addressController.setDefaultAddress);
+
 export default router;
+
