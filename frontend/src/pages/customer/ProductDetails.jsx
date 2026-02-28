@@ -215,6 +215,18 @@ const ProductDetails = () => {
                                 <span className="text-lg">✨</span>
                                 <span>{addingToCart ? 'Preserving...' : 'Add to Wardrobe'}</span>
                             </button>
+
+                            {/* Virtual Try-On Button — only shown when seller uploaded a try-on image */}
+                            {product.tryOnImage && (
+                                <button
+                                    onClick={() => navigate('/try-on')}
+                                    className="w-full py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 border-2 border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white transition-all"
+                                >
+                                    <span className="text-lg">👗</span>
+                                    <span>Virtual Try-On</span>
+                                </button>
+                            )}
+
                             <button
                                 onClick={handleBuyNow}
                                 className="w-full btn-athenic-outline py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3"

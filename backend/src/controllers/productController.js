@@ -1,16 +1,26 @@
 import * as productService from '../services/productService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
-import { uploadMultipleImages } from '../utils/cloudinaryUpload.js';
+import { uploadMultipleImages, uploadToCloudinary } from '../utils/cloudinaryUpload.js';
 
 export const createProduct = async (req, res, next) => {
     try {
         const sellerId = req.user.userId;
         const productData = req.body;
 
-        // Handle image uploads
-        if (req.files && req.files.length > 0) {
+        // Handle product gallery images  (field: 'images')
+        if (req.files?.images && req.files.images.length > 0) {
+            const imageUrls = await uploadMultipleImages(req.files.images, 'products');
+            productData.images = imageUrls;
+        } else if (Array.isArray(req.files) && req.files.length > 0) {
+            // Fallback: multer.array() instead of multer.fields()
             const imageUrls = await uploadMultipleImages(req.files, 'products');
             productData.images = imageUrls;
+        }
+
+        // Handle try-on image (field: 'tryOnImage') — single transparent PNG
+        if (req.files?.tryOnImage && req.files.tryOnImage.length > 0) {
+            const tryOnUrl = await uploadToCloudinary(req.files.tryOnImage[0].buffer, 'tryon');
+            productData.tryOnImage = tryOnUrl;
         }
 
         const product = await productService.createProduct(sellerId, productData);
@@ -200,15 +210,20 @@ export const updateProduct = async (req, res, next) => {
         const productId = req.params.id;
         const updates = req.body;
 
-        // Handle new images
-        if (req.files && req.files.length > 0) {
-            const newImageUrls = await uploadMultipleImages(req.files, 'products');
-
+        // Handle new product gallery images (field: 'images')
+        const imageFiles = req.files?.images || (Array.isArray(req.files) ? req.files : []);
+        if (imageFiles.length > 0) {
+            const newImageUrls = await uploadMultipleImages(imageFiles, 'products');
             if (updates.replaceImages) {
                 updates.images = newImageUrls;
             } else {
                 updates.images = [...(updates.images || []), ...newImageUrls];
             }
+        }
+
+        // Handle try-on image update (field: 'tryOnImage')
+        if (req.files?.tryOnImage && req.files.tryOnImage.length > 0) {
+            updates.tryOnImage = await uploadToCloudinary(req.files.tryOnImage[0].buffer, 'tryon');
         }
 
         const product = await productService.updateProduct(productId, sellerId, updates);

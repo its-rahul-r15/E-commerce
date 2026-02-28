@@ -105,6 +105,14 @@ const Navbar = () => {
                             <Link to="/about" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
                                 About Us
                             </Link>
+                            {/* AR Virtual Try-On link */}
+                            <Link
+                                to="/try-on"
+                                className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-gold)] hover:opacity-70 transition-opacity uppercase flex items-center space-x-1 border border-[var(--athenic-gold)] border-opacity-40 px-3 py-1"
+                            >
+                                <span>✨</span>
+                                <span>Try On</span>
+                            </Link>
                         </div>
 
                         {/* Center: Logo */}

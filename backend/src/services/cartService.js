@@ -45,7 +45,7 @@ export const addToCart = async (customerId, itemData) => {
     const { productId, quantity } = itemData;
 
     // Verify product exists and is available
-    const product = await Product.findById(productId).populate('shopId');
+    const product = await Product.findById(productId); // No need to populate shopId
 
     if (!product) {
         throw new Error('Product not found');
@@ -81,10 +81,10 @@ export const addToCart = async (customerId, itemData) => {
 
         cart.items[existingItemIndex].quantity = newQuantity;
     } else {
-        // Add new item
+        // Add new item — product.shopId is an ObjectId directly (not populated)
         cart.items.push({
             productId,
-            shopId: product.shopId._id,
+            shopId: product.shopId, // ObjectId directly — no ._id needed
             quantity,
         });
     }

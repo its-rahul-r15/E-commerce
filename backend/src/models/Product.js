@@ -109,6 +109,18 @@ const productSchema = new mongoose.Schema({
             message: 'Invalid image URL',
         },
     }],
+    // Special transparent/cutout image used for AR Virtual Try-On overlay
+    // Seller uploads a flat-lay or transparent PNG specifically for this purpose
+    tryOnImage: {
+        type: String, // Single Cloudinary URL
+        default: null,
+        validate: {
+            validator: function (url) {
+                return !url || /^https?:\/\/.+/.test(url);
+            },
+            message: 'Invalid try-on image URL',
+        },
+    },
     isAvailable: {
         type: Boolean,
         default: true,

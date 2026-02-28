@@ -219,19 +219,6 @@ export const addToCartValidator = [
 // ==================== Order Validation ====================
 
 export const createOrderValidator = [
-    body('shopId')
-        .notEmpty().withMessage('Shop ID is required')
-        .isMongoId().withMessage('Invalid shop ID'),
-
-    body('items')
-        .isArray({ min: 1 }).withMessage('Order must have at least one item'),
-
-    body('items.*.productId')
-        .isMongoId().withMessage('Invalid product ID'),
-
-    body('items.*.quantity')
-        .isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
-
     body('deliveryAddress.street')
         .trim()
         .escape()
@@ -326,13 +313,16 @@ export const paymentCreateOrderValidator = [
 ];
 
 export const paymentVerifyValidator = [
-    body('razorpay_order_id')
+    body('orderId')
         .notEmpty().withMessage('Order ID is required'),
 
-    body('razorpay_payment_id')
+    body('razorpayOrderId')
+        .notEmpty().withMessage('Razorpay order ID is required'),
+
+    body('razorpayPaymentId')
         .notEmpty().withMessage('Payment ID is required'),
 
-    body('razorpay_signature')
+    body('razorpaySignature')
         .notEmpty().withMessage('Signature is required'),
 
     handleValidationErrors,

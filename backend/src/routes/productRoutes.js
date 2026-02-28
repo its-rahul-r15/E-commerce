@@ -26,7 +26,10 @@ router.post(
     auth,
     requireSeller,
     apiRateLimiter,
-    upload.array('images', 5), // Max 5 images
+    upload.fields([
+        { name: 'images', maxCount: 5 },       // Product gallery images
+        { name: 'tryOnImage', maxCount: 1 },   // AR try-on transparent image
+    ]),
     createProductValidator,
     productController.createProduct
 );
@@ -44,7 +47,10 @@ router.patch(
     auth,
     requireSeller,
     apiRateLimiter,
-    upload.array('images', 5),
+    upload.fields([
+        { name: 'images', maxCount: 5 },       // Product gallery images
+        { name: 'tryOnImage', maxCount: 1 },   // AR try-on transparent image
+    ]),
     mongoIdValidator,
     updateProductValidator,
     productController.updateProduct

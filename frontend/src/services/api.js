@@ -248,3 +248,31 @@ export const couponService = {
     },
 };
 
+// ── Saved Addresses ──────────────────────────────────────────────────────────
+export const addressService = {
+    // Get all saved addresses for logged-in user
+    getAddresses: async () => {
+        const response = await axios.get('/auth/addresses');
+        return response.data.data.addresses;
+    },
+
+    // Add a new address
+    addAddress: async (addressData) => {
+        const response = await axios.post('/auth/addresses', addressData);
+        return response.data.data.addresses;
+    },
+
+    // Delete address at index
+    deleteAddress: async (index) => {
+        const response = await axios.delete(`/auth/addresses/${index}`);
+        return response.data.data.addresses;
+    },
+
+    // Set address at index as default
+    setDefault: async (index) => {
+        const response = await axios.patch(`/auth/addresses/${index}/default`);
+        return response.data.data.addresses;
+    },
+};
+
+

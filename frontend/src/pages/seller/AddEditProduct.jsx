@@ -31,6 +31,7 @@ const AddEditProduct = () => {
     });
 
     const [imagePreviews, setImagePreviews] = useState([]);
+    const [tryOnImagePreview, setTryOnImagePreview] = useState(null); // { file?, url }
     const [loading, setLoading] = useState(isEdit);
     const [submitting, setSubmitting] = useState(false);
 
@@ -59,6 +60,10 @@ const AddEditProduct = () => {
                 colors: product.colors || [],
             });
             setImagePreviews(product.images || []);
+            // Load existing tryOnImage if available
+            if (product.tryOnImage) {
+                setTryOnImagePreview({ url: product.tryOnImage, existing: true });
+            }
         } catch (error) {
             console.error('Error fetching product:', error);
             alert('Failed to load product');
@@ -136,6 +141,23 @@ const AddEditProduct = () => {
         setImagePreviews(previews);
     };
 
+    // Handle Try-On image file selection
+    const handleTryOnImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File must be under 5MB');
+            return;
+        }
+        setTryOnImagePreview({ file, url: URL.createObjectURL(file) });
+    };
+
+    const removeTryOnImage = () => setTryOnImagePreview(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -167,6 +189,11 @@ const AddEditProduct = () => {
             formData.sizes.forEach(size => data.append('sizes', size));
             formData.colors.forEach(color => data.append('colors', color));
 
+
+            // Append try-on image if a new file was selected
+            if (tryOnImagePreview?.file) {
+                data.append('tryOnImage', tryOnImagePreview.file);
+            }
 
             imagePreviews.forEach(preview => {
                 if (preview.file) {
@@ -518,6 +545,67 @@ const AddEditProduct = () => {
                             <p className="text-xs text-gray-500 mt-2">
                                 Separate tags with commas. These help customers find your product.
                             </p>
+                        </div>
+                    </div>
+
+                    {/* ── AR Try-On Image Card ── */}
+                    <div className="bg-white rounded-2xl shadow-sm border-2 border-[var(--athenic-gold)] border-opacity-30 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--mehron)] to-[var(--mehron-light)] px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-sm font-bold text-white flex items-center uppercase tracking-widest">
+                                <PhotoIcon className="h-5 w-5 mr-3 text-[var(--gold)]" />
+                                ✨ AR Virtual Try-On Image
+                            </h2>
+                            <span className="text-[9px] font-serif text-[var(--gold-pale)] uppercase tracking-widest opacity-70">Optional</span>
+                        </div>
+                        <div className="p-6">
+                            {/* Guidance Banner */}
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                                <p className="text-xs font-semibold text-amber-800 mb-2">📌 What to upload here:</p>
+                                <ul className="text-xs text-amber-700 space-y-1 list-disc list-inside">
+                                    <li>A <strong>flat-lay photo</strong> of the garment on a plain white/transparent background</li>
+                                    <li>No model wearing it — just the clothing item alone</li>
+                                    <li>Ideally a <strong>PNG with transparent background</strong> (removes white bg automatically)</li>
+                                    <li>Good lighting, front-facing, symmetrical if possible</li>
+                                    <li>This image will be overlaid on the customer's body in the AR Try-On feature</li>
+                                </ul>
+                            </div>
+
+                            {/* Preview or Upload */}
+                            {tryOnImagePreview ? (
+                                <div className="relative group w-48 mx-auto">
+                                    <div className="relative rounded-xl overflow-hidden border-2 border-[var(--athenic-gold)] border-opacity-40 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAH0lEQVQoU2NkYGD4z8BQDwAEgAF/QualIAAAAAABJRU5ErkJggg==')] bg-repeat">
+                                        <img
+                                            src={tryOnImagePreview.url}
+                                            alt="Try-On Preview"
+                                            className="w-full h-48 object-contain"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={removeTryOnImage}
+                                        className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        ✕ Remove
+                                    </button>
+                                    <p className="text-center text-[10px] text-gray-400 mt-2 font-serif uppercase tracking-widest">
+                                        {tryOnImagePreview.existing ? 'Existing Try-On Image' : 'New Try-On Image'}
+                                    </p>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[var(--athenic-gold)] border-opacity-40 rounded-xl cursor-pointer bg-[var(--ivory)] hover:bg-[var(--gold-pale)] transition-colors">
+                                    <div className="text-center">
+                                        <p className="text-3xl mb-2">👗</p>
+                                        <p className="text-sm font-serif text-[var(--athenic-blue)] font-semibold">Upload Try-On Image</p>
+                                        <p className="text-xs text-gray-400 mt-1">PNG (transparent) or JPG, max 5MB</p>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleTryOnImageChange}
+                                    />
+                                </label>
+                            )}
                         </div>
                     </div>
 

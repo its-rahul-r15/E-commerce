@@ -73,18 +73,19 @@ const Cart = () => {
         }
     };
 
-    // Group items by shop
+    // Group items by shop — fallback to product._id if shopId not available
     const groupedItems = cart?.items?.reduce((acc, item) => {
-        const shopId = item.productId?.shopId?._id;
+        const shopId = item.productId?.shopId?._id || item.shopId || item.productId?._id;
         if (!shopId) return acc;
-        if (!acc[shopId]) {
-            acc[shopId] = {
-                shopName: item.productId.shopId.shopName,
-                shopId: shopId,
+        const shopKey = shopId.toString();
+        if (!acc[shopKey]) {
+            acc[shopKey] = {
+                shopName: item.productId?.shopId?.shopName || 'Klyra Store',
+                shopId: shopKey,
                 items: []
             };
         }
-        acc[shopId].items.push(item);
+        acc[shopKey].items.push(item);
         return acc;
     }, {}) || {};
 
@@ -176,7 +177,7 @@ const Cart = () => {
                                         const originalPrice = product.discountedPrice ? product.price : null;
 
                                         return (
-                                            <div key={item._id} className="p-6 flex flex-col sm:flex-row items-center gap-6 group hover:bg-gray-50/50 transition-colors">
+                                            <div key={product._id} className="p-6 flex flex-col sm:flex-row items-center gap-6 group hover:bg-gray-50/50 transition-colors">
                                                 {/* Image */}
                                                 <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 border border-gray-200">
                                                     <img
