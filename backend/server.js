@@ -78,6 +78,7 @@ import orderRoutes from './src/routes/orderRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import paymentRoutes from './src/routes/paymentRoutes.js';
 import couponRoutes from './src/routes/couponRoutes.js';
+import tailoringRoutes from './src/routes/tailoringRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -87,6 +88,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/tailoring', tailoringRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

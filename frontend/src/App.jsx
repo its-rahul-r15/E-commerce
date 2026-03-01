@@ -18,6 +18,7 @@ import SellerDashboard from './pages/seller/SellerDashboard';
 import SellerProducts from './pages/seller/SellerProducts';
 import AddEditProduct from './pages/seller/AddEditProduct';
 import SellerOrders from './pages/seller/SellerOrders';
+import SellerTailoring from './pages/seller/SellerTailoring';
 import RegisterShop from './pages/seller/RegisterShop';
 import SellerShop from './pages/seller/SellerShop';
 import SellerAnalytics from './pages/seller/SellerAnalytics';
@@ -31,6 +32,8 @@ import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 import CustomerAIAssistant from './components/customer/CustomerAIAssistant';
 import VirtualTryOn from './pages/customer/VirtualTryOn';
+import CustomTailoring from './pages/customer/CustomTailoring';
+import MyTailoringRequests from './pages/customer/MyTailoringRequests';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -71,6 +74,8 @@ function App() {
             <Route path="/shop/:id" element={<ShopPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/try-on" element={<VirtualTryOn />} />
+            <Route path="/tailoring" element={<ProtectedRoute allowedRoles={['customer']}><CustomTailoring /></ProtectedRoute>} />
+            <Route path="/tailoring/requests" element={<ProtectedRoute allowedRoles={['customer']}><MyTailoringRequests /></ProtectedRoute>} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute allowedRoles={['customer']}><Orders /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -81,6 +86,7 @@ function App() {
             <Route path="/seller/products/add" element={<ProtectedRoute allowedRoles={['seller']}><AddEditProduct /></ProtectedRoute>} />
             <Route path="/seller/products/edit/:id" element={<ProtectedRoute allowedRoles={['seller']}><AddEditProduct /></ProtectedRoute>} />
             <Route path="/seller/orders" element={<ProtectedRoute allowedRoles={['seller']}><SellerOrders /></ProtectedRoute>} />
+            <Route path="/seller/tailoring" element={<ProtectedRoute allowedRoles={['seller']}><SellerTailoring /></ProtectedRoute>} />
             <Route path="/seller/shop" element={<ProtectedRoute allowedRoles={['seller']}><SellerShop /></ProtectedRoute>} />
             <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={['seller']}><SellerAnalytics /></ProtectedRoute>} />
             <Route path="/seller/inventory" element={<ProtectedRoute allowedRoles={['seller']}><SellerInventory /></ProtectedRoute>} />

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { productService, cartService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import ProductCard from '../../components/customer/ProductCard';
+import ImageZoomModal from '../../components/customer/ImageZoomModal';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -15,6 +16,12 @@ const ProductDetails = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [moreFromShop, setMoreFromShop] = useState([]);
+    const [zoomOpen, setZoomOpen] = useState(false);
+    const [zoomIndex, setZoomIndex] = useState(0);
+
+    // Clothing categories that support virtual try-on
+    const TRYON_CATEGORIES = ['Kurta', 'Saree', 'Lehenga', 'Salwar Suit', 'Sherwani', 'Dress', 'Top', 'Shirt', 'Jacket', 'Ethnic Wear', 'Western Wear', 'Clothing', 'Fashion'];
+    const TAILORING_CATEGORIES = ['Kurta', 'Saree', 'Lehenga', 'Salwar Suit', 'Sherwani', 'Dress', 'Ethnic Wear'];
 
     // Selected variants
     const [selectedColor, setSelectedColor] = useState('');
@@ -111,12 +118,22 @@ const ProductDetails = () => {
 
                     {/* Left: Statuesque Gallery (Col 1-5) */}
                     <div className="lg:col-span-5 space-y-8">
-                        <div className="relative aspect-[3/4] overflow-hidden bg-white border border-[var(--athenic-gold)] border-opacity-10 shadow-lg group">
+                        {/* Main Image — click to open zoom modal */}
+                        <div
+                            className="relative aspect-[3/4] overflow-hidden bg-white border border-[var(--athenic-gold)] border-opacity-10 shadow-lg group cursor-zoom-in"
+                            onClick={() => { setZoomIndex(selectedImage); setZoomOpen(true); }}
+                        >
                             <img
                                 src={product.images?.[selectedImage] || '/placeholder.png'}
                                 alt={product.name}
                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                             />
+                            {/* Zoom badge */}
+                            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1.5 px-3 py-1.5"
+                                style={{ background: 'rgba(10,10,14,0.65)', backdropFilter: 'blur(6px)', border: '1px solid rgba(197,165,95,0.35)' }}>
+                                <span className="text-[var(--athenic-gold)] text-xs">🔍</span>
+                                <span className="text-[8px] font-serif tracking-[0.3em] text-white uppercase">Zoom</span>
+                            </div>
                             {originalPrice && (
                                 <div className="absolute top-6 right-6 bg-[#E5C369] text-[var(--athenic-blue)] px-4 py-2 font-serif text-[10px] tracking-widest uppercase shadow-md animate-pulse">
                                     Gold tier 15% off
@@ -124,17 +141,36 @@ const ProductDetails = () => {
                             )}
                         </div>
 
-                        {/* Secondary Gallery */}
-                        <div className="grid grid-cols-2 gap-8">
-                            {product.images?.slice(1, 3).map((img, idx) => (
-                                <div key={idx} className="relative aspect-square overflow-hidden bg-white border border-[var(--athenic-gold)] border-opacity-10 shadow-sm transition-all hover:shadow-md">
-                                    <img src={img} alt="" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
-                                    <p className="absolute bottom-4 left-4 text-[8px] font-serif uppercase tracking-widest text-white mix-blend-difference italic">
-                                        {idx === 0 ? 'Detail: The Art of the Fold' : 'Silhouette: Classical Structure'}
+                        {/* Secondary Gallery — all images as clickable angle thumbnails */}
+                        <div className="grid grid-cols-3 gap-4">
+                            {(product.images || []).map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => { setSelectedImage(idx); }}
+                                    onDoubleClick={() => { setZoomIndex(idx); setZoomOpen(true); }}
+                                    className={`relative aspect-square overflow-hidden bg-white shadow-sm transition-all hover:shadow-md focus:outline-none ${selectedImage === idx
+                                            ? 'border-2 border-[var(--athenic-gold)]'
+                                            : 'border border-[var(--athenic-gold)] border-opacity-20 hover:border-opacity-60'
+                                        }`}
+                                >
+                                    <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                                    <p className="absolute bottom-2 left-2 text-[7px] font-serif uppercase tracking-widest text-white mix-blend-difference italic">
+                                        {['Front', 'Detail', 'Side', 'Back', 'Close-up'][idx] || `View ${idx + 1}`}
                                     </p>
-                                </div>
+                                </button>
                             ))}
                         </div>
+
+                        {/* Open full gallery hint */}
+                        {(product.images?.length || 0) > 1 && (
+                            <button
+                                onClick={() => { setZoomIndex(0); setZoomOpen(true); }}
+                                className="w-full text-[8px] font-serif tracking-[0.35em] uppercase text-[var(--athenic-gold)] opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 py-2"
+                            >
+                                <span>🖼</span>
+                                <span>View All {product.images.length} Images in Full-Screen</span>
+                            </button>
+                        )}
                     </div>
 
                     {/* Right: Product Info (Col 6-12) */}
@@ -216,14 +252,25 @@ const ProductDetails = () => {
                                 <span>{addingToCart ? 'Preserving...' : 'Add to Wardrobe'}</span>
                             </button>
 
-                            {/* Virtual Try-On Button — only shown when seller uploaded a try-on image */}
-                            {product.tryOnImage && (
+                            {/* Virtual Try-On — always shown for clothing categories */}
+                            {TRYON_CATEGORIES.includes(product.category) && (
                                 <button
-                                    onClick={() => navigate('/try-on')}
+                                    onClick={() => navigate(`/try-on?product=${product._id}`)}
                                     className="w-full py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 border-2 border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white transition-all"
                                 >
                                     <span className="text-lg">👗</span>
                                     <span>Virtual Try-On</span>
+                                </button>
+                            )}
+
+                            {/* Custom Tailoring — for eligible ethnic categories */}
+                            {TAILORING_CATEGORIES.includes(product.category) && (
+                                <button
+                                    onClick={() => navigate(`/tailoring?product=${product._id}`)}
+                                    className="w-full py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 border-2 border-[var(--mehron-deep,#7c2d12)] text-[var(--mehron-deep,#7c2d12)] hover:bg-[var(--mehron-deep,#7c2d12)] hover:text-white transition-all"
+                                >
+                                    <span className="text-lg">✂️</span>
+                                    <span>Custom Tailoring</span>
                                 </button>
                             )}
 
@@ -327,6 +374,15 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* ── Image Zoom Modal ──────────────────────────────────────── */}
+            {zoomOpen && (
+                <ImageZoomModal
+                    images={product.images || []}
+                    initialIndex={zoomIndex}
+                    onClose={() => setZoomOpen(false)}
+                />
             )}
         </div>
     );

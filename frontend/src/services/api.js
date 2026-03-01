@@ -275,4 +275,42 @@ export const addressService = {
     },
 };
 
+// ── Tailoring Service ─────────────────────────────────────────────────────────
+export const tailoringService = {
+    // Submit a tailoring request (customer)
+    submitRequest: async (data) => {
+        const response = await axios.post('/tailoring', data);
+        return response.data.data;
+    },
+
+    // Get customer's own tailoring requests
+    getMyRequests: async (page = 1, status = '') => {
+        const params = new URLSearchParams({ page });
+        if (status) params.append('status', status);
+        const response = await axios.get(`/tailoring/my?${params}`);
+        return response.data;
+    },
+
+    // Get a single tailoring request by ID
+    getRequestById: async (id) => {
+        const response = await axios.get(`/tailoring/${id}`);
+        return response.data.data;
+    },
+
+    // Get shop tailoring requests (seller)
+    getShopRequests: async (page = 1, status = '') => {
+        const params = new URLSearchParams({ page });
+        if (status) params.append('status', status);
+        const response = await axios.get(`/tailoring/shop?${params}`);
+        return response.data;
+    },
+
+    // Update status (seller)
+    updateStatus: async (id, data) => {
+        const response = await axios.patch(`/tailoring/${id}/status`, data);
+        return response.data.data;
+    },
+};
+
+
 

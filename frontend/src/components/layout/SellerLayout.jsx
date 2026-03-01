@@ -42,6 +42,7 @@ const SellerLayout = ({ children }) => {
         { name: 'Dashboard', icon: HomeIcon, path: '/seller/dashboard' },
         { name: 'Products', icon: ShoppingBagIcon, path: '/seller/products' },
         { name: 'Orders', icon: ShoppingCartIcon, path: '/seller/orders' },
+        { name: 'Tailoring', icon: CubeIcon, path: '/seller/tailoring' },
         { name: 'Inventory', icon: CubeIcon, path: '/seller/inventory' },
         { name: 'Analytics', icon: ChartBarIcon, path: '/seller/analytics' },
         { name: 'Shop Settings', icon: Cog6ToothIcon, path: '/seller/shop' },
