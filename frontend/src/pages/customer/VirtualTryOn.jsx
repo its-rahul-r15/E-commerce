@@ -4,10 +4,10 @@
  * Assembles CameraFeed, ClothRenderer, usePoseDetector and ProductSelector
  * into a premium UI matching the Klyra athenic design system.
  */
-import { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { cartService } from '../../services/api';
+import { cartService, productService } from '../../services/api';
 import CameraFeed from '../../components/tryon/CameraFeed';
 import ClothRenderer from '../../components/tryon/ClothRenderer';
 import ProductSelector from '../../components/tryon/ProductSelector';
@@ -15,7 +15,9 @@ import usePoseDetector from '../../components/tryon/usePoseDetector';
 
 const VirtualTryOn = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { isAuthenticated } = useAuth();
+    const urlProductId = searchParams.get('product');
 
     // Refs for camera / canvas
     const videoRef = useRef(null);
@@ -28,6 +30,15 @@ const VirtualTryOn = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [cameraError, setCameraError] = useState(null);
+    const [cameraDenied, setCameraDenied] = useState(false);
+
+    // Auto-select product from URL ?product= param
+    useEffect(() => {
+        if (!urlProductId || selectedProduct) return;
+        productService.getProductById(urlProductId)
+            .then(d => setSelectedProduct(d.product))
+            .catch(() => { });
+    }, [urlProductId]);
 
     // Pose landmarks from MediaPipe
     const { landmarks, isReady, status } = usePoseDetector(videoRef, isCameraActive);
@@ -36,6 +47,7 @@ const VirtualTryOn = () => {
 
     const handleStartCamera = async () => {
         setCameraError(null);
+        setCameraDenied(false);
         // Check browser support
         if (!navigator.mediaDevices?.getUserMedia) {
             setCameraError('Your browser does not support camera access.');
@@ -53,6 +65,7 @@ const VirtualTryOn = () => {
                         ? 'No camera found on this device.'
                         : 'Unable to access camera. Please try again.';
             setCameraError(msg);
+            if (err.name === 'NotAllowedError') setCameraDenied(true);
         }
     };
 
@@ -189,6 +202,12 @@ const VirtualTryOn = () => {
                                                     : 'Stand in front of the camera'}
                                 </p>
                             </div>
+                            {/* MediaPipe credit */}
+                            <div className="mt-3 pt-3 border-t border-gray-100">
+                                <p className="text-[7px] font-serif text-gray-300 tracking-widest uppercase text-center">
+                                    Powered by MediaPipe AI · Google
+                                </p>
+                            </div>
                         </div>
 
                         {/* Selected Product Info */}
@@ -218,6 +237,31 @@ const VirtualTryOn = () => {
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Size Confidence Panel */}
+                        {selectedProduct && selectedProduct.sizes?.length > 0 && (
+                            <div className="bg-white border border-[var(--athenic-gold)] border-opacity-30 p-5">
+                                <h3 className="font-serif text-[10px] tracking-[0.25em] uppercase text-gray-400 mb-3">
+                                    📏 Size Guide
+                                </h3>
+                                <div className="flex flex-wrap gap-1.5 mb-3">
+                                    {selectedProduct.sizes.map(size => (
+                                        <span key={size} className="text-[8px] font-serif tracking-widest uppercase px-2 py-1 border border-[var(--athenic-gold)] border-opacity-40 text-[var(--athenic-gold)]">
+                                            {size}
+                                        </span>
+                                    ))}
+                                </div>
+                                <p className="text-[8px] font-serif text-gray-400 tracking-widest uppercase leading-relaxed">
+                                    Select your size when adding to cart. Fits vary — check measurements on the product page.
+                                </p>
+                                <button
+                                    onClick={() => navigate(`/product/${selectedProduct._id}`)}
+                                    className="mt-3 w-full text-[8px] font-serif uppercase tracking-widest text-[var(--athenic-gold)] border border-[var(--athenic-gold)] border-opacity-40 py-2 hover:bg-[var(--athenic-gold)] hover:text-white transition-all"
+                                >
+                                    Full Size Chart →
+                                </button>
                             </div>
                         )}
 
@@ -303,12 +347,35 @@ const VirtualTryOn = () => {
                     />
                 </div>
 
-                {/* ── Tips Banner ──────────────────────────────────────────────── */}
-                <div className="mt-6 p-5 bg-[var(--ivory)] border border-[var(--athenic-gold)] border-opacity-20">
-                    <p className="text-[9px] font-serif uppercase tracking-widest text-center text-[var(--athenic-gold)]">
-                        ✨ Pro Tip: Ensure good lighting and stand in front of a plain background for best results
-                    </p>
-                </div>
+                {/* ── Camera Denied Fallback / Tips Banner ─────────────────── */}
+                {cameraDenied && !isCameraActive ? (
+                    <div className="mt-6 p-6 border border-[var(--athenic-gold)] border-opacity-30 bg-white">
+                        <div className="flex items-start space-x-4">
+                            <span className="text-3xl flex-shrink-0">👗</span>
+                            <div className="flex-1">
+                                <h3 className="font-serif text-[10px] tracking-[0.25em] uppercase text-[var(--athenic-blue)] mb-2">
+                                    Garment Preview (Static)
+                                </h3>
+                                <p className="text-[9px] font-serif text-gray-400 uppercase tracking-widest leading-relaxed mb-4">
+                                    Camera access was denied. Allow camera in browser settings and refresh to use Live AR. You can still browse and view garments below.
+                                </p>
+                                {selectedProduct && (
+                                    <div className="flex space-x-3">
+                                        {selectedProduct.images?.slice(0, 2).map((img, i) => (
+                                            <img key={i} src={img} alt={`View ${i + 1}`} className="w-24 h-32 object-cover border border-[var(--athenic-gold)] border-opacity-30" />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mt-6 p-5 bg-[var(--ivory)] border border-[var(--athenic-gold)] border-opacity-20">
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-center text-[var(--athenic-gold)]">
+                            ✨ Pro Tip: Ensure good lighting and stand in front of a plain background for best results
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* ── Screenshot Preview Modal ──────────────────────────────────── */}

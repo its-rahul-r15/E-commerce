@@ -101,6 +101,12 @@ const Profile = () => {
                                         My Orders
                                     </button>
                                     <button
+                                        onClick={() => navigate('/tailoring/requests')}
+                                        className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                                    >
+                                        ✂️ My Tailoring Requests
+                                    </button>
+                                    <button
                                         onClick={() => navigate('/cart')}
                                         className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
                                     >
