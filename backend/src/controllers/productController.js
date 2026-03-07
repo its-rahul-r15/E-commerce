@@ -1,6 +1,6 @@
 import * as productService from '../services/productService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
-import { uploadMultipleImages, uploadToCloudinary } from '../utils/cloudinaryUpload.js';
+import { uploadMultipleImages, uploadToCloudinary, uploadVideoToCloudinary } from '../utils/cloudinaryUpload.js';
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -21,6 +21,12 @@ export const createProduct = async (req, res, next) => {
         if (req.files?.tryOnImage && req.files.tryOnImage.length > 0) {
             const tryOnUrl = await uploadToCloudinary(req.files.tryOnImage[0].buffer, 'tryon');
             productData.tryOnImage = tryOnUrl;
+        }
+
+        // Handle 360° video (field: 'video360') — short rotation clip
+        if (req.files?.video360 && req.files.video360.length > 0) {
+            const videoUrl = await uploadVideoToCloudinary(req.files.video360[0].buffer, 'products360');
+            productData.video360 = videoUrl;
         }
 
         const product = await productService.createProduct(sellerId, productData);
@@ -226,6 +232,11 @@ export const updateProduct = async (req, res, next) => {
             updates.tryOnImage = await uploadToCloudinary(req.files.tryOnImage[0].buffer, 'tryon');
         }
 
+        // Handle 360° video update (field: 'video360')
+        if (req.files?.video360 && req.files.video360.length > 0) {
+            updates.video360 = await uploadVideoToCloudinary(req.files.video360[0].buffer, 'products360');
+        }
+
         const product = await productService.updateProduct(productId, sellerId, updates);
 
         return successResponse(
@@ -343,6 +354,71 @@ export const debugQueryInspector = (req, res, next) => {
         });
         return successResponse(res, result, 'Query Inspection');
     } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Get featured products (Admin-curated)
+ * GET /api/products/featured
+ */
+export const getFeaturedProducts = async (req, res, next) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const products = await productService.getFeaturedProducts(limit);
+
+        return successResponse(
+            res,
+            { products },
+            'Featured products retrieved successfully'
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Get random products for discovery
+ * GET /api/products/random
+ */
+export const getRandomProducts = async (req, res, next) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const products = await productService.getRandomProducts(limit);
+
+        return successResponse(
+            res,
+            { products },
+            'Random products retrieved successfully'
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Toggle featured status (Admin only)
+ * PATCH /api/products/admin/:id/featured
+ */
+export const toggleFeatured = async (req, res, next) => {
+    try {
+        const { featured } = req.body;
+
+        if (typeof featured !== 'boolean') {
+            return errorResponse(res, 'featured field must be a boolean', 400, 'INVALID_INPUT');
+        }
+
+        const product = await productService.toggleFeatured(req.params.id, featured);
+
+        return successResponse(
+            res,
+            { product },
+            `Product ${featured ? 'featured' : 'unfeatured'} successfully`
+        );
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return errorResponse(res, error.message, 404, 'PRODUCT_NOT_FOUND');
+        }
         next(error);
     }
 };

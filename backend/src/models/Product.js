@@ -121,11 +121,26 @@ const productSchema = new mongoose.Schema({
             message: 'Invalid try-on image URL',
         },
     },
+    // Optional 360° rotation video (max 10 sec) for interactive product viewer
+    video360: {
+        type: String, // Single Cloudinary video URL
+        default: null,
+        validate: {
+            validator: function (url) {
+                return !url || /^https?:\/\/.+/.test(url);
+            },
+            message: 'Invalid 360° video URL',
+        },
+    },
     isAvailable: {
         type: Boolean,
         default: true,
     },
     isBanned: {
+        type: Boolean,
+        default: false,
+    },
+    isFeatured: {
         type: Boolean,
         default: false,
     },

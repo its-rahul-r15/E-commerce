@@ -158,6 +158,18 @@ export const productService = {
         const response = await axios.get(`/products/debug/inspector?${params}`);
         return response.data.data;
     },
+
+    // Get featured products (admin-curated)
+    getFeaturedProducts: async (limit = 10) => {
+        const response = await axios.get(`/products/featured?limit=${limit}`);
+        return response.data.data?.products || [];
+    },
+
+    // Get random products (for discovery)
+    getRandomProducts: async (limit = 10) => {
+        const response = await axios.get(`/products/random?limit=${limit}`);
+        return response.data.data?.products || [];
+    },
 };
 
 export const cartService = {

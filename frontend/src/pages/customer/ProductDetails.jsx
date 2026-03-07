@@ -4,6 +4,7 @@ import { productService, cartService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import ProductCard from '../../components/customer/ProductCard';
 import ImageZoomModal from '../../components/customer/ImageZoomModal';
+import Product360Viewer from '../../components/customer/Product360Viewer';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -18,6 +19,7 @@ const ProductDetails = () => {
     const [moreFromShop, setMoreFromShop] = useState([]);
     const [zoomOpen, setZoomOpen] = useState(false);
     const [zoomIndex, setZoomIndex] = useState(0);
+    const [show360, setShow360] = useState(false);
 
     // Clothing categories that support virtual try-on
     const TRYON_CATEGORIES = ['Kurta', 'Saree', 'Lehenga', 'Salwar Suit', 'Sherwani', 'Dress', 'Top', 'Shirt', 'Jacket', 'Ethnic Wear', 'Western Wear', 'Clothing', 'Fashion'];
@@ -149,8 +151,8 @@ const ProductDetails = () => {
                                     onClick={() => { setSelectedImage(idx); }}
                                     onDoubleClick={() => { setZoomIndex(idx); setZoomOpen(true); }}
                                     className={`relative aspect-square overflow-hidden bg-white shadow-sm transition-all hover:shadow-md focus:outline-none ${selectedImage === idx
-                                            ? 'border-2 border-[var(--athenic-gold)]'
-                                            : 'border border-[var(--athenic-gold)] border-opacity-20 hover:border-opacity-60'
+                                        ? 'border-2 border-[var(--athenic-gold)]'
+                                        : 'border border-[var(--athenic-gold)] border-opacity-20 hover:border-opacity-60'
                                         }`}
                                 >
                                     <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
@@ -159,6 +161,24 @@ const ProductDetails = () => {
                                     </p>
                                 </button>
                             ))}
+
+                            {/* 360° View Thumbnail — shown when product has a 360° video */}
+                            {product.video360 && (
+                                <button
+                                    onClick={() => setShow360(true)}
+                                    className="relative aspect-square overflow-hidden bg-[#0a0a0e] shadow-sm transition-all hover:shadow-lg focus:outline-none border-2 border-[var(--athenic-gold)] border-opacity-40 hover:border-opacity-100 group"
+                                >
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
+                                        <div className="w-10 h-10 rounded-full border border-[var(--athenic-gold)] flex items-center justify-center text-[var(--athenic-gold)] text-lg bg-black/40 backdrop-blur-sm group-hover:scale-110 transition-transform">
+                                            🔄
+                                        </div>
+                                        <p className="text-[8px] font-serif uppercase tracking-[0.25em] text-[var(--athenic-gold)] opacity-80 group-hover:opacity-100">
+                                            360° View
+                                        </p>
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                                </button>
+                            )}
                         </div>
 
                         {/* Open full gallery hint */}
@@ -382,6 +402,15 @@ const ProductDetails = () => {
                     images={product.images || []}
                     initialIndex={zoomIndex}
                     onClose={() => setZoomOpen(false)}
+                />
+            )}
+
+            {/* ── 360° Product Viewer Modal ──────────────────────────────── */}
+            {show360 && product.video360 && (
+                <Product360Viewer
+                    videoUrl={product.video360}
+                    productName={product.name}
+                    onClose={() => setShow360(false)}
                 />
             )}
         </div>

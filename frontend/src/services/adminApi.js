@@ -71,4 +71,9 @@ export const adminService = {
         const response = await axios.patch(`/products/admin/${productId}/ban`, { banned: false });
         return response.data;
     },
+
+    toggleFeatured: async (productId, featured) => {
+        const response = await axios.patch(`/products/admin/${productId}/featured`, { featured });
+        return response.data;
+    },
 };

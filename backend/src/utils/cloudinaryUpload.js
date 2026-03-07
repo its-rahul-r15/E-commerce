@@ -4,21 +4,28 @@ import { Readable } from 'stream';
 
 /**
  * Cloudinary Upload Utilities
- * Helper functions for uploading images to Cloudinary
+ * Helper functions for uploading images and videos to Cloudinary
  */
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
 
+// Image-only multer (legacy)
 export const upload = multer({
     storage,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+        fileSize: 20 * 1024 * 1024, // 20MB limit (to support video uploads)
     },
     fileFilter: (req, file, cb) => {
-        // Accept images only
-        if (!file.mimetype.startsWith('image/')) {
-            return cb(new Error('Only image files are allowed'), false);
+        // Accept images for image fields, videos for video360 field
+        if (file.fieldname === 'video360') {
+            if (!file.mimetype.startsWith('video/')) {
+                return cb(new Error('Only video files are allowed for 360° view'), false);
+            }
+        } else {
+            if (!file.mimetype.startsWith('image/')) {
+                return cb(new Error('Only image files are allowed'), false);
+            }
         }
         cb(null, true);
     },
@@ -69,6 +76,36 @@ export const uploadMultipleImages = async (files, folder = 'shops') => {
     );
 
     return Promise.all(uploadPromises);
+};
+
+/**
+ * Upload video buffer to Cloudinary
+ * @param {Buffer} buffer - Video buffer
+ * @param {string} folder - Cloudinary folder name
+ * @returns {Promise<string>} Cloudinary video URL
+ */
+export const uploadVideoToCloudinary = (buffer, folder = 'products360') => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: 'video',
+                transformation: [
+                    { quality: 'auto' },
+                ],
+            },
+            (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result.secure_url);
+                }
+            }
+        );
+
+        const readableStream = Readable.from(buffer);
+        readableStream.pipe(uploadStream);
+    });
 };
 
 /**

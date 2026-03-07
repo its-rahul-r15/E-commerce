@@ -50,9 +50,22 @@ const AdminProducts = () => {
         }
     };
 
+    const handleToggleFeatured = async (productId, currentlyFeatured) => {
+        setUpdating(true);
+        try {
+            await adminService.toggleFeatured(productId, !currentlyFeatured);
+            fetchProducts();
+        } catch (error) {
+            alert(error.response?.data?.error || 'Failed to update featured status');
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     const filteredProducts = products.filter(p => {
         if (filter === 'banned') return p.isBanned;
         if (filter === 'active') return !p.isBanned && p.isAvailable;
+        if (filter === 'featured') return p.isFeatured;
         return true;
     });
 
@@ -72,7 +85,7 @@ const AdminProducts = () => {
 
             {/* Filter Tabs */}
             <div className="bg-white rounded-none p-2 mb-6 inline-flex space-x-2 border border-[var(--border-mehron)] shadow-sm">
-                {['all', 'active', 'banned'].map((tab) => (
+                {['all', 'active', 'featured', 'banned'].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setFilter(tab)}
@@ -81,7 +94,7 @@ const AdminProducts = () => {
                             : 'text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
                             }`}
                     >
-                        {tab === 'active' ? 'Active' : tab === 'banned' ? 'Banned' : 'All Products'}
+                        {tab === 'active' ? 'Active' : tab === 'banned' ? 'Banned' : tab === 'featured' ? '⭐ Featured' : 'All Products'}
                     </button>
                 ))}
             </div>
@@ -162,7 +175,18 @@ const AdminProducts = () => {
                                             {product.isBanned ? 'Banned' : product.isAvailable ? 'Active' : 'Hidden'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-right space-x-2">
+                                        <button
+                                            onClick={() => handleToggleFeatured(product._id, product.isFeatured)}
+                                            disabled={updating}
+                                            title={product.isFeatured ? 'Remove from Featured' : 'Add to Featured'}
+                                            className={`px-2 py-1 text-base rounded-none border transition-all disabled:opacity-50 ${product.isFeatured
+                                                ? 'bg-[var(--gold-pale)] border-[var(--gold)] text-[var(--gold)]'
+                                                : 'bg-white border-gray-200 text-gray-300 hover:text-[var(--gold)] hover:border-[var(--gold)]'
+                                                }`}
+                                        >
+                                            {product.isFeatured ? '★' : '☆'}
+                                        </button>
                                         {product.isBanned ? (
                                             <button
                                                 onClick={() => handleUnban(product._id)}
