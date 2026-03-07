@@ -497,3 +497,74 @@ export const getComparisons = async (productId) => {
 
     return comparisons;
 };
+
+/**
+ * Get featured products (Admin-curated collection)
+ * @param {number} limit - Max products to return
+ * @returns {Promise<Array>} Featured products
+ */
+export const getFeaturedProducts = async (limit = 10) => {
+    const cacheKey = `products:featured:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return JSON.parse(cached);
+
+    const products = await Product.find({
+        isFeatured: true,
+        isAvailable: true,
+        isBanned: false,
+    })
+        .populate('shopId', 'shopName location rating')
+        .sort('-createdAt')
+        .limit(limit)
+        .lean();
+
+    await setCache(cacheKey, JSON.stringify(products), 300);
+    return products;
+};
+
+/**
+ * Get random products for discovery
+ * @param {number} limit - Number of random products
+ * @returns {Promise<Array>} Random products
+ */
+export const getRandomProducts = async (limit = 10) => {
+    const products = await Product.aggregate([
+        { $match: { isAvailable: true, isBanned: false, stock: { $gt: 0 } } },
+        { $sample: { size: limit } },
+        {
+            $lookup: {
+                from: 'shops',
+                localField: 'shopId',
+                foreignField: '_id',
+                as: 'shopId',
+                pipeline: [{ $project: { shopName: 1, location: 1, rating: 1 } }],
+            }
+        },
+        { $unwind: { path: '$shopId', preserveNullAndEmptyArrays: true } },
+    ]);
+
+    return products;
+};
+
+/**
+ * Toggle featured status (Admin only)
+ * @param {string} productId - Product ID
+ * @param {boolean} featured - Featured status
+ * @returns {Promise<Object>} Updated product
+ */
+export const toggleFeatured = async (productId, featured) => {
+    const product = await Product.findByIdAndUpdate(
+        productId,
+        { isFeatured: featured },
+        { new: true }
+    );
+
+    if (!product) {
+        throw new Error('Product not found');
+    }
+
+    await deleteCache(`product:${productId}`);
+    await deleteCachePattern('products:*');
+
+    return product;
+};

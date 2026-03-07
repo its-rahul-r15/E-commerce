@@ -7,7 +7,8 @@ import {
     PhotoIcon,
     CurrencyRupeeIcon,
     TagIcon,
-    InboxStackIcon
+    InboxStackIcon,
+    VideoCameraIcon
 } from '@heroicons/react/24/outline';
 
 const AddEditProduct = () => {
@@ -32,6 +33,7 @@ const AddEditProduct = () => {
 
     const [imagePreviews, setImagePreviews] = useState([]);
     const [tryOnImagePreview, setTryOnImagePreview] = useState(null); // { file?, url }
+    const [video360Preview, setVideo360Preview] = useState(null); // { file?, url, existing? }
     const [loading, setLoading] = useState(isEdit);
     const [submitting, setSubmitting] = useState(false);
 
@@ -63,6 +65,10 @@ const AddEditProduct = () => {
             // Load existing tryOnImage if available
             if (product.tryOnImage) {
                 setTryOnImagePreview({ url: product.tryOnImage, existing: true });
+            }
+            // Load existing 360° video if available
+            if (product.video360) {
+                setVideo360Preview({ url: product.video360, existing: true });
             }
         } catch (error) {
             console.error('Error fetching product:', error);
@@ -158,6 +164,34 @@ const AddEditProduct = () => {
 
     const removeTryOnImage = () => setTryOnImagePreview(null);
 
+    // Handle 360° video file selection with duration validation
+    const handleVideo360Change = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('video/')) {
+            alert('Please select a video file (MP4, WebM, MOV)');
+            return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            alert('Video must be under 20MB');
+            return;
+        }
+        // Validate duration ≤ 10 seconds
+        const tempVideo = document.createElement('video');
+        tempVideo.preload = 'metadata';
+        tempVideo.onloadedmetadata = () => {
+            URL.revokeObjectURL(tempVideo.src);
+            if (tempVideo.duration > 10) {
+                alert('360° video must be 10 seconds or shorter. Your video is ' + Math.round(tempVideo.duration) + ' seconds.');
+                return;
+            }
+            setVideo360Preview({ file, url: URL.createObjectURL(file) });
+        };
+        tempVideo.src = URL.createObjectURL(file);
+    };
+
+    const removeVideo360 = () => setVideo360Preview(null);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -193,6 +227,11 @@ const AddEditProduct = () => {
             // Append try-on image if a new file was selected
             if (tryOnImagePreview?.file) {
                 data.append('tryOnImage', tryOnImagePreview.file);
+            }
+
+            // Append 360° video if a new file was selected
+            if (video360Preview?.file) {
+                data.append('video360', video360Preview.file);
             }
 
             imagePreviews.forEach(preview => {
@@ -603,6 +642,70 @@ const AddEditProduct = () => {
                                         className="hidden"
                                         accept="image/*"
                                         onChange={handleTryOnImageChange}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* ── 360° Product Video Card ── */}
+                    <div className="bg-white rounded-2xl shadow-sm border-2 border-[var(--athenic-gold)] border-opacity-30 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--mehron)] to-[var(--mehron-light)] px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-sm font-bold text-white flex items-center uppercase tracking-widest">
+                                <VideoCameraIcon className="h-5 w-5 mr-3 text-[var(--gold)]" />
+                                🔄 360° Product View Video
+                            </h2>
+                            <span className="text-[9px] font-serif text-[var(--gold-pale)] uppercase tracking-widest opacity-70">Optional</span>
+                        </div>
+                        <div className="p-6">
+                            {/* Guidance Banner */}
+                            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
+                                <p className="text-xs font-semibold text-indigo-800 mb-2">🎬 What to upload here:</p>
+                                <ul className="text-xs text-indigo-700 space-y-1 list-disc list-inside">
+                                    <li>A <strong>short rotation video</strong> of the product (max 10 seconds)</li>
+                                    <li>Slowly rotate the product 360° on a turntable or by hand</li>
+                                    <li>Use a <strong>clean, plain background</strong> for best results</li>
+                                    <li>Formats: MP4, WebM, MOV (max 20MB)</li>
+                                    <li>Customers will see an interactive drag-to-rotate viewer</li>
+                                </ul>
+                            </div>
+
+                            {/* Preview or Upload */}
+                            {video360Preview ? (
+                                <div className="relative group w-full max-w-sm mx-auto">
+                                    <div className="relative rounded-xl overflow-hidden border-2 border-[var(--athenic-gold)] border-opacity-40 bg-black">
+                                        <video
+                                            src={video360Preview.url}
+                                            className="w-full h-48 object-contain"
+                                            controls
+                                            muted
+                                            loop
+                                            playsInline
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={removeVideo360}
+                                        className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        ✕ Remove
+                                    </button>
+                                    <p className="text-center text-[10px] text-gray-400 mt-2 font-serif uppercase tracking-widest">
+                                        {video360Preview.existing ? 'Existing 360° Video' : 'New 360° Video'}
+                                    </p>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[var(--athenic-gold)] border-opacity-40 rounded-xl cursor-pointer bg-[var(--ivory)] hover:bg-[var(--gold-pale)] transition-colors">
+                                    <div className="text-center">
+                                        <p className="text-3xl mb-2">🔄</p>
+                                        <p className="text-sm font-serif text-[var(--athenic-blue)] font-semibold">Upload 360° Video</p>
+                                        <p className="text-xs text-gray-400 mt-1">MP4, WebM, MOV · Max 10 sec · Max 20MB</p>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        accept="video/mp4,video/webm,video/quicktime,video/*"
+                                        onChange={handleVideo360Change}
                                     />
                                 </label>
                             )}

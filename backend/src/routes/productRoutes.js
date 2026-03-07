@@ -16,6 +16,8 @@ const router = express.Router();
 // Public routes
 router.get('/', readRateLimiter, paginationValidator, productController.getProducts);
 router.get('/search', readRateLimiter, productController.searchProducts);
+router.get('/featured', readRateLimiter, productController.getFeaturedProducts);
+router.get('/random', readRateLimiter, productController.getRandomProducts);
 router.get('/shop/:shopId', readRateLimiter, shopIdValidator, productController.getShopProducts);
 router.get('/:id', readRateLimiter, mongoIdValidator, productController.getProductById);
 router.get('/:id/compare', readRateLimiter, mongoIdValidator, productController.getComparisons);
@@ -29,6 +31,7 @@ router.post(
     upload.fields([
         { name: 'images', maxCount: 5 },       // Product gallery images
         { name: 'tryOnImage', maxCount: 1 },   // AR try-on transparent image
+        { name: 'video360', maxCount: 1 },     // 360° rotation video (max 10 sec)
     ]),
     createProductValidator,
     productController.createProduct
@@ -50,6 +53,7 @@ router.patch(
     upload.fields([
         { name: 'images', maxCount: 5 },       // Product gallery images
         { name: 'tryOnImage', maxCount: 1 },   // AR try-on transparent image
+        { name: 'video360', maxCount: 1 },     // 360° rotation video (max 10 sec)
     ]),
     mongoIdValidator,
     updateProductValidator,
@@ -80,6 +84,14 @@ router.patch(
     requireAdmin,
     mongoIdValidator,
     productController.toggleProductBan
+);
+
+router.patch(
+    '/admin/:id/featured',
+    auth,
+    requireAdmin,
+    mongoIdValidator,
+    productController.toggleFeatured
 );
 
 router.get('/debug/all', productController.debugGetAll);

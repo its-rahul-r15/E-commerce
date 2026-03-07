@@ -16,8 +16,9 @@ const HOME_CATEGORIES = [
 ];
 
 const Home = () => {
-    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [randomProducts, setRandomProducts] = useState([]);
     const [nearbyShops, setNearbyShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [shopsLoading, setShopsLoading] = useState(true);
@@ -68,10 +69,18 @@ const Home = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const data = await productService.getProducts({ limit: 10 });
-            setProducts(data?.data || []);
+            const [trendingData, featuredData, randomData] = await Promise.all([
+                productService.getProducts({ limit: 10 }),
+                productService.getFeaturedProducts(10),
+                productService.getRandomProducts(10)
+            ]);
+            setProducts(trendingData?.data || []);
+            setFeaturedProducts(featuredData || []);
+            setRandomProducts(randomData || []);
         } catch (error) {
             setProducts([]);
+            setFeaturedProducts([]);
+            setRandomProducts([]);
         } finally {
             setLoading(false);
         }
@@ -197,8 +206,34 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Featured Collection (Admin Curated) */}
+            {featuredProducts.length > 0 && (
+                <section className="max-w-7xl mx-auto px-4 py-16">
+                    <div className="flex flex-col md:flex-row items-baseline justify-between mb-12">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-[var(--athenic-gold)] text-lg">⭐</span>
+                                <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)]">Klyra's Choice</p>
+                            </div>
+                            <h2 className="text-4xl font-serif tracking-widest text-[var(--athenic-blue)] uppercase">FEATURED COLLECTION</h2>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 lg:gap-8">
+                        {featuredProducts.map((product) => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* Meander Divider */}
+            {featuredProducts.length > 0 && (
+                <div className="meander-border opacity-20 my-4"></div>
+            )}
+
             {/* Trending Collection */}
-            <section className="max-w-7xl mx-auto px-4 py-20">
+            <section className="max-w-7xl mx-auto px-4 py-16">
                 <div className="flex flex-col md:flex-row items-baseline justify-between mb-12">
                     <div>
                         <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] mb-2">Curated for you</p>
@@ -217,7 +252,34 @@ const Home = () => {
             </section>
 
             {/* Meander Divider */}
-            <div className="meander-border opacity-30 mt-20"></div>
+            <div className="meander-border opacity-20 my-4"></div>
+
+            {/* Discovery / Random Collection */}
+            {randomProducts.length > 0 && (
+                <section className="max-w-7xl mx-auto px-4 py-16">
+                    <div className="flex flex-col md:flex-row items-baseline justify-between mb-12">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-[var(--athenic-gold)] text-lg">✨</span>
+                                <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)]">Discover Something New</p>
+                            </div>
+                            <h2 className="text-4xl font-serif tracking-widest text-[var(--athenic-blue)] uppercase">HIDDEN GEMS</h2>
+                        </div>
+                        <button onClick={fetchData} className="text-[10px] font-serif font-bold uppercase tracking-widest border border-[var(--athenic-gold)] px-4 py-2 hover:bg-[var(--athenic-gold)] hover:text-white transition-colors flex items-center gap-2">
+                            <span>🔄</span> Refresh
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 lg:gap-8">
+                        {randomProducts.map((product) => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* Meander Divider */}
+            <div className="meander-border opacity-30 mt-10"></div>
 
             {/* Brand Philosophy Section */}
             <section className="py-32 bg-gradient-to-b from-[var(--athenic-bg)] to-[var(--gold-pale)] items-center flex flex-col justify-center text-center px-4 relative">
