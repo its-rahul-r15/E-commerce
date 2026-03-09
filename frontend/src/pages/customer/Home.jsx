@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { productService, shopService, couponService } from '../../services/api';
+import { productService, couponService } from '../../services/api';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import ShopCard from '../../components/customer/ShopCard';
 import ProductCard from '../../components/customer/ProductCard';
 
 const HOME_CATEGORIES = [
@@ -19,52 +18,13 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [randomProducts, setRandomProducts] = useState([]);
-    const [nearbyShops, setNearbyShops] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [shopsLoading, setShopsLoading] = useState(true);
 
     useEffect(() => {
-        getUserLocation();
         fetchData();
     }, []);
 
-    const getUserLocation = useCallback(() => {
-        if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    fetchNearbyShops(latitude, longitude);
-                },
-                () => fetchAllShops()
-            );
-        } else {
-            fetchAllShops();
-        }
-    }, []);
 
-    const fetchNearbyShops = async (lat, lng) => {
-        try {
-            setShopsLoading(true);
-            const data = await shopService.getNearbyShops(lat, lng);
-            setNearbyShops(data?.shops || []);
-        } catch (error) {
-            setNearbyShops([]);
-        } finally {
-            setShopsLoading(false);
-        }
-    };
-
-    const fetchAllShops = async () => {
-        try {
-            setShopsLoading(true);
-            const data = await shopService.getPublicShops(1, 10);
-            setNearbyShops((data.shops || []).slice(0, 3));
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setShopsLoading(false);
-        }
-    };
 
     const fetchData = async () => {
         try {
@@ -170,23 +130,7 @@ const Home = () => {
             {/* Meander Divider */}
             <div className="meander-border opacity-10 my-6"></div>
 
-            {/* Specialized Categories */}
-            <section className="max-w-7xl mx-auto px-4 py-16 text-center">
-                <p className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] mb-4">
-                    Personalized Experience
-                </p>
-                <h2 className="text-3xl font-serif tracking-widest text-[var(--athenic-blue)] mb-12 uppercase">
-                    SHOPS NEAR YOU
-                </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {shopsLoading ? (
-                        [1, 2, 3].map(i => <div key={i} className="h-64 bg-white animate-pulse border border-gray-100"></div>)
-                    ) : nearbyShops.map(shop => (
-                        <ShopCard key={shop._id} shop={shop} />
-                    ))}
-                </div>
-            </section>
 
             {/* Promotion / Coupon Bar */}
             <section className="bg-gradient-to-r from-[var(--mehron-blush)] to-[var(--mehron-soft)] py-4 border-y border-[var(--athenic-gold)] border-opacity-20 my-10">

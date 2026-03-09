@@ -144,6 +144,12 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    returnDays: {
+        type: Number,
+        default: 7,
+        min: [0, 'Return days cannot be negative'],
+        max: [90, 'Return period cannot exceed 90 days'],
+    },
     tags: [{
         type: String,
         trim: true,

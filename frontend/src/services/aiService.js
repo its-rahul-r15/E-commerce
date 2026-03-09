@@ -376,3 +376,244 @@ Return ONLY valid JSON array.`;
 
     return ruleTrends;
 }
+
+/**
+ * CUSTOMER: Generate personalized product comparison insights
+ * Uses user preference profile to highlight what matters most
+ */
+export async function generateProductComparison(currentProduct, similarProducts, userPreferences) {
+    const prefType = userPreferences?.type || 'balanced';
+    const prefLabel = prefType === 'quality' ? 'Quality Connoisseur' : prefType === 'price' ? 'Smart Saver' : 'Balanced Shopper';
+
+    // Build product summary for AI prompt
+    const buildSummary = (p) => {
+        const effectivePrice = p.discountedPrice || p.price;
+        const discount = p.discountedPrice ? Math.round(((p.price - p.discountedPrice) / p.price) * 100) : 0;
+        return `"${p.name}" | ₹${effectivePrice} ${discount > 0 ? `(${discount}% off, MRP ₹${p.price})` : ''} | ${p.category || 'N/A'} | Brand: ${p.brand || 'N/A'} | Colors: ${(p.colors || []).join(', ') || 'N/A'} | Sizes: ${(p.sizes || []).join(', ') || 'N/A'} | Shop: ${p.shopId?.shopName || 'N/A'}`;
+    };
+
+    const currentSummary = buildSummary(currentProduct);
+    const alternativeSummaries = similarProducts.map((p, i) => `${i + 1}. ${buildSummary(p)}`).join('\n');
+
+    // Rule-based fallback comparison
+    const ruleBasedInsights = () => {
+        const currentPrice = currentProduct.discountedPrice || currentProduct.price;
+        const insights = [];
+
+        // Analyze each similar product
+        const productAnalysis = similarProducts.map(p => {
+            const price = p.discountedPrice || p.price;
+            const discount = p.discountedPrice ? Math.round(((p.price - p.discountedPrice) / p.price) * 100) : 0;
+            const priceDiff = price - currentPrice;
+            const priceDiffPercent = Math.round((priceDiff / currentPrice) * 100);
+
+            let verdict = '';
+            if (prefType === 'price') {
+                if (priceDiff < 0) verdict = `₹${Math.abs(priceDiff)} sasta — Great value pick! 💰`;
+                else if (priceDiff === 0) verdict = 'Same price range';
+                else verdict = `₹${priceDiff} expensive — Premium choice`;
+            } else if (prefType === 'quality') {
+                if (p.brand) verdict = `${p.brand} brand — Quality assured ⭐`;
+                else if (priceDiff > 0) verdict = `Premium option at ₹${price}`;
+                else verdict = `Budget-friendly alternative at ₹${price}`;
+            } else {
+                if (Math.abs(priceDiffPercent) < 10) verdict = 'Similar value proposition';
+                else if (priceDiff < 0) verdict = `₹${Math.abs(priceDiff)} more affordable`;
+                else verdict = `₹${priceDiff} more premium`;
+            }
+
+            return {
+                name: p.name,
+                price: price,
+                discount: discount,
+                verdict: verdict,
+                shop: p.shopId?.shopName || 'Shop',
+            };
+        });
+
+        // Overall recommendation
+        let recommendation = '';
+        if (prefType === 'price') {
+            const cheapest = [...similarProducts].sort((a, b) => (a.discountedPrice || a.price) - (b.discountedPrice || b.price))[0];
+            if (cheapest && (cheapest.discountedPrice || cheapest.price) < currentPrice) {
+                recommendation = `As a Smart Saver, you might prefer "${cheapest.name}" — it's ₹${currentPrice - (cheapest.discountedPrice || cheapest.price)} cheaper with similar features. But the current product has its own unique appeal!`;
+            } else {
+                recommendation = `Great choice! This product offers competitive pricing in its category. You're getting good value for money.`;
+            }
+        } else if (prefType === 'quality') {
+            const premium = [...similarProducts].sort((a, b) => (b.discountedPrice || b.price) - (a.discountedPrice || a.price))[0];
+            if (premium && (premium.discountedPrice || premium.price) > currentPrice) {
+                recommendation = `As a Quality Connoisseur, you might also like "${premium.name}" — it's a premium option at ₹${(premium.discountedPrice || premium.price).toLocaleString()}. Both are excellent choices!`;
+            } else {
+                recommendation = `Excellent taste! This is the premium pick in its category. Quality craftsmanship at its finest.`;
+            }
+        } else {
+            recommendation = `We found ${similarProducts.length} alternatives for you. Compare prices, styles, and availability to find your perfect match!`;
+        }
+
+        return {
+            prefLabel,
+            recommendation,
+            productAnalysis,
+        };
+    };
+
+    // Try AI-powered comparison
+    const prompt = `You are a personalized shopping advisor for an Indian fashion e-commerce platform.
+
+USER PROFILE: ${prefLabel} (${prefType} focused, avg spend ₹${userPreferences?.avgSpend || 'N/A'})
+Preferred categories: ${(userPreferences?.preferredCategories || []).join(', ') || 'N/A'}
+
+CURRENT PRODUCT (user is viewing):
+${currentSummary}
+
+ALTERNATIVES:
+${alternativeSummaries || 'No alternatives found'}
+
+Generate a personalized comparison as JSON:
+{
+  "prefLabel": "${prefLabel}",
+  "recommendation": "2-3 sentence personalized recommendation based on user type",
+  "productAnalysis": [
+    {"name": "product name", "price": number, "discount": number, "verdict": "1-line personalized verdict", "shop": "shop name"}
+  ]
+}
+
+Rules:
+- Tailor recommendations to "${prefType}" preference
+- Use ₹ for prices, be friendly and specific
+- verdict should be 10-15 words max
+- Return ONLY valid JSON`;
+
+    const raw = await callAI(prompt);
+    if (raw) {
+        try {
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (match) {
+                const aiResult = JSON.parse(match[0]);
+                if (aiResult.recommendation && aiResult.productAnalysis) {
+                    return aiResult;
+                }
+            }
+        } catch { /* use rule-based */ }
+    }
+
+    return ruleBasedInsights();
+}
+
+/**
+ * CUSTOMER: Conversational AI chat — Klyra shopping assistant
+ * Maintains full conversation history for context-aware replies.
+ * Returns: { reply: string, showProducts: boolean, searchFilters: object|null }
+ */
+export async function chatWithKlyraAssistant(userMessage, conversationHistory = []) {
+    const systemPrompt = `You are "Naitri", a friendly, warm, and knowledgeable AI shopping assistant for Klyra — a premium Indian fashion & lifestyle brand.
+
+PERSONALITY:
+- You are like a best friend who loves fashion. Speak naturally, warmly, with a mix of English and occasional Hindi words (like "bilkul", "zaroor", "dekho").  
+- Be enthusiastic but not over-the-top. Use emojis sparingly (1-2 per message max).
+- Keep responses SHORT (2-4 sentences max). Be concise and helpful.
+- Never say "I'm an AI" or "As an AI". You are Naitri, a styling expert at Klyra.
+
+CAPABILITIES:
+- Help customers find products (kurtas, sarees, lehengas, shirts, dresses, accessories, ethnic wear)
+- Give fashion advice, styling tips, outfit recommendations
+- Answer questions about Klyra (premium Indian fashion, quality fabrics, curated collections)
+- Help with sizing, color matching, occasion-based suggestions
+- Talk about trends, festivals, wedding wear, office wear, casual wear
+
+RESPONSE FORMAT:
+Your response MUST be a valid JSON object with exactly these fields:
+{
+  "reply": "Your conversational response text here",
+  "showProducts": true/false,
+  "searchFilters": { "searchQuery": "keywords", "category": "category or null", "maxPrice": number or null, "minPrice": number or null, "color": "color or null" } or null
+}
+
+RULES:
+- Set showProducts: true ONLY when user asks to see/find/show products, or asks for recommendations
+- Set showProducts: false for greetings, general chat, questions, fashion advice without specific product needs
+- searchFilters.searchQuery should be product keywords ONLY (e.g. "silk kurta", "red saree", "office shirt")
+- If user says hi/hello/namaste, respond warmly and ask how you can help. Do NOT search products.
+- If user asks about returns/shipping/sizing, answer helpfully without showing products
+- Always respond in the language the user uses (Hindi/English/Hinglish)
+
+Return ONLY valid JSON. No extra text.`;
+
+    // Build messages array with history
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...conversationHistory.slice(-10).map(msg => ({
+            role: msg.role === 'assistant' ? 'assistant' : 'user',
+            content: msg.text || msg.content || '',
+        })),
+        { role: 'user', content: userMessage },
+    ];
+
+    // Try Groq AI
+    if (GROQ_API_KEY) {
+        try {
+            const res = await fetch(GROQ_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                },
+                body: JSON.stringify({
+                    model: GROQ_MODEL,
+                    messages,
+                    temperature: 0.7,
+                    max_tokens: 512,
+                }),
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const text = data.choices?.[0]?.message?.content || '';
+                try {
+                    const match = text.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        const parsed = JSON.parse(match[0]);
+                        return {
+                            reply: parsed.reply || "Let me help you find something beautiful! ✨",
+                            showProducts: !!parsed.showProducts,
+                            searchFilters: parsed.searchFilters || null,
+                        };
+                    }
+                } catch { /* fall through */ }
+                // If JSON parsing failed, use raw text as reply
+                return { reply: text.slice(0, 500), showProducts: false, searchFilters: null };
+            }
+        } catch { /* fall through to fallback */ }
+    }
+
+    // Fallback: Rule-based response with personality  
+    const lower = userMessage.toLowerCase();
+    const greetings = ['hi', 'hello', 'hey', 'namaste', 'hii', 'hlo', 'kaise ho', 'how are you'];
+    const isGreeting = greetings.some(g => lower.includes(g));
+
+    if (isGreeting) {
+        return {
+            reply: "Hey! Welcome to Klyra 🙏 Main hoon Naitri, aapki personal styling assistant. Batao kya dhundh rahe ho — saree, kurta, ya kuch special occasion ke liye?",
+            showProducts: false,
+            searchFilters: null,
+        };
+    }
+
+    // If it looks like a product search, parse & search
+    const ruleResult = ruleBasedParser(userMessage);
+    if (ruleResult.searchQuery) {
+        return {
+            reply: `Zaroor! "${ruleResult.searchQuery}" ke liye best options dhundh rahi hoon... 🔍`,
+            showProducts: true,
+            searchFilters: ruleResult,
+        };
+    }
+
+    // Generic helpful response
+    return {
+        reply: "Main aapki shopping mein madad kar sakti hoon! Batao kya chahiye — koi specific outfit, color, ya budget? Jaise \"show me silk kurtas under 2000\" ✨",
+        showProducts: false,
+        searchFilters: null,
+    };
+}

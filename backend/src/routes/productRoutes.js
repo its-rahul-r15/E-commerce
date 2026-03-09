@@ -21,6 +21,7 @@ router.get('/random', readRateLimiter, productController.getRandomProducts);
 router.get('/shop/:shopId', readRateLimiter, shopIdValidator, productController.getShopProducts);
 router.get('/:id', readRateLimiter, mongoIdValidator, productController.getProductById);
 router.get('/:id/compare', readRateLimiter, mongoIdValidator, productController.getComparisons);
+router.get('/:id/personalized-compare', auth, readRateLimiter, mongoIdValidator, productController.getPersonalizedComparison);
 
 // Seller routes (protected)
 router.post(

@@ -153,6 +153,28 @@ export const getComparisons = async (req, res, next) => {
 };
 
 /**
+ * Get personalized product comparison (based on user order history)
+ * GET /api/products/:id/personalized-compare
+ */
+export const getPersonalizedComparison = async (req, res, next) => {
+    try {
+        const userId = req.user?._id || req.user?.id || null;
+        const result = await productService.getPersonalizedComparison(req.params.id, userId);
+
+        return successResponse(
+            res,
+            result,
+            'Personalized comparison retrieved successfully'
+        );
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return errorResponse(res, error.message, 404, 'PRODUCT_NOT_FOUND');
+        }
+        next(error);
+    }
+};
+
+/**
  * Get products for a specific shop
  * GET /api/products/shop/:shopId
  */
