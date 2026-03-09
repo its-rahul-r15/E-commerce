@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import ProductCard from '../../components/customer/ProductCard';
 import ImageZoomModal from '../../components/customer/ImageZoomModal';
 import Product360Viewer from '../../components/customer/Product360Viewer';
+import ProductComparison from '../../components/customer/ProductComparison';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -20,6 +21,7 @@ const ProductDetails = () => {
     const [zoomOpen, setZoomOpen] = useState(false);
     const [zoomIndex, setZoomIndex] = useState(0);
     const [show360, setShow360] = useState(false);
+    const [showComparison, setShowComparison] = useState(false);
 
     // Clothing categories that support virtual try-on
     const TRYON_CATEGORIES = ['Kurta', 'Saree', 'Lehenga', 'Salwar Suit', 'Sherwani', 'Dress', 'Top', 'Shirt', 'Jacket', 'Ethnic Wear', 'Western Wear', 'Clothing', 'Fashion'];
@@ -43,9 +45,8 @@ const ProductDetails = () => {
             if (data.product.colors?.length > 0) setSelectedColor(data.product.colors[0]);
             if (data.product.sizes?.length > 0) setSelectedSize(data.product.sizes[0]);
 
-            if (data.product?.shopId?._id) {
-                fetchMoreFromShop(data.product.shopId._id);
-            }
+            // Fetch related products (from same shop + same category)
+            fetchRelatedProducts(data.product.shopId?._id, data.product.category);
         } catch (error) {
             console.error('Error fetching product:', error);
         } finally {
@@ -53,12 +54,52 @@ const ProductDetails = () => {
         }
     };
 
-    const fetchMoreFromShop = async (shopId) => {
+    const fetchRelatedProducts = async (shopId, category) => {
         try {
-            const data = await productService.getProducts({ shopId: shopId, limit: 10 });
-            setMoreFromShop(data.products?.filter(p => p._id !== id).slice(0, 5) || []);
+            let related = [];
+            const existingIds = new Set([id]); // always exclude current product
+
+            // Helper to extract products array from API response
+            // getProducts returns { success, data: [...products], pagination }
+            const extractProducts = (res) => {
+                if (Array.isArray(res?.data)) return res.data;
+                if (Array.isArray(res?.data?.products)) return res.data.products;
+                if (Array.isArray(res)) return res;
+                return [];
+            };
+
+            // Pass 1: products from same shop
+            if (shopId) {
+                try {
+                    const shopData = await productService.getProducts({ shopId: shopId, limit: 10 });
+                    const shopProducts = extractProducts(shopData).filter(p => !existingIds.has(p._id));
+                    shopProducts.forEach(p => existingIds.add(p._id));
+                    related = [...related, ...shopProducts];
+                } catch { /* ignore */ }
+            }
+
+            // Pass 2: same category products
+            if (related.length < 5 && category) {
+                try {
+                    const catData = await productService.getProducts({ category: category, limit: 10 });
+                    const catProducts = extractProducts(catData).filter(p => !existingIds.has(p._id));
+                    catProducts.forEach(p => existingIds.add(p._id));
+                    related = [...related, ...catProducts];
+                } catch { /* ignore */ }
+            }
+
+            // Pass 3: any available products (broadest fallback)
+            if (related.length < 5) {
+                try {
+                    const allData = await productService.getProducts({ limit: 10 });
+                    const allProducts = extractProducts(allData).filter(p => !existingIds.has(p._id));
+                    related = [...related, ...allProducts];
+                } catch { /* ignore */ }
+            }
+
+            setMoreFromShop(related.slice(0, 5));
         } catch (error) {
-            console.error('Error fetching shop products:', error);
+            console.error('Error fetching related products:', error);
         }
     };
 
@@ -261,45 +302,86 @@ const ProductDetails = () => {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="space-y-4 mb-16">
-                            <button
-                                onClick={handleAddToCart}
-                                disabled={addingToCart}
-                                className="w-full btn-athenic-gold py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 athenic-shadow"
-                            >
-                                <span className="text-lg">✨</span>
-                                <span>{addingToCart ? 'Preserving...' : 'Add to Wardrobe'}</span>
-                            </button>
-
-                            {/* Virtual Try-On — always shown for clothing categories */}
-                            {TRYON_CATEGORIES.includes(product.category) && (
+                        {/* Action Buttons — 2x2 Grid */}
+                        <div className="mb-16 space-y-4">
+                            {/* Row 1: Add to Cart + Buy Now */}
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
-                                    onClick={() => navigate(`/try-on?product=${product._id}`)}
-                                    className="w-full py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 border-2 border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white transition-all"
+                                    onClick={handleAddToCart}
+                                    disabled={addingToCart}
+                                    className="btn-athenic-gold py-5 text-[11px] tracking-[0.2em] uppercase flex items-center justify-center space-x-2 athenic-shadow"
                                 >
-                                    <span className="text-lg">👗</span>
-                                    <span>Virtual Try-On</span>
+                                    <span className="text-lg">🛒</span>
+                                    <span>{addingToCart ? 'Adding...' : 'Add to Cart'}</span>
                                 </button>
-                            )}
 
-                            {/* Custom Tailoring — for eligible ethnic categories */}
-                            {TAILORING_CATEGORIES.includes(product.category) && (
                                 <button
-                                    onClick={() => navigate(`/tailoring?product=${product._id}`)}
-                                    className="w-full py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3 border-2 border-[var(--mehron-deep,#7c2d12)] text-[var(--mehron-deep,#7c2d12)] hover:bg-[var(--mehron-deep,#7c2d12)] hover:text-white transition-all"
+                                    onClick={handleBuyNow}
+                                    className="btn-athenic-outline py-5 text-[11px] tracking-[0.2em] uppercase flex items-center justify-center space-x-2"
                                 >
-                                    <span className="text-lg">✂️</span>
-                                    <span>Custom Tailoring</span>
+                                    <span className="text-lg">💳</span>
+                                    <span>Buy Now</span>
                                 </button>
-                            )}
+                            </div>
 
-                            <button
-                                onClick={handleBuyNow}
-                                className="w-full btn-athenic-outline py-6 text-[11px] tracking-[0.3em] uppercase flex items-center justify-center space-x-3"
-                            >
-                                <span>Secure the Sculpture</span>
-                            </button>
+                            {/* Row 2: Try-On / Tailoring / Compare (2-col grid) */}
+                            <div className="grid grid-cols-2 gap-3">
+                                {TRYON_CATEGORIES.includes(product.category) && (
+                                    <button
+                                        onClick={() => navigate(`/try-on?product=${product._id}`)}
+                                        className="py-5 text-[11px] tracking-[0.2em] uppercase flex items-center justify-center space-x-2 border-2 border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white transition-all"
+                                    >
+                                        <span className="text-lg">👗</span>
+                                        <span>Virtual Try-On</span>
+                                    </button>
+                                )}
+
+                                {TAILORING_CATEGORIES.includes(product.category) && (
+                                    <button
+                                        onClick={() => navigate(`/tailoring?product=${product._id}`)}
+                                        className="py-5 text-[11px] tracking-[0.2em] uppercase flex items-center justify-center space-x-2 border-2 border-[var(--mehron-deep,#7c2d12)] text-[var(--mehron-deep,#7c2d12)] hover:bg-[var(--mehron-deep,#7c2d12)] hover:text-white transition-all"
+                                    >
+                                        <span className="text-lg">✂️</span>
+                                        <span>Custom Tailoring</span>
+                                    </button>
+                                )}
+
+                                {isAuthenticated && (
+                                    <button
+                                        onClick={() => setShowComparison(true)}
+                                        className="py-5 text-[11px] tracking-[0.2em] uppercase flex items-center justify-center space-x-2 border-2 border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white transition-all group"
+                                    >
+                                        <span className="text-lg group-hover:scale-110 transition-transform">⚖️</span>
+                                        <span>Compare Products</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Return Policy Badge */}
+                        <div className="flex items-center space-x-6 py-6 border-y border-gray-100 mb-8">
+                            <div className="flex items-center space-x-3">
+                                <span className="text-xl">🔄</span>
+                                <div>
+                                    <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--athenic-blue)] font-semibold">
+                                        {(product.returnDays ?? 7) > 0
+                                            ? `${product.returnDays ?? 7} Day Easy Returns`
+                                            : 'No Returns'}
+                                    </p>
+                                    <p className="text-[9px] font-serif text-gray-400 uppercase tracking-widest mt-0.5">
+                                        {(product.returnDays ?? 7) > 0
+                                            ? 'Hassle-free return policy'
+                                            : 'This product is non-returnable'}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <span className="text-xl">🛡️</span>
+                                <div>
+                                    <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--athenic-blue)] font-semibold">Authentic Product</p>
+                                    <p className="text-[9px] font-serif text-gray-400 uppercase tracking-widest mt-0.5">Quality Guaranteed</p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Philosophy & Details */}
@@ -413,6 +495,13 @@ const ProductDetails = () => {
                     onClose={() => setShow360(false)}
                 />
             )}
+
+            {/* ── Personalized Comparison Modal ──────────────────────────── */}
+            <ProductComparison
+                productId={product._id}
+                isOpen={showComparison}
+                onClose={() => setShowComparison(false)}
+            />
         </div>
     );
 };

@@ -5,13 +5,13 @@ import { successResponse, errorResponse, paginatedResponse } from '../utils/resp
 export const createOrder = async (req, res, next) => {
     try {
         const customerId = req.user.userId;
-        const { deliveryAddress } = req.body;
+        const { deliveryAddress, deliveryCoordinates } = req.body;
 
         if (!deliveryAddress || !deliveryAddress.street || !deliveryAddress.city) {
             return errorResponse(res, 'Valid delivery address is required', 400, 'INVALID_ADDRESS');
         }
 
-        const orders = await orderService.createOrder(customerId, { deliveryAddress });
+        const orders = await orderService.createOrder(customerId, { deliveryAddress, deliveryCoordinates });
 
         return successResponse(
             res,

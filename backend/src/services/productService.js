@@ -1,5 +1,6 @@
 import Product from '../models/Product.js';
 import Shop from '../models/Shop.js';
+import Order from '../models/Order.js';
 import { deleteCache, deleteCachePattern, setCache, getCache } from './cacheService.js';
 
 /**
@@ -496,6 +497,206 @@ export const getComparisons = async (productId) => {
         .limit(10);
 
     return comparisons;
+};
+
+/**
+ * Get personalized product comparison based on user's order history
+ * Analyzes past purchases to determine quality vs price preference
+ * @param {string} productId - Current product being viewed
+ * @param {string} userId - Logged-in user ID
+ * @returns {Promise<Object>} { currentProduct, similarProducts, userPreferences }
+ */
+export const getPersonalizedComparison = async (productId, userId) => {
+    // 1. Fetch the current product
+    const currentProduct = await Product.findById(productId)
+        .populate('shopId', 'shopName rating location');
+
+    if (!currentProduct) {
+        throw new Error('Product not found');
+    }
+
+    // 2. Analyze user's order history to build preference profile
+    let userPreferences = {
+        type: 'balanced',        // 'quality', 'price', or 'balanced'
+        avgSpend: 0,
+        totalOrders: 0,
+        preferredCategories: [],
+        preferredBrands: [],
+        priceWeight: 50,         // 0-100 scale (100 = fully price focused)
+        qualityWeight: 50,       // 0-100 scale (100 = fully quality focused)
+    };
+
+    if (userId) {
+        const userOrders = await Order.find({
+            customerId: userId,
+            status: { $in: ['completed', 'accepted', 'preparing', 'ready', 'pending'] },
+        })
+            .populate('items.productId', 'price discountedPrice category brand name')
+            .sort('-createdAt')
+            .limit(50)
+            .lean();
+
+        if (userOrders.length > 0) {
+            const purchasedProducts = [];
+            const categoryCount = {};
+            const brandCount = {};
+            let totalSpent = 0;
+
+            for (const order of userOrders) {
+                for (const item of order.items) {
+                    const prod = item.productId;
+                    if (!prod) continue;
+                    purchasedProducts.push(prod);
+                    totalSpent += item.price * item.quantity;
+
+                    // Track category frequency
+                    if (prod.category) {
+                        categoryCount[prod.category] = (categoryCount[prod.category] || 0) + 1;
+                    }
+                    // Track brand frequency
+                    if (prod.brand) {
+                        brandCount[prod.brand] = (brandCount[prod.brand] || 0) + 1;
+                    }
+                }
+            }
+
+            const avgSpend = purchasedProducts.length > 0
+                ? totalSpent / purchasedProducts.length
+                : 0;
+
+            // Get average price for same category products in DB
+            const categoryAvg = await Product.aggregate([
+                {
+                    $match: {
+                        category: currentProduct.category,
+                        isAvailable: true,
+                        isBanned: false,
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        avgPrice: {
+                            $avg: {
+                                $cond: [
+                                    { $gt: ['$discountedPrice', 0] },
+                                    '$discountedPrice',
+                                    '$price'
+                                ]
+                            }
+                        },
+                    }
+                }
+            ]);
+
+            const marketAvgPrice = categoryAvg[0]?.avgPrice || avgSpend;
+
+            // Determine preference type
+            let priceWeight = 50;
+            let qualityWeight = 50;
+
+            if (avgSpend > marketAvgPrice * 1.2) {
+                // User tends to spend more → quality focused
+                qualityWeight = 75;
+                priceWeight = 25;
+            } else if (avgSpend < marketAvgPrice * 0.8) {
+                // User tends to spend less → price focused
+                priceWeight = 75;
+                qualityWeight = 25;
+            }
+
+            // Sort categories and brands by frequency
+            const sortedCategories = Object.entries(categoryCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([cat]) => cat);
+
+            const sortedBrands = Object.entries(brandCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([brand]) => brand);
+
+            userPreferences = {
+                type: qualityWeight > priceWeight ? 'quality' : priceWeight > qualityWeight ? 'price' : 'balanced',
+                avgSpend: Math.round(avgSpend),
+                totalOrders: userOrders.length,
+                preferredCategories: sortedCategories,
+                preferredBrands: sortedBrands,
+                priceWeight,
+                qualityWeight,
+            };
+        }
+    }
+
+    // 3. Find similar products for comparison
+    const currentEffectivePrice = currentProduct.discountedPrice || currentProduct.price;
+    const priceRange = currentEffectivePrice * 0.5; // ±50% price range
+
+    const similarQuery = {
+        _id: { $ne: productId },
+        category: currentProduct.category,
+        isAvailable: true,
+        isBanned: false,
+        stock: { $gt: 0 },
+        $or: [
+            {
+                discountedPrice: {
+                    $gte: currentEffectivePrice - priceRange,
+                    $lte: currentEffectivePrice + priceRange,
+                }
+            },
+            {
+                price: {
+                    $gte: currentEffectivePrice - priceRange,
+                    $lte: currentEffectivePrice + priceRange,
+                }
+            },
+        ],
+    };
+
+    // Sort based on user preference
+    let sortCriteria = '-createdAt'; // default
+    if (userPreferences.type === 'price') {
+        sortCriteria = 'price'; // cheapest first
+    } else if (userPreferences.type === 'quality') {
+        sortCriteria = '-price'; // premium first
+    }
+
+    let similarProducts = await Product.find(similarQuery)
+        .populate('shopId', 'shopName rating location')
+        .sort(sortCriteria)
+        .limit(6)
+        .lean();
+
+    // If not enough results, broaden search to same category without price filter
+    if (similarProducts.length < 3) {
+        const broaderQuery = {
+            _id: { $ne: productId },
+            category: currentProduct.category,
+            isAvailable: true,
+            isBanned: false,
+            stock: { $gt: 0 },
+        };
+
+        const existingIds = similarProducts.map(p => p._id.toString());
+
+        const moreProducts = await Product.find({
+            ...broaderQuery,
+            _id: { $nin: [productId, ...existingIds] },
+        })
+            .populate('shopId', 'shopName rating location')
+            .sort(sortCriteria)
+            .limit(6 - similarProducts.length)
+            .lean();
+
+        similarProducts = [...similarProducts, ...moreProducts];
+    }
+
+    return {
+        currentProduct,
+        similarProducts,
+        userPreferences,
+    };
 };
 
 /**

@@ -10,27 +10,26 @@ import { deleteCachePattern } from './cacheService.js';
  */
 
 /**
- * Create order from cart
+ * Create order from cart — routes each item to NEAREST vendor with stock
  * @param {string} customerId - Customer user ID
- * @param {Object} orderData - { deliveryAddress, paymentMethod }
- * @returns {Promise<Object>} Created order
+ * @param {Object} orderData - { deliveryAddress, deliveryCoordinates }
+ * @returns {Promise<Object>} Created orders
  */
 export const createOrder = async (customerId, orderData) => {
-    const { deliveryAddress } = orderData;
+    const { deliveryAddress, deliveryCoordinates } = orderData;
 
     // Get customer's cart — populate product AND product's shopId
     const cart = await Cart.findOne({ customerId }).populate({
         path: 'items.productId',
-        populate: { path: 'shopId', select: '_id' },
+        populate: { path: 'shopId', select: '_id shopName location' },
     });
 
     if (!cart || cart.items.length === 0) {
         throw new Error('Cart is empty');
     }
 
-    // Group items by shop
+    // Route each item to the nearest vendor with stock
     const itemsByShop = {};
-    let totalAmount = 0;
 
     for (const item of cart.items) {
         const product = item.productId;
@@ -43,35 +42,86 @@ export const createOrder = async (customerId, orderData) => {
             throw new Error(`Insufficient stock for ${product.name}. Only ${product.stock} available`);
         }
 
-        // Extract shopId robustly:
-        // product.shopId may be a populated object OR a raw ObjectId
-        const rawShopId = product.shopId?._id || product.shopId || item.shopId;
-        const shopId = rawShopId?.toString();
+        // Find the nearest vendor/shop that has this product with enough stock
+        let assignedShopId = null;
 
-        // DEBUG — will show in server terminal
-        console.log(`[ORDER DEBUG] product="${product.name}" product.shopId=${JSON.stringify(product.shopId)} item.shopId=${item.shopId} resolved shopId="${shopId}"`);
+        if (deliveryCoordinates && deliveryCoordinates.length === 2) {
+            // Find all products with the same name & category across all shops
+            const matchingProducts = await Product.find({
+                name: product.name,
+                category: product.category,
+                isAvailable: true,
+                isBanned: false,
+                stock: { $gte: item.quantity },
+            }).populate('shopId', '_id shopName location status').lean();
 
-        if (!shopId || shopId === 'undefined' || shopId === 'null') {
-            throw new Error(`Product "${product.name}" is not linked to a shop. Please contact support.`);
+            // Get shop IDs that have this product in stock
+            const shopsWithStock = matchingProducts
+                .filter(p => p.shopId && p.shopId.status === 'approved')
+                .map(p => ({
+                    shopId: p.shopId._id,
+                    productId: p._id,
+                    shopName: p.shopId.shopName,
+                    location: p.shopId.location,
+                }));
+
+            if (shopsWithStock.length > 0) {
+                // Find nearest shop using MongoDB $near
+                const nearestShops = await Shop.find({
+                    _id: { $in: shopsWithStock.map(s => s.shopId) },
+                    status: 'approved',
+                    location: {
+                        $near: {
+                            $geometry: {
+                                type: 'Point',
+                                coordinates: deliveryCoordinates, // [lng, lat]
+                            },
+                        },
+                    },
+                }).limit(1).lean();
+
+                if (nearestShops.length > 0) {
+                    assignedShopId = nearestShops[0]._id.toString();
+                    // Find the matching product from this shop
+                    const shopProduct = matchingProducts.find(
+                        p => p.shopId._id.toString() === assignedShopId
+                    );
+                    if (shopProduct) {
+                        // Use the product ID from this specific shop
+                        item.productId = shopProduct;
+                    }
+                    console.log(`[ROUTING] "${product.name}" → Nearest vendor: ${nearestShops[0].shopName || assignedShopId}`);
+                }
+            }
         }
 
-        if (!itemsByShop[shopId]) {
-            itemsByShop[shopId] = [];
+        // Fallback: use original shop from cart/product
+        if (!assignedShopId) {
+            const rawShopId = product.shopId?._id || product.shopId || item.shopId;
+            assignedShopId = rawShopId?.toString();
+            console.log(`[ROUTING] "${product.name}" → Fallback to original vendor: ${assignedShopId}`);
         }
 
-        const price = product.discountedPrice || product.price;
-        const itemTotal = price * item.quantity;
-        totalAmount += itemTotal;
+        if (!assignedShopId || assignedShopId === 'undefined' || assignedShopId === 'null') {
+            throw new Error(`Product "${product.name}" is not linked to a vendor. Please contact support.`);
+        }
 
-        itemsByShop[shopId].push({
-            productId: product._id,
-            name: product.name,
+        if (!itemsByShop[assignedShopId]) {
+            itemsByShop[assignedShopId] = [];
+        }
+
+        const actualProduct = item.productId;
+        const price = actualProduct.discountedPrice || actualProduct.price;
+
+        itemsByShop[assignedShopId].push({
+            productId: actualProduct._id,
+            name: actualProduct.name,
             price,
             quantity: item.quantity,
         });
     }
 
-    // Create separate order for each shop
+    // Create separate order per vendor
     const orders = [];
 
     for (const [shopId, items] of Object.entries(itemsByShop)) {
@@ -96,11 +146,6 @@ export const createOrder = async (customerId, orderData) => {
 
         orders.push(order);
     }
-
-    // DON'T clear cart here - it should only be cleared after successful payment
-    // Cart clearing is now handled in payment verification handler
-    // cart.items = [];
-    // await cart.save();
 
     // Invalidate product caches
     await deleteCachePattern('products:*');

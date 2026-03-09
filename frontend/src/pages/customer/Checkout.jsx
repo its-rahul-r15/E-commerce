@@ -17,9 +17,17 @@ const Checkout = () => {
     const [mode, setMode] = useState('saved'); // 'saved' | 'new'
     const [newForm, setNewForm] = useState(EMPTY_FORM);
     const [savingAddress, setSavingAddress] = useState(false);
+    const [deliveryCoordinates, setDeliveryCoordinates] = useState(null); // [lng, lat]
 
     useEffect(() => {
         fetchAll();
+        // Get user's delivery location for nearest-vendor routing
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => setDeliveryCoordinates([pos.coords.longitude, pos.coords.latitude]),
+                () => console.log('[Checkout] Geolocation denied, will use fallback vendor routing')
+            );
+        }
     }, []);
 
     const fetchAll = async () => {
@@ -140,7 +148,7 @@ const Checkout = () => {
                 state: addr.state,
                 pincode: addr.pincode,
             };
-            const response = await orderService.createOrder(deliveryAddress);
+            const response = await orderService.createOrder(deliveryAddress, deliveryCoordinates);
             const order = response.orders?.[0];
             if (!order) { alert('Failed to create order'); return; }
 

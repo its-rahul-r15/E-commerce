@@ -105,6 +105,12 @@ export const productService = {
         return response.data.data;
     },
 
+    // Get personalized product comparison (based on user order history)
+    getPersonalizedComparison: async (productId) => {
+        const response = await axios.get(`/products/${productId}/personalized-compare`);
+        return response.data.data;
+    },
+
     // Get shop products
     getShopProducts: async (shopId, filters = {}) => {
         const { page = 1, ...rest } = filters;
@@ -206,8 +212,8 @@ export const cartService = {
 
 export const orderService = {
     //Create order
-    createOrder: async (deliveryAddress) => {
-        const response = await axios.post('/orders', { deliveryAddress });
+    createOrder: async (deliveryAddress, deliveryCoordinates) => {
+        const response = await axios.post('/orders', { deliveryAddress, deliveryCoordinates });
         return response.data.data;
     },
 

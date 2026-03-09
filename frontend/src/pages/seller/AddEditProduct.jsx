@@ -25,6 +25,7 @@ const AddEditProduct = () => {
         subCategory: '',
         style: '',
         stock: '',
+        returnDays: 7,
         tags: '',
         brand: '',
         sizes: [],
@@ -54,6 +55,7 @@ const AddEditProduct = () => {
                 discountedPrice: product.discountedPrice || '',
                 category: product.category,
                 stock: product.stock,
+                returnDays: product.returnDays ?? 7,
                 tags: product.tags?.join(', ') || '',
                 brand: product.brand || '',
                 subCategory: product.subCategory || '',
@@ -209,6 +211,7 @@ const AddEditProduct = () => {
             if (formData.discountedPrice) data.append('discountedPrice', formData.discountedPrice);
             data.append('category', formData.category);
             data.append('stock', formData.stock);
+            data.append('returnDays', formData.returnDays);
 
             if (formData.tags) {
                 const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -556,6 +559,30 @@ const AddEditProduct = () => {
                                         placeholder="0"
                                     />
                                 </div>
+                            </div>
+
+                            {/* Return Policy */}
+                            <div className="mt-5">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Return Policy (Days)
+                                    <span className="ml-1 text-xs font-normal text-gray-500">Default: 7 days</span>
+                                </label>
+                                <div className="flex items-center space-x-3">
+                                    <input
+                                        type="number"
+                                        name="returnDays"
+                                        min="0"
+                                        max="90"
+                                        value={formData.returnDays}
+                                        onChange={handleChange}
+                                        className="w-32 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none"
+                                    />
+                                    <span className="text-sm text-gray-500">days</span>
+                                    {formData.returnDays == 0 && (
+                                        <span className="text-xs text-red-500 font-medium">⚠ No returns allowed</span>
+                                    )}
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">Set to 0 if product is non-returnable</p>
                             </div>
                         </div>
                     </div>
