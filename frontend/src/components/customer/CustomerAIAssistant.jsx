@@ -147,7 +147,7 @@ const CustomerAIAssistant = () => {
             {/* Floating Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 border-2 border-[var(--athenic-gold)] focus:outline-none ${isOpen
+                className={`fixed bottom-20 lg:bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 border-2 border-[var(--athenic-gold)] focus:outline-none ${isOpen
                     ? 'bg-white text-black scale-90'
                     : 'bg-white hover:scale-110'
                     }`}
@@ -168,12 +168,12 @@ const CustomerAIAssistant = () => {
 
             {/* Pulse Indicator */}
             {!isOpen && (
-                <div className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[var(--athenic-gold)] opacity-30 animate-ping pointer-events-none"></div>
+                <div className="fixed bottom-20 lg:bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[var(--athenic-gold)] opacity-30 animate-ping pointer-events-none"></div>
             )}
 
             {/* Chat Panel */}
             {isOpen && (
-                <div className="fixed bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] bg-white border border-[var(--athenic-gold)] border-opacity-20 shadow-2xl flex flex-col animate-slide-up overflow-hidden max-h-[80vh] rounded-2xl">
+                <div className="fixed bottom-40 lg:bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)] bg-white border border-[var(--athenic-gold)] border-opacity-20 shadow-2xl flex flex-col animate-slide-up overflow-hidden max-h-[80vh] rounded-2xl">
 
                     {/* Header */}
                     <div className="bg-gradient-to-r from-[var(--athenic-blue)] to-[#1a365d] px-6 py-4 flex items-center justify-between flex-shrink-0">
