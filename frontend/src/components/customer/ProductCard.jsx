@@ -1,13 +1,37 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
+import { useWishlist } from '../../contexts/WishlistContext';
 
 const ProductCard = ({ product }) => {
     const price = product.discountedPrice || product.price;
+    const { isInWishlist, toggleWishlist } = useWishlist();
+    const isSaved = isInWishlist(product._id);
+    const navigate = useNavigate();
+
+    const handleWishlistClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWishlist(product);
+    };
 
     return (
         <Link
             to={`/product/${product._id}`}
-            className="group block"
+            className="group block relative"
         >
+            {/* Wishlist Button */}
+            <button
+                onClick={handleWishlistClick}
+                className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-[#FF5A5F] transition-colors"
+            >
+                {isSaved ? (
+                    <HeartSolid className="w-5 h-5 text-[#FF5A5F]" />
+                ) : (
+                    <HeartOutline className="w-5 h-5" />
+                )}
+            </button>
+
             {/* Image Container with Hover Effect */}
             <div className="relative aspect-[3/4] overflow-hidden bg-white mb-4 border border-[var(--athenic-gold)] border-opacity-10 shadow-sm transition-all duration-700 group-hover:shadow-xl">
                 <img

@@ -180,7 +180,7 @@ const Checkout = () => {
                     }
                 },
                 notes: { address: `${addr.street}, ${addr.city}` },
-                theme: { color: '#10B981' },
+                theme: { color: '#1a2332' }, // Athenic blue color for Razorpay modal
                 modal: {
                     ondismiss: async () => {
                         try { await paymentService.paymentFailed(order._id); } catch { }
@@ -198,95 +198,101 @@ const Checkout = () => {
     };
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent" />
+        <div className="min-h-screen flex items-center justify-center bg-[#faf9f7]">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--athenic-gold)] border-t-transparent mx-auto"></div>
+                <p className="mt-4 text-[10px] font-serif uppercase tracking-[0.3em] text-gray-400">Preparing checkout...</p>
+            </div>
         </div>
     );
 
     const subtotal = calculateTotal();
-    const total = subtotal + 40 + subtotal * 0.05;
+    const total = subtotal; // Assuming shipping and tax are complementary for Klyra
     const activeAddr = getActiveAddress();
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen bg-[#faf9f7] py-12 font-serif">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Steps */}
-                <div className="mb-8 flex items-center justify-center space-x-4 text-sm font-medium">
-                    <span className="text-gray-400">Cart</span>
+                <div className="mb-12 flex items-center justify-center space-x-4 text-[10px] uppercase tracking-[0.2em] font-semibold">
+                    <span className="text-gray-400 cursor-pointer hover:text-[var(--athenic-gold)] transition-colors" onClick={() => navigate('/cart')}>Cart</span>
                     <span className="text-gray-300">›</span>
-                    <span className="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Checkout</span>
+                    <span className="text-[var(--athenic-blue)] border-b border-[var(--athenic-blue)] pb-0.5">Checkout</span>
                     <span className="text-gray-300">›</span>
                     <span className="text-gray-400">Payment</span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-10">
 
                         {/* ── Saved Addresses ──────────────────────────────── */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                                    <span className="w-7 h-7 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm mr-3">1</span>
-                                    Delivery Address
+                        <div className="bg-white border border-gray-100 overflow-hidden">
+                            <div className="px-8 py-5 border-b border-gray-100 bg-[#fdfcfa] flex items-center justify-between">
+                                <h2 className="text-sm font-serif font-semibold text-[var(--athenic-blue)] tracking-wide flex items-center uppercase">
+                                    <span className="w-8 h-8 border border-[var(--athenic-gold)]/30 text-[var(--athenic-gold)] flex items-center justify-center text-xs mr-4">I</span>
+                                    Delivery Details
                                 </h2>
                                 {savedAddresses.length > 0 && (
                                     <button
                                         onClick={() => setMode(mode === 'new' ? 'saved' : 'new')}
-                                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                                        className="text-[10px] text-[var(--athenic-gold)] hover:text-yellow-600 uppercase tracking-widest font-semibold transition-colors"
                                     >
-                                        {mode === 'new' ? '← Saved Addresses' : '+ Add New'}
+                                        {mode === 'new' ? '← Saved Addresses' : '+ Add New Address'}
                                     </button>
                                 )}
                             </div>
 
-                            <div className="p-6">
+                            <div className="p-8">
                                 {/* ── Mode: Select saved address ─────────────── */}
                                 {mode === 'saved' && savedAddresses.length > 0 && (
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         {savedAddresses.map((addr, idx) => (
                                             <div
                                                 key={idx}
                                                 onClick={() => setSelectedIdx(idx)}
-                                                className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all ${selectedIdx === idx
-                                                    ? 'border-emerald-500 bg-emerald-50'
-                                                    : 'border-gray-200 hover:border-emerald-300'
+                                                className={`relative cursor-pointer border p-6 transition-all ${selectedIdx === idx
+                                                    ? 'border-[var(--athenic-gold)] bg-[#fdfcfa]'
+                                                    : 'border-gray-200 hover:border-[var(--athenic-gold)]/50'
                                                     }`}
                                             >
                                                 <div className="flex items-start justify-between">
-                                                    <div className="flex items-start space-x-3">
-                                                        {/* Radio */}
-                                                        <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedIdx === idx ? 'border-emerald-500' : 'border-gray-300'}`}>
-                                                            {selectedIdx === idx && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+                                                    <div className="flex items-start space-x-4">
+                                                        {/* Custom Radio Button */}
+                                                        <div className={`mt-1 w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors ${selectedIdx === idx ? 'border-[var(--athenic-gold)]' : 'border-gray-300'}`}>
+                                                            {selectedIdx === idx && <div className="w-2 h-2 rounded-full bg-[var(--athenic-gold)]" />}
                                                         </div>
                                                         <div>
-                                                            <p className="font-semibold text-gray-900 text-sm">{addr.street}</p>
-                                                            <p className="text-gray-500 text-xs mt-0.5">
+                                                            <p className="font-semibold text-[var(--athenic-blue)] text-base mb-1 tracking-wide">{addr.street}</p>
+                                                            <p className="text-gray-500 text-xs font-serif leading-relaxed uppercase tracking-wider">
                                                                 {addr.city}, {addr.state} — {addr.pincode}
                                                             </p>
                                                             {addr.landmark && (
-                                                                <p className="text-gray-400 text-xs mt-0.5">Near: {addr.landmark}</p>
+                                                                <p className="text-gray-400 text-[10px] mt-1 uppercase tracking-widest">Near {addr.landmark}</p>
                                                             )}
                                                         </div>
                                                     </div>
 
                                                     {/* Actions */}
-                                                    <div className="flex items-center space-x-2 flex-shrink-0 ml-3">
+                                                    <div className="flex flex-col items-end space-y-3 flex-shrink-0 ml-4">
                                                         {addr.isDefault ? (
-                                                            <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Default</span>
+                                                            <span className="text-[9px] border border-[var(--athenic-gold)]/30 text-[var(--athenic-gold)] px-2 py-1 uppercase tracking-[0.2em]">Default</span>
                                                         ) : (
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleSetDefault(idx); }}
-                                                                className="text-[10px] text-gray-400 hover:text-emerald-600 transition-colors"
+                                                                className="text-[9px] text-gray-400 hover:text-[var(--athenic-gold)] transition-colors uppercase tracking-[0.1em]"
                                                             >
                                                                 Set Default
                                                             </button>
                                                         )}
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); handleDeleteAddress(idx); }}
-                                                            className="text-[10px] text-red-400 hover:text-red-600 transition-colors"
+                                                            className="text-gray-300 hover:text-red-400 transition-colors p-1"
+                                                            title="Remove"
                                                         >
-                                                            ✕
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -297,94 +303,97 @@ const Checkout = () => {
 
                                 {/* ── Mode: New address form ─────────────────── */}
                                 {mode === 'new' && (
-                                    <form className="space-y-4">
+                                    <form className="space-y-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                            <label className="block text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 mb-2">
                                                 Street Address <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 value={newForm.street}
                                                 onChange={e => setNewForm({ ...newForm, street: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
-                                                placeholder="House no., Building, Street"
+                                                className="w-full px-4 py-3 border border-gray-200 focus:border-[var(--athenic-gold)] outline-none text-sm font-serif bg-[#faf9f7] transition-colors"
                                             />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-6">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">City <span className="text-red-500">*</span></label>
+                                                <label className="block text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 mb-2">City <span className="text-red-500">*</span></label>
                                                 <input type="text" value={newForm.city} onChange={e => setNewForm({ ...newForm, city: e.target.value })}
-                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none" placeholder="City" />
+                                                    className="w-full px-4 py-3 border border-gray-200 focus:border-[var(--athenic-gold)] outline-none text-sm font-serif bg-[#faf9f7] transition-colors" />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">State <span className="text-red-500">*</span></label>
+                                                <label className="block text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 mb-2">State <span className="text-red-500">*</span></label>
                                                 <input type="text" value={newForm.state} onChange={e => setNewForm({ ...newForm, state: e.target.value })}
-                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none" placeholder="State" />
+                                                    className="w-full px-4 py-3 border border-gray-200 focus:border-[var(--athenic-gold)] outline-none text-sm font-serif bg-[#faf9f7] transition-colors" />
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-6">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Pincode <span className="text-red-500">*</span></label>
+                                                <label className="block text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 mb-2">Pincode <span className="text-red-500">*</span></label>
                                                 <input type="text" maxLength="6" pattern="[0-9]{6}" value={newForm.pincode}
                                                     onChange={e => setNewForm({ ...newForm, pincode: e.target.value })}
-                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none" placeholder="6-digit pincode" />
+                                                    className="w-full px-4 py-3 border border-gray-200 focus:border-[var(--athenic-gold)] outline-none text-sm font-serif bg-[#faf9f7] transition-colors" />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Landmark <span className="text-gray-400">(Optional)</span></label>
+                                                <label className="block text-[10px] font-serif uppercase tracking-[0.2em] text-gray-500 mb-2">Landmark <span className="text-gray-400 lowercase tracking-normal">(optional)</span></label>
                                                 <input type="text" value={newForm.landmark} onChange={e => setNewForm({ ...newForm, landmark: e.target.value })}
-                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none" placeholder="Nearby landmark" />
+                                                    className="w-full px-4 py-3 border border-gray-200 focus:border-[var(--athenic-gold)] outline-none text-sm font-serif bg-[#faf9f7] transition-colors" />
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-3 pt-2">
                                             <input type="checkbox" id="setDefault" checked={newForm.isDefault}
                                                 onChange={e => setNewForm({ ...newForm, isDefault: e.target.checked })}
-                                                className="w-4 h-4 text-emerald-500 rounded border-gray-300" />
-                                            <label htmlFor="setDefault" className="text-sm text-gray-600">Save as default address</label>
+                                                className="w-4 h-4 border-gray-300 accent-[var(--athenic-gold)]" />
+                                            <label htmlFor="setDefault" className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-500 cursor-pointer">Save as default address</label>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={handleSaveNewAddress}
                                             disabled={savingAddress}
-                                            className="w-full py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition-all disabled:opacity-60"
+                                            className="w-full py-4 bg-[var(--athenic-blue)] text-white text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[var(--athenic-blue)]/90 transition-all disabled:opacity-60"
                                         >
-                                            {savingAddress ? 'Saving...' : '💾 Save & Use This Address'}
+                                            {savingAddress ? 'Saving Details...' : 'Save & Continue'}
                                         </button>
                                     </form>
                                 )}
 
                                 {/* No addresses + no form shown */}
                                 {mode === 'saved' && savedAddresses.length === 0 && (
-                                    <div className="text-center py-6 text-gray-400">
-                                        <p className="text-sm">No saved addresses yet.</p>
-                                        <button onClick={() => setMode('new')} className="mt-2 text-emerald-600 font-medium text-sm">+ Add Address</button>
+                                    <div className="text-center py-10">
+                                        <p className="text-[11px] font-serif uppercase tracking-[0.2em] text-gray-400 mb-4">No addresses on file</p>
+                                        <button onClick={() => setMode('new')} className="btn-athenic-outline px-8 py-3 text-[10px] tracking-[0.2em] uppercase">Add New Address</button>
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* ── Order Items ───────────────────────────────────── */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="px-8 py-5 border-b border-gray-100 bg-gray-50/50">
-                                <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                                    <span className="w-7 h-7 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-sm mr-3">2</span>
+                        <div className="bg-white border border-gray-100 overflow-hidden">
+                            <div className="px-8 py-5 border-b border-gray-100 bg-[#fdfcfa]">
+                                <h2 className="text-sm font-serif font-semibold text-[var(--athenic-blue)] tracking-wide flex items-center uppercase">
+                                    <span className="w-8 h-8 border border-[var(--athenic-gold)]/30 text-[var(--athenic-gold)] flex items-center justify-center text-xs mr-4">II</span>
                                     Order Review
                                 </h2>
                             </div>
-                            <div className="p-6 space-y-4">
+                            <div className="p-8 space-y-6">
                                 {cart?.items?.map((item) => {
                                     const product = item.productId;
                                     if (!product) return null;
                                     const price = product.discountedPrice || product.price;
                                     return (
-                                        <div key={product._id} className="flex items-center space-x-4 border-b border-gray-50 pb-4 last:border-0 last:pb-0">
-                                            <div className="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                                                <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover" />
+                                        <div key={product._id} className="flex items-center justify-between border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                                            <div className="flex items-center space-x-6">
+                                                <div className="w-16 h-20 bg-gray-50 overflow-hidden border border-gray-100 flex-shrink-0">
+                                                    <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-serif text-[var(--athenic-blue)] text-sm mb-1 tracking-wide">{product.name}</p>
+                                                    <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Quantity: {item.quantity}</p>
+                                                </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-gray-900 text-sm">{product.name}</p>
-                                                <p className="text-xs text-gray-500">Qty: {item.quantity} × ₹{price}</p>
+                                            <div className="text-right">
+                                                <p className="font-serif text-[var(--athenic-blue)] font-semibold">₹{(price * item.quantity).toLocaleString()}</p>
                                             </div>
-                                            <p className="font-bold text-gray-900 text-sm">₹{(price * item.quantity).toFixed(2)}</p>
                                         </div>
                                     );
                                 })}
@@ -394,52 +403,61 @@ const Checkout = () => {
 
                     {/* ── Order Summary ────────────────────────────────────── */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 border border-gray-100 space-y-5">
-                            <h2 className="text-xl font-bold text-gray-900">Order Summary</h2>
+                        <div className="bg-white border border-gray-100 p-8 sticky top-24">
+                            <h2 className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] font-semibold mb-6">Order Summary</h2>
 
-                            {/* Active address preview */}
-                            {activeAddr && (
-                                <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3">
-                                    <p className="text-[10px] font-semibold text-emerald-700 uppercase tracking-widest mb-1">Delivering to</p>
-                                    <p className="text-xs font-medium text-gray-800">{activeAddr.street}</p>
-                                    <p className="text-xs text-gray-500">{activeAddr.city}, {activeAddr.state} — {activeAddr.pincode}</p>
+                            <div className="space-y-4 mb-8">
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-serif text-gray-500">Subtotal</span>
+                                    <span className="font-serif font-semibold text-[var(--athenic-blue)]">₹{subtotal.toLocaleString()}</span>
                                 </div>
-                            )}
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-serif text-gray-500">Shipping</span>
+                                    <span className="font-serif text-[var(--athenic-gold)] font-semibold">Complimentary</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-serif text-gray-500">Taxes</span>
+                                    <span className="font-serif text-[var(--athenic-gold)] font-semibold">Included</span>
+                                </div>
 
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Subtotal</span>
-                                    <span className="font-medium text-gray-900">₹{subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Shipping</span>
-                                    <span className="font-medium text-gray-900">₹40.00</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Tax (5%)</span>
-                                    <span className="font-medium text-gray-900">₹{(subtotal * 0.05).toFixed(2)}</span>
-                                </div>
-                                <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between items-center">
-                                    <span className="font-bold text-gray-900">Total</span>
-                                    <span className="text-2xl font-bold text-emerald-600">₹{total.toFixed(2)}</span>
+                                <div className="border-t border-gray-100 pt-5 mt-5">
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <span className="text-sm font-serif font-semibold text-[var(--athenic-blue)] block">Total</span>
+                                        </div>
+                                        <span className="text-2xl font-serif font-bold text-[var(--athenic-blue)]">₹{total.toLocaleString()}</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={submitting || !activeAddr}
-                                className="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl hover:bg-emerald-600 transition-all transform hover:-translate-y-0.5 shadow-lg shadow-emerald-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed"
+                                className="w-full bg-[var(--athenic-gold)] text-white py-4 text-[10px] uppercase tracking-[0.25em] font-serif font-semibold hover:bg-yellow-600 transition-all focus:outline-none flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group mb-4"
                             >
                                 {submitting ? (
-                                    <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>Processing...</span></>
+                                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>Processing Securely...</span></>
                                 ) : (
-                                    <span>{activeAddr ? 'Pay & Place Order' : 'Select an Address First'}</span>
+                                    <>
+                                        <span>{activeAddr ? 'Complete Purchase' : 'Select Address'}</span>
+                                        {activeAddr && (
+                                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        )}
+                                    </>
                                 )}
                             </button>
 
-                            <div className="bg-emerald-50 rounded-lg p-4">
-                                <h3 className="text-sm font-bold text-emerald-900 mb-1">Buyer Protection</h3>
-                                <p className="text-xs text-emerald-700">Full refund if item not received or not as described.</p>
+                            {/* Trust elements */}
+                            <div className="bg-[#fdfcfa] border border-gray-100 p-5 mt-6">
+                                <h3 className="text-[9px] uppercase tracking-[0.2em] font-semibold text-[var(--athenic-blue)] mb-2 flex items-center">
+                                    <svg className="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                    Secure Transaction
+                                </h3>
+                                <p className="text-[10px] text-gray-500 font-serif leading-loose">
+                                    Your personal information is encrypted and securely processed via Razorpay. We never store payment details.
+                                </p>
                             </div>
                         </div>
                     </div>

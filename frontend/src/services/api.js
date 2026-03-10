@@ -330,5 +330,22 @@ export const tailoringService = {
     },
 };
 
+export const wishlistService = {
+    // Get user's wishlist
+    getWishlist: async () => {
+        const response = await axios.get('/wishlist');
+        return response.data.wishlist;
+    },
 
+    // Toggle product in wishlist
+    toggleItem: async (productId) => {
+        const response = await axios.post('/wishlist/toggle', { productId });
+        return response.data;
+    },
 
+    // Clear entire wishlist
+    clearWishlist: async () => {
+        const response = await axios.delete('/wishlist');
+        return response.data;
+    }
+};

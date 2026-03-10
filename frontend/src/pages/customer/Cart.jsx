@@ -58,11 +58,7 @@ const Cart = () => {
     const handleApplyCoupon = async () => {
         setCouponError('');
         try {
-            // Validate against the first shop in cart for now (assuming single shop checkout optimization or backend handles it)
-            // In a real multi-vendor cart, coupons might be shop-specific. 
-            // Here we pass the first shop ID found.
             const shopId = cart?.items?.[0]?.productId?.shopId?._id;
-
             const data = await couponService.validateCoupon(couponCode, subtotal, shopId);
             setAppliedCoupon(data.coupon);
             setDiscount(data.discountAmount);
@@ -73,7 +69,7 @@ const Cart = () => {
         }
     };
 
-    // Group items by shop — fallback to product._id if shopId not available
+    // Group items by shop
     const groupedItems = cart?.items?.reduce((acc, item) => {
         const shopId = item.productId?.shopId?._id || item.shopId || item.productId?._id;
         if (!shopId) return acc;
@@ -89,7 +85,6 @@ const Cart = () => {
         return acc;
     }, {}) || {};
 
-    const shopCount = Object.keys(groupedItems).length;
     const itemCount = cart?.items?.length || 0;
 
     const calculateTotal = () => {
@@ -101,32 +96,34 @@ const Cart = () => {
     };
 
     const subtotal = calculateTotal();
-    const estDelivery = '10 min'; // Fast delivery!
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+            <div className="min-h-screen flex items-center justify-center bg-[#faf9f7]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-2 border-[var(--athenic-gold)] border-t-transparent mx-auto"></div>
+                    <p className="mt-4 text-[10px] font-serif uppercase tracking-[0.3em] text-gray-400">Preparing your collection...</p>
+                </div>
             </div>
         );
     }
 
     if (!cart?.items || cart.items.length === 0) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center p-8 bg-white rounded-2xl shadow-sm max-w-md w-full mx-4">
-                    <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg className="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
+                <div className="text-center max-w-md w-full mx-4 px-12 py-16">
+                    <div className="w-20 h-20 mx-auto mb-8 border border-[var(--athenic-gold)]/30 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-[var(--athenic-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Cart is Empty</h2>
-                    <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+                    <h2 className="text-2xl font-serif text-[var(--athenic-blue)] mb-3 tracking-wide">Your Collection Awaits</h2>
+                    <p className="text-[11px] font-serif text-gray-400 uppercase tracking-[0.2em] mb-10">Begin curating your personal selection</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="w-full bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-200"
+                        className="btn-athenic-gold px-10 py-4 text-[11px] tracking-[0.25em] uppercase"
                     >
-                        Start Shopping
+                        Explore Collection
                     </button>
                 </div>
             </div>
@@ -134,98 +131,110 @@ const Cart = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen bg-[#faf9f7] py-12 font-serif">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        Your Cart <span className="text-lg font-medium text-gray-500 ml-2">({itemCount} items from {shopCount} shops)</span>
-                    </h1>
+
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <p className="text-[9px] uppercase tracking-[0.4em] text-[var(--athenic-gold)] font-semibold mb-2">Your Personal Selection</p>
+                    <h1 className="text-3xl font-serif text-[var(--athenic-blue)] tracking-wide">Shopping Bag</h1>
+                    <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] mt-2">
+                        {itemCount} {itemCount === 1 ? 'piece' : 'pieces'} curated for you
+                    </p>
+                    <div className="w-16 h-px bg-[var(--athenic-gold)] mx-auto mt-4"></div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Cart Items Column */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* Cart Items */}
                     <div className="lg:col-span-2 space-y-6">
                         {Object.values(groupedItems).map((group) => (
-                            <div key={group.shopId} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                            <div key={group.shopId} className="bg-white border border-gray-100 overflow-hidden">
                                 {/* Shop Header */}
-                                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-[#fdfcfa]">
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-lg">
-                                            🏪
+                                        <div className="w-9 h-9 border border-[var(--athenic-gold)]/30 flex items-center justify-center">
+                                            <span className="text-[var(--athenic-gold)] text-sm">⚜️</span>
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-gray-900 flex items-center">
+                                            <h3 className="text-sm font-serif font-semibold text-[var(--athenic-blue)] tracking-wide flex items-center">
                                                 {group.shopName}
-                                                <span className="ml-2 bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Verified</span>
+                                                <span className="ml-2 text-[8px] px-2 py-0.5 border border-[var(--athenic-gold)]/30 text-[var(--athenic-gold)] uppercase tracking-[0.15em]">Verified</span>
                                             </h3>
-                                            <p className="text-xs text-gray-500">Shipping from Local Warehouse</p>
+                                            <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Curated collection</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => navigate(`/shop/${group.shopId}`)}
-                                        className="text-emerald-500 text-sm font-medium hover:text-emerald-600"
-                                    >
-                                        Add more items
-                                    </button>
                                 </div>
 
-                                {/* Items List */}
-                                <div className="divide-y divide-gray-100">
+                                {/* Items */}
+                                <div className="divide-y divide-gray-50">
                                     {group.items.map((item) => {
                                         const product = item.productId;
                                         const price = product.discountedPrice || product.price;
                                         const originalPrice = product.discountedPrice ? product.price : null;
+                                        const savings = originalPrice ? (originalPrice - price) * item.quantity : 0;
 
                                         return (
-                                            <div key={product._id} className="p-6 flex flex-col sm:flex-row items-center gap-6 group hover:bg-gray-50/50 transition-colors">
+                                            <div key={product._id} className="p-6 flex flex-col sm:flex-row items-start gap-6 group hover:bg-[#fdfcfa] transition-colors">
                                                 {/* Image */}
-                                                <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 border border-gray-200">
+                                                <div
+                                                    onClick={() => navigate(`/product/${product._id}`)}
+                                                    className="w-28 h-36 bg-gray-50 overflow-hidden flex-shrink-0 cursor-pointer border border-gray-100"
+                                                >
                                                     <img
                                                         src={product.images?.[0] || '/placeholder-product.png'}
                                                         alt={product.name}
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                                     />
                                                 </div>
 
                                                 {/* Details */}
                                                 <div className="flex-1 w-full">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <h4
-                                                            onClick={() => navigate(`/product/${product._id}`)}
-                                                            className="font-bold text-gray-900 text-lg cursor-pointer hover:text-emerald-600 transition-colors"
-                                                        >
-                                                            {product.name}
-                                                        </h4>
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <div>
+                                                            <p className="text-[9px] text-[var(--athenic-gold)] uppercase tracking-[0.2em] mb-1">{product.category || 'Fashion'}</p>
+                                                            <h4
+                                                                onClick={() => navigate(`/product/${product._id}`)}
+                                                                className="font-serif text-[var(--athenic-blue)] text-base cursor-pointer hover:text-[var(--athenic-gold)] transition-colors tracking-wide"
+                                                            >
+                                                                {product.name}
+                                                            </h4>
+                                                        </div>
                                                         <button
                                                             onClick={() => handleRemoveItem(product._id)}
-                                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                                                            title="Remove item"
+                                                            className="text-gray-300 hover:text-red-400 transition-colors p-1"
+                                                            title="Remove"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                                                             </svg>
                                                         </button>
                                                     </div>
 
-                                                    <p className="text-sm text-gray-500 mb-4">
-                                                        Color: Space Grey | Size: Universal
-                                                    </p>
+                                                    {/* Color/Size info */}
+                                                    <div className="flex items-center space-x-4 mt-2 mb-4">
+                                                        {item.selectedColor && (
+                                                            <span className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Color: {item.selectedColor}</span>
+                                                        )}
+                                                        {item.selectedSize && (
+                                                            <span className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Size: {item.selectedSize}</span>
+                                                        )}
+                                                    </div>
 
                                                     <div className="flex items-center justify-between">
                                                         {/* Quantity */}
-                                                        <div className="flex items-center border border-gray-200 rounded-lg bg-white">
+                                                        <div className="flex items-center border border-gray-200">
                                                             <button
                                                                 onClick={() => handleUpdateQuantity(product._id, item.quantity - 1)}
-                                                                disabled={item.quantity <= 1}
-                                                                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30"
+                                                                disabled={item.quantity <= 1 || updating}
+                                                                className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[var(--athenic-blue)] hover:bg-[#fdfcfa] transition-all disabled:opacity-30 text-sm"
                                                             >
                                                                 −
                                                             </button>
-                                                            <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
+                                                            <span className="w-10 text-center font-serif text-sm text-[var(--athenic-blue)]">{item.quantity}</span>
                                                             <button
                                                                 onClick={() => handleUpdateQuantity(product._id, item.quantity + 1)}
-                                                                disabled={item.quantity >= product.stock}
-                                                                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30"
+                                                                disabled={item.quantity >= product.stock || updating}
+                                                                className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[var(--athenic-blue)] hover:bg-[#fdfcfa] transition-all disabled:opacity-30 text-sm"
                                                             >
                                                                 +
                                                             </button>
@@ -233,9 +242,14 @@ const Cart = () => {
 
                                                         {/* Price */}
                                                         <div className="text-right">
-                                                            <div className="text-xl font-bold text-gray-900">₹{(price * item.quantity).toFixed(2)}</div>
+                                                            <div className="text-lg font-serif font-semibold text-[var(--athenic-blue)]">
+                                                                ₹{(price * item.quantity).toLocaleString()}
+                                                            </div>
                                                             {originalPrice && (
-                                                                <div className="text-xs text-gray-400 line-through">₹{(originalPrice * item.quantity).toFixed(2)}</div>
+                                                                <div className="flex items-center justify-end space-x-2">
+                                                                    <span className="text-[10px] text-gray-400 line-through">₹{(originalPrice * item.quantity).toLocaleString()}</span>
+                                                                    <span className="text-[9px] text-[var(--athenic-gold)] font-semibold">SAVE ₹{savings.toLocaleString()}</span>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
@@ -245,110 +259,126 @@ const Cart = () => {
                                     })}
                                 </div>
 
-                                {/* Shop Specific Delivery Info */}
-                                <div className="bg-emerald-50/50 px-6 py-3 border-t border-emerald-100 flex items-center space-x-2">
-                                    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                    </svg>
-                                    <span className="text-sm font-medium text-emerald-800">
-                                        Standard Delivery: <span className="font-bold">₹12.00</span> • Est. {estDelivery}
+                                {/* Shop subtotal */}
+                                <div className="bg-[#fdfcfa] px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+                                    <span className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Subtotal</span>
+                                    <span className="text-sm font-serif font-semibold text-[var(--athenic-blue)]">
+                                        ₹{group.items.reduce((sum, i) => sum + (i.productId.discountedPrice || i.productId.price) * i.quantity, 0).toLocaleString()}
                                     </span>
-                                    <div className="flex-1 text-right text-sm text-gray-600">
-                                        Shop Subtotal: <span className="font-bold text-gray-900">₹{group.items.reduce((sum, i) => sum + (i.productId.discountedPrice || i.productId.price) * i.quantity, 0).toFixed(2)}</span>
-                                    </div>
                                 </div>
                             </div>
                         ))}
+
+                        {/* Continue Shopping */}
+                        <button
+                            onClick={() => navigate('/')}
+                            className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[var(--athenic-gold)] transition-colors font-serif group mt-2"
+                        >
+                            <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <span>Continue browsing</span>
+                        </button>
                     </div>
 
-                    {/* Order Summary Column */}
+                    {/* Order Summary */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 border border-gray-100">
-                            <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                        <div className="bg-white border border-gray-100 p-8 sticky top-24">
+                            <h2 className="text-[10px] font-serif uppercase tracking-[0.3em] text-[var(--athenic-gold)] font-semibold mb-6">Order Summary</h2>
 
                             <div className="space-y-4 mb-6">
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Subtotal ({itemCount} items)</span>
-                                    <span className="font-medium text-gray-900">₹{subtotal.toFixed(2)}</span>
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-serif text-gray-500">Subtotal ({itemCount} pieces)</span>
+                                    <span className="font-serif font-semibold text-[var(--athenic-blue)]">₹{subtotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between text-emerald-600">
-                                    <span>Shipping</span>
-                                    <span className="font-medium">FREE</span>
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-serif text-gray-500">Shipping</span>
+                                    <span className="font-serif text-[var(--athenic-gold)] font-semibold">Complimentary</span>
                                 </div>
+                                {discount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-serif text-[var(--athenic-gold)]">Coupon Discount</span>
+                                        <span className="font-serif font-semibold text-[var(--athenic-gold)]">−₹{discount.toLocaleString()}</span>
+                                    </div>
+                                )}
                             </div>
-                            {discount > 0 && (
-                                <div className="flex justify-between text-emerald-600">
-                                    <span>Discount</span>
-                                    <span className="font-medium">-₹{discount.toFixed(2)}</span>
-                                </div>
-                            )}
-                            <div className="border-t border-dashed border-gray-200 my-4"></div>
-                            <div className="flex justify-between items-end">
-                                <div>
-                                    <span className="text-lg font-bold text-gray-900 block">Total Amount</span>
-                                    <span className="text-xs text-emerald-600">✨ Free Shipping & No Tax</span>
-                                </div>
-                                <span className="text-3xl font-bold text-emerald-600">₹{(subtotal - discount).toFixed(2)}</span>
-                            </div>
-                        </div>
 
-                        <button
-                            onClick={() => navigate('/checkout')}
-                            className="w-full bg-emerald-500 text-white font-bold py-4 rounded-xl hover:bg-emerald-600 transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-200 flex items-center justify-center space-x-2 group"
-                        >
-                            <span>Proceed to Checkout</span>
-                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </button>
-                        <p className="text-xs text-center text-gray-400 mt-4">
-                            By proceeding, you agree to our Terms of Service
-                        </p>
-
-                        {/* Coupon Code */}
-                        <div className="mt-8">
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Have a coupon code?</label>
-                            <div className="flex space-x-2">
-                                <input
-                                    type="text"
-                                    placeholder="CODE123"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value)}
-                                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 bg-gray-50"
-                                />
-                                <button
-                                    onClick={handleApplyCoupon}
-                                    disabled={!couponCode || appliedCoupon}
-                                    className={`px-4 py-2 border font-bold rounded-lg text-sm transition-colors ${appliedCoupon
-                                        ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50'
-                                        }`}
-                                >
-                                    {appliedCoupon ? 'Applied' : 'Apply'}
-                                </button>
-                            </div>
-                            {couponError && <p className="text-xs text-red-500 mt-2">{couponError}</p>}
-                            {appliedCoupon && (
-                                <div className="mt-2 bg-emerald-50 border border-emerald-100 rounded-lg p-2 flex justify-between items-center">
-                                    <span className="text-xs text-emerald-700">Coupon <b>{appliedCoupon.code}</b> applied!</span>
-                                    <button onClick={() => { setAppliedCoupon(null); setDiscount(0); }} className="text-xs text-red-500 hover:underline">Remove</button>
+                            <div className="border-t border-gray-100 pt-5 mb-8">
+                                <div className="flex justify-between items-end">
+                                    <div>
+                                        <span className="text-sm font-serif font-semibold text-[var(--athenic-blue)] block">Total</span>
+                                        <span className="text-[9px] text-gray-400 uppercase tracking-[0.15em]">Inclusive of all charges</span>
+                                    </div>
+                                    <span className="text-2xl font-serif font-bold text-[var(--athenic-blue)]">₹{(subtotal - discount).toLocaleString()}</span>
                                 </div>
-                            )}
-                        </div>
+                            </div>
 
-                        {/* Trust Icons */}
-                        <div className="mt-8 flex justify-center space-x-6 grayscale opacity-60">
-                            <div className="flex flex-col items-center">
-                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                <span className="text-[10px] uppercase font-bold">Secure</span>
+                            <button
+                                onClick={() => navigate('/checkout')}
+                                className="w-full bg-[var(--athenic-blue)] text-white py-4 text-[11px] uppercase tracking-[0.25em] font-serif font-semibold hover:bg-[var(--athenic-blue)]/90 transition-all flex items-center justify-center space-x-3 group"
+                            >
+                                <span>Proceed to Checkout</span>
+                                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </button>
+
+                            <p className="text-[8px] text-center text-gray-400 mt-3 uppercase tracking-[0.15em] font-serif">
+                                Secure checkout • SSL encrypted
+                            </p>
+
+                            {/* Coupon Code */}
+                            <div className="mt-8 pt-8 border-t border-gray-100">
+                                <label className="block text-[9px] font-serif uppercase tracking-[0.2em] text-gray-400 mb-3">Apply Coupon Code</label>
+                                <div className="flex space-x-2">
+                                    <input
+                                        type="text"
+                                        placeholder="ENTER CODE"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                        className="flex-1 border border-gray-200 px-4 py-2.5 text-xs font-serif uppercase tracking-widest outline-none focus:border-[var(--athenic-gold)] transition-colors bg-[#faf9f7]"
+                                    />
+                                    <button
+                                        onClick={handleApplyCoupon}
+                                        disabled={!couponCode || appliedCoupon}
+                                        className={`px-5 py-2.5 text-[10px] uppercase tracking-[0.15em] font-serif font-semibold border transition-all ${appliedCoupon
+                                            ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                                            : 'border-[var(--athenic-gold)] text-[var(--athenic-gold)] hover:bg-[var(--athenic-gold)] hover:text-white'
+                                            }`}
+                                    >
+                                        {appliedCoupon ? '✓ Applied' : 'Apply'}
+                                    </button>
+                                </div>
+                                {couponError && <p className="text-[10px] text-red-400 mt-2 font-serif">{couponError}</p>}
+                                {appliedCoupon && (
+                                    <div className="mt-3 bg-[#fdfcfa] border border-[var(--athenic-gold)]/20 p-3 flex justify-between items-center">
+                                        <span className="text-[10px] text-[var(--athenic-gold)] font-serif">
+                                            ✨ <strong>{appliedCoupon.code}</strong> applied — you save ₹{discount.toLocaleString()}
+                                        </span>
+                                        <button
+                                            onClick={() => { setAppliedCoupon(null); setDiscount(0); setCouponCode(''); }}
+                                            className="text-[9px] text-gray-400 hover:text-red-400 uppercase tracking-wider font-serif"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex flex-col items-center">
-                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                                <span className="text-[10px] uppercase font-bold">Protected</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                                <span className="text-[10px] uppercase font-bold">Returns</span>
+
+                            {/* Trust badges */}
+                            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center space-x-8">
+                                <div className="flex flex-col items-center text-gray-300">
+                                    <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                    <span className="text-[8px] uppercase tracking-[0.2em] font-serif">Secure</span>
+                                </div>
+                                <div className="flex flex-col items-center text-gray-300">
+                                    <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                                    <span className="text-[8px] uppercase tracking-[0.2em] font-serif">Authentic</span>
+                                </div>
+                                <div className="flex flex-col items-center text-gray-300">
+                                    <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                    <span className="text-[8px] uppercase tracking-[0.2em] font-serif">Easy Returns</span>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -117,16 +117,16 @@ const AdminLoyaltyGifts = () => {
                                     step="1000"
                                     value={minSpend}
                                     onChange={e => setMinSpend(Number(e.target.value))}
-                                    className="w-40 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none"
+                                    className="w-40 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 text-gray-500 outline-none"
                                     placeholder="e.g. 50000"
-                                />
+                                />     
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Top N Customers</label>
                                 <select
                                     value={topN}
                                     onChange={e => setTopN(Number(e.target.value))}
-                                    className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none bg-white"
+                                    className="px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 text-gray-500 outline-none bg-white"
                                 >
                                     {[5, 10, 15, 20, 25, 50].map(n => (
                                         <option key={n} value={n}>Top {n}</option>
@@ -224,7 +224,7 @@ const AdminLoyaltyGifts = () => {
                                     <select
                                         value={couponForm.discountType}
                                         onChange={e => setCouponForm({ ...couponForm, discountType: e.target.value })}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none bg-white"
+                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none text-gray-500 bg-white"
                                     >
                                         <option value="percentage">Percentage (%)</option>
                                         <option value="fixed">Fixed Amount (₹)</option>
@@ -240,7 +240,7 @@ const AdminLoyaltyGifts = () => {
                                         max={couponForm.discountType === 'percentage' ? 100 : 50000}
                                         value={couponForm.discountValue}
                                         onChange={e => setCouponForm({ ...couponForm, discountValue: Number(e.target.value) })}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none"
+                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none text-gray-500"
                                     />
                                 </div>
                                 <div>
@@ -251,7 +251,7 @@ const AdminLoyaltyGifts = () => {
                                         max="365"
                                         value={couponForm.expiryDays}
                                         onChange={e => setCouponForm({ ...couponForm, expiryDays: Number(e.target.value) })}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none"
+                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none text-gray-500"
                                     />
                                 </div>
                                 <div>
@@ -261,7 +261,7 @@ const AdminLoyaltyGifts = () => {
                                         min="0"
                                         value={couponForm.minPurchase}
                                         onChange={e => setCouponForm({ ...couponForm, minPurchase: Number(e.target.value) })}
-                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none"
+                                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-amber-500 outline-none text-gray-500"
                                         placeholder="0 = no minimum"
                                     />
                                 </div>
