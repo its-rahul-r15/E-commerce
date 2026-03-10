@@ -80,6 +80,7 @@ import paymentRoutes from './src/routes/paymentRoutes.js';
 import couponRoutes from './src/routes/couponRoutes.js';
 import tailoringRoutes from './src/routes/tailoringRoutes.js';
 import loyaltyRoutes from './src/routes/loyaltyRoutes.js';
+import wishlistRoutes from './src/routes/wishlistRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -91,6 +92,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/tailoring', tailoringRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 import { cartService } from '../../services/api';
 import {
+    Bars3Icon,
     MapPinIcon,
     MagnifyingGlassIcon,
     ShoppingBagIcon,
@@ -13,9 +15,11 @@ import {
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [location, setLocation] = useState('Detecting location...');
     const { user, isAuthenticated, logout } = useAuth();
+    const { wishlistCount } = useWishlist();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -78,7 +82,7 @@ const Navbar = () => {
     return (
         <div className="relative z-50">
             {/* Top Location Bar - Mehron Gradient */}
-            <div className="bg-gradient-to-r from-[var(--mehron-deep)] to-[var(--mehron)] py-2">
+            <div className="hidden lg:block bg-gradient-to-r from-[var(--mehron-deep)] to-[var(--mehron)] py-2">
                 <div className="max-w-7xl mx-auto px-4 flex justify-center items-center">
                     <button className="flex items-center space-x-2 text-[var(--gold-pale)] hover:text-white transition-colors group">
                         <MapPinIcon className="w-4 h-4" />
@@ -90,9 +94,19 @@ const Navbar = () => {
             </div>
 
             {/* Main Navbar */}
-            <nav className="bg-[var(--athenic-bg)] border-b border-[var(--athenic-gold)] border-opacity-30">
+            <nav className="bg-white lg:bg-[var(--athenic-bg)] border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex items-center justify-between h-20">
+                    <div className="flex items-center justify-between h-16 lg:h-20">
+
+                        {/* Mobile Hamburger Menu icon */}
+                        <div className="flex items-center lg:hidden w-1/4">
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="text-[#FF5A5F] hover:text-[#e0484d] transition-colors p-2 -ml-2 rounded-lg"
+                            >
+                                <Bars3Icon className="w-7 h-7" />
+                            </button>
+                        </div>
 
                         {/* Left: Navigation Links */}
                         <div className="hidden lg:flex items-center space-x-8">
@@ -117,7 +131,14 @@ const Navbar = () => {
 
                         {/* Center: Logo */}
                         <div className="flex-1 flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-                            <Link to="/" className="flex flex-col items-center group">
+                            {/* Mobile Logo */}
+                            <Link to="/" className="lg:hidden flex flex-col items-center group">
+                                <span className="text-2xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
+                                    KLYRA
+                                </span>
+                            </Link>
+                            {/* Desktop Logo */}
+                            <Link to="/" className="hidden lg:flex flex-col items-center group">
                                 <span className="text-3xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
                                     KLYRA
                                 </span>
@@ -126,74 +147,132 @@ const Navbar = () => {
                         </div>
 
                         {/* Right: Actions */}
-                        <div className="flex items-center space-x-4 sm:space-x-6">
-                            {/* Search */}
-                            <form onSubmit={handleSearch} className="hidden md:block relative">
+                        <div className="flex items-center justify-end w-1/4 lg:w-auto lg:space-x-4">
+                            {/* Desktop-only Actions */}
+                            <div className="hidden lg:flex items-center space-x-4 sm:space-x-6">
+                                {/* Search */}
+                                <form onSubmit={handleSearch} className="hidden md:block relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Search for products..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-48 lg:w-64 bg-transparent border-b border-[var(--athenic-blue)] border-opacity-20 py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] placeholder:italic placeholder:opacity-50 transition-all"
+                                    />
+                                    <MagnifyingGlassIcon className="w-4 h-4 absolute right-2 top-1.5 text-[var(--athenic-blue)] opacity-50" />
+                                </form>
+
+                                {/* Wishlist */}
+                                <button
+                                    onClick={() => navigate('/wishlist')}
+                                    className="relative text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
+                                >
+                                    <HeartIcon className="w-5 h-5" />
+                                    {wishlistCount > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#FF5A5F] lg:bg-[var(--athenic-gold)] text-white text-[9px] rounded-full flex items-center justify-center font-bold">
+                                            {wishlistCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {/* Profile */}
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                        className="text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
+                                    >
+                                        <UserIcon className="w-5 h-5" />
+                                    </button>
+                                    {showProfileMenu && (
+                                        <div className="absolute right-0 mt-4 w-48 bg-white border border-[var(--athenic-gold)] shadow-xl z-[60] py-2">
+                                            {isAuthenticated ? (
+                                                <>
+                                                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                                                        <p className="text-[10px] font-serif uppercase tracking-wider text-gray-500">Welcome</p>
+                                                        <p className="text-sm font-serif truncate">{user?.name}</p>
+                                                    </div>
+                                                    <button onClick={() => navigate('/orders')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)]">Orders</button>
+                                                    <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)]">Profile</button>
+                                                    {user.role === 'seller' && (
+                                                        <button onClick={() => navigate('/seller/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)] text-[var(--athenic-teal)]">Seller Hub</button>
+                                                    )}
+                                                    {user.role === 'admin' && (
+                                                        <button onClick={() => navigate('/admin/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-red-50 text-red-600 font-bold">🛡️ Admin Panel</button>
+                                                    )}
+                                                    <div className="border-t border-gray-100 mt-2">
+                                                        <button onClick={logout} className="w-full text-left px-4 py-2 text-xs font-serif text-red-500 hover:bg-red-50">Logout</button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <button onClick={() => navigate('/login')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)]">Login / Register</button>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Cart (Visible on both) */}
+                            <button
+                                onClick={() => navigate('/cart')}
+                                className="relative flex items-center justify-center w-10 h-10 lg:w-auto lg:h-auto rounded-xl lg:rounded-none bg-[#fae6e6] lg:bg-transparent text-[#FF5A5F] lg:text-[var(--athenic-blue)] hover:bg-[#ffe4e4] lg:hover:text-[var(--athenic-gold)] transition-colors ml-2 lg:ml-0"
+                            >
+                                <ShoppingBagIcon className="w-5 h-5 lg:w-5 lg:h-5" />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#FF5A5F] lg:bg-[var(--athenic-gold)] text-white text-[9px] rounded-full flex items-center justify-center font-bold">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Menu Dropdown */}
+                {isMobileMenuOpen && (
+                    <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl z-[60]">
+                        <div className="px-4 py-4 space-y-2">
+                            <form onSubmit={handleSearch} className="relative mb-4">
                                 <input
                                     type="text"
                                     placeholder="Search for products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-48 lg:w-64 bg-transparent border-b border-[var(--athenic-blue)] border-opacity-20 py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] placeholder:italic placeholder:opacity-50 transition-all"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 pl-10 text-sm focus:outline-none focus:border-[#FF5A5F] transition-all"
                                 />
-                                <MagnifyingGlassIcon className="w-4 h-4 absolute right-2 top-1.5 text-[var(--athenic-blue)] opacity-50" />
+                                <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
                             </form>
+                            <Link to="/products" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Products</Link>
+                            <Link to="/shops" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Shops</Link>
+                            <Link to="/about" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">About Us</Link>
+                            <Link to="/try-on" className="px-4 py-3 text-base font-medium text-[#FF5A5F] bg-[#fae6e6] hover:bg-[#ffe4e4] rounded-xl transition-colors flex items-center space-x-2">
+                                <span className="text-xl">✨</span>
+                                <span>Virtual Try-On</span>
+                            </Link>
 
-                            {/* Wishlist */}
-                            <button className="text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors">
-                                <HeartIcon className="w-5 h-5" />
-                            </button>
-
-                            {/* Cart */}
-                            <button
-                                onClick={() => navigate('/cart')}
-                                className="relative text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
-                            >
-                                <ShoppingBagIcon className="w-5 h-5" />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[var(--athenic-gold)] text-white text-[9px] rounded-full flex items-center justify-center font-bold">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </button>
-
-                            {/* Profile */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                                    className="text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
-                                >
-                                    <UserIcon className="w-5 h-5" />
-                                </button>
-                                {showProfileMenu && (
-                                    <div className="absolute right-0 mt-4 w-48 bg-white border border-[var(--athenic-gold)] shadow-xl z-[60] py-2">
-                                        {isAuthenticated ? (
-                                            <>
-                                                <div className="px-4 py-2 border-b border-gray-100 mb-2">
-                                                    <p className="text-[10px] font-serif uppercase tracking-wider text-gray-500">Welcome</p>
-                                                    <p className="text-sm font-serif truncate">{user?.name}</p>
-                                                </div>
-                                                <button onClick={() => navigate('/orders')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)]">Orders</button>
-                                                <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)]">Profile</button>
-                                                {user.role === 'seller' && (
-                                                    <button onClick={() => navigate('/seller/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)] hover:text-[var(--athenic-gold)] text-[var(--athenic-teal)]">Seller Hub</button>
-                                                )}
-                                                {user.role === 'admin' && (
-                                                    <button onClick={() => navigate('/admin/dashboard')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-red-50 text-red-600 font-bold">🛡️ Admin Panel</button>
-                                                )}
-                                                <div className="border-t border-gray-100 mt-2">
-                                                    <button onClick={logout} className="w-full text-left px-4 py-2 text-xs font-serif text-red-500 hover:bg-red-50">Logout</button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <button onClick={() => navigate('/login')} className="w-full text-left px-4 py-2 text-xs font-serif hover:bg-[var(--athenic-bg)]">Login / Register</button>
+                            <div className="border-t border-gray-100 mt-4 pt-4 space-y-2">
+                                {isAuthenticated ? (
+                                    <>
+                                        <div className="px-4 py-2">
+                                            <p className="text-xs text-gray-500 uppercase tracking-wider">Welcome</p>
+                                            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                                        </div>
+                                        <button onClick={() => navigate('/orders')} className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Orders</button>
+                                        <button onClick={() => navigate('/profile')} className="w-full text-left px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Profile</button>
+                                        {user.role === 'seller' && (
+                                            <button onClick={() => navigate('/seller/dashboard')} className="w-full text-left px-4 py-3 text-base font-medium text-[var(--athenic-teal)] hover:bg-teal-50 rounded-xl transition-colors">Seller Hub</button>
                                         )}
-                                    </div>
+                                        {user.role === 'admin' && (
+                                            <button onClick={() => navigate('/admin/dashboard')} className="w-full text-left px-4 py-3 text-base font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors">🛡️ Admin Panel</button>
+                                        )}
+                                        <button onClick={logout} className="w-full text-left px-4 py-3 text-base font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors mt-2">Logout</button>
+                                    </>
+                                ) : (
+                                    <button onClick={() => navigate('/login')} className="w-full text-left px-4 py-3 text-base font-medium text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Login / Register</button>
                                 )}
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
             </nav>
         </div>
     );
