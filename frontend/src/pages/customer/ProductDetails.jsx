@@ -161,24 +161,41 @@ const ProductDetails = () => {
 
                     {/* Left: Statuesque Gallery (Col 1-5) */}
                     <div className="lg:col-span-5 space-y-8">
-                        {/* Main Image — click to open zoom modal */}
+                        {/* Main Image — hover to zoom like Amazon */}
                         <div
-                            className="relative aspect-[3/4] overflow-hidden bg-white border border-[var(--athenic-gold)] border-opacity-10 shadow-lg group cursor-zoom-in"
+                            className="relative aspect-[3/4] overflow-hidden bg-white border border-[var(--athenic-gold)] border-opacity-10 shadow-lg group cursor-crosshair"
                             onClick={() => { setZoomIndex(selectedImage); setZoomOpen(true); }}
+                            onMouseMove={(e) => {
+                                const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+                                const x = ((e.clientX - left) / width) * 100;
+                                const y = ((e.clientY - top) / height) * 100;
+                                const img = e.currentTarget.querySelector('img.zoom-image');
+                                if (img) {
+                                    img.style.transformOrigin = `${x}% ${y}%`;
+                                    img.style.transform = 'scale(2.5)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                const img = e.currentTarget.querySelector('img.zoom-image');
+                                if (img) {
+                                    img.style.transformOrigin = 'center center';
+                                    img.style.transform = '';
+                                }
+                            }}
                         >
                             <img
                                 src={product.images?.[selectedImage] || '/placeholder.png'}
                                 alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                className="w-full h-full object-cover transition-transform duration-300 zoom-image group-hover:scale-105"
                             />
                             {/* Zoom badge */}
-                            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1.5 px-3 py-1.5"
+                            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center space-x-1.5 px-3 py-1.5 pointer-events-none"
                                 style={{ background: 'rgba(10,10,14,0.65)', backdropFilter: 'blur(6px)', border: '1px solid rgba(197,165,95,0.35)' }}>
                                 <span className="text-[var(--athenic-gold)] text-xs">🔍</span>
                                 <span className="text-[8px] font-serif tracking-[0.3em] text-white uppercase">Zoom</span>
                             </div>
                             {originalPrice && (
-                                <div className="absolute top-6 right-6 bg-[#E5C369] text-[var(--athenic-blue)] px-4 py-2 font-serif text-[10px] tracking-widest uppercase shadow-md animate-pulse">
+                                <div className="absolute top-6 right-6 bg-[#E5C369] text-[var(--athenic-blue)] px-4 py-2 font-serif text-[10px] tracking-widest uppercase shadow-md animate-pulse pointer-events-none">
                                     Gold tier 15% off
                                 </div>
                             )}
