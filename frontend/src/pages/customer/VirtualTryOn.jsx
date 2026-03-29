@@ -34,6 +34,7 @@ const VirtualTryOn = () => {
 
     // Auto-select product from URL ?product= param
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (!urlProductId || selectedProduct) return;
         productService.getProductById(urlProductId)
             .then(d => setSelectedProduct(d.product))

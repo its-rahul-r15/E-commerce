@@ -10,6 +10,7 @@ const SearchResults = () => {
     const [query, setQuery] = useState('');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const searchQuery = searchParams.get('q');
         if (searchQuery) {
             setQuery(searchQuery);

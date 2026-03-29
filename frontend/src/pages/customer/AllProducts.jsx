@@ -33,6 +33,7 @@ const AllProducts = () => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         // Sync filters from URL on component mount
         const urlCategories = searchParams.get('categories') || searchParams.get('category');
         const urlMinPrice = searchParams.get('minPrice');

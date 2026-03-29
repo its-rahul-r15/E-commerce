@@ -46,7 +46,7 @@ const SellerTailoring = () => {
     // Update panel state
     const [updatePanel, setUpdatePanel] = useState(null); // {id, status, notes, price, days}
 
-    useEffect(() => { fetchRequests(); }, [filter]);
+    useEffect(() => { window.scrollTo(0, 0); fetchRequests(); }, [filter]);
 
     const fetchRequests = async () => {
         setLoading(true);

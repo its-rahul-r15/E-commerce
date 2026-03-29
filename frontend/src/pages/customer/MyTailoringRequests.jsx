@@ -35,7 +35,7 @@ const MyTailoringRequests = () => {
     const [filter, setFilter] = useState('');
     const [expanded, setExpanded] = useState(null);
 
-    useEffect(() => { fetchRequests(); }, [filter]);
+    useEffect(() => { window.scrollTo(0, 0); fetchRequests(); }, [filter]);
 
     const fetchRequests = async () => {
         setLoading(true);
