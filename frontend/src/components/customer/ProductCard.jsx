@@ -18,58 +18,55 @@ const ProductCard = ({ product }) => {
     return (
         <Link
             to={`/product/${product._id}`}
-            className="group block relative"
+            className="group block relative w-full"
         >
-            {/* Wishlist Button */}
-            <button
-                onClick={handleWishlistClick}
-                className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-[#FF5A5F] transition-colors"
-            >
-                {isSaved ? (
-                    <HeartSolid className="w-5 h-5 text-[#FF5A5F]" />
-                ) : (
-                    <HeartOutline className="w-5 h-5" />
-                )}
-            </button>
-
             {/* Image Container with Hover Effect */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-white mb-4 border border-[var(--athenic-gold)] border-opacity-10 shadow-sm transition-all duration-700 group-hover:shadow-xl">
+            <div className="relative aspect-[3/4] overflow-hidden bg-gray-50 mb-3 group-hover:shadow-lg transition-shadow">
                 <img
                     src={product.images?.[0] || '/placeholder-product.png'}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
 
-                {/* Add to Cart Overlay */}
-                <div className="absolute inset-x-0 bottom-0 bg-[var(--athenic-blue)] text-white py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <p className="text-[9px] font-serif uppercase text-center tracking-widest">Add to Wardrobe</p>
-                </div>
-
-                {/* Status Badge */}
-                {product.stock === 0 && (
-                    <div className="absolute top-2 left-2 bg-gray-100 text-[8px] font-serif px-2 py-1 tracking-widest uppercase">
-                        Coming Soon
+                {/* Status Badges */}
+                {product.stock === 0 ? (
+                    <div className="absolute top-0 left-0 bg-gray-900 text-white text-[10px] uppercase font-semibold px-4 py-1.5 tracking-wider">
+                        SOLD OUT
+                    </div>
+                ) : product.discountedPrice && product.discountedPrice < product.price && (
+                    <div className="absolute top-0 left-0 bg-[#c34a36] text-white text-[10px] uppercase font-semibold px-4 py-1.5 tracking-wider">
+                        SALE
                     </div>
                 )}
+                
+                {/* Wishlist Button */}
+                <button
+                    onClick={handleWishlistClick}
+                    className="absolute top-3 right-3 z-10 p-1 text-gray-900 hover:text-red-500 hover:scale-110 transition-transform bg-transparent"
+                >
+                    {isSaved ? (
+                        <HeartSolid className="w-5 h-5 text-[#c34a36]" />
+                    ) : (
+                        <HeartOutline className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(255,255,255,0.7)]" strokeWidth={1.5} />
+                    )}
+                </button>
             </div>
 
             {/* Product Metadata */}
-            <div className="px-1">
-                <p className="text-[8px] font-serif uppercase tracking-[0.1em] text-[var(--athenic-gold)] mb-1">
-                    {product.category || 'Athens Selection'}
-                </p>
-                <h3 className="text-[11px] font-serif uppercase tracking-widest text-[var(--athenic-blue)] mb-2 line-clamp-1 group-hover:text-[var(--athenic-gold)] transition-colors">
+            <div className="px-1 text-left">
+                <h3 className="text-xs text-gray-800 font-medium line-clamp-1 mb-1 group-hover:text-gray-500 transition-colors uppercase pr-2">
                     {product.name}
                 </h3>
 
-                <div className="flex items-center justify-between">
-                    <p className="text-sm md:text-base font-serif font-bold text-[var(--athenic-blue)]">
+                <div className="flex items-baseline space-x-2">
+                    <span className="text-sm font-semibold text-gray-900">
                         ₹{price.toLocaleString()}
-                    </p>
-                    <div className="flex items-center space-x-0.5">
-                        <span className="text-[8px] text-[var(--athenic-gold)]">★</span>
-                        <span className="text-[8px] font-serif text-gray-500">4.8</span>
-                    </div>
+                    </span>
+                    {product.discountedPrice && product.discountedPrice < product.price && (
+                        <span className="text-[10px] text-gray-400 line-through font-medium">
+                            ₹{product.price.toLocaleString()}
+                        </span>
+                    )}
                 </div>
             </div>
         </Link>
