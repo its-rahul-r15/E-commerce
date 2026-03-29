@@ -39,6 +39,7 @@ const AddEditProduct = () => {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (isEdit) {
             fetchProduct();
         }

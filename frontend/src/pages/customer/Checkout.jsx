@@ -20,6 +20,7 @@ const Checkout = () => {
     const [deliveryCoordinates, setDeliveryCoordinates] = useState(null); // [lng, lat]
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchAll();
         // Get user's delivery location for nearest-vendor routing
         if ('geolocation' in navigator) {

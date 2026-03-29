@@ -9,6 +9,7 @@ const Orders = () => {
     const [filter, setFilter] = useState('');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchOrders();
     }, [filter]);
 

@@ -10,6 +10,7 @@ const AdminUsers = () => {
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchUsers();
     }, [roleFilter]);
 
