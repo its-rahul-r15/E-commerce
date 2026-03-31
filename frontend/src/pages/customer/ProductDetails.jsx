@@ -94,11 +94,11 @@ const ProductDetails = () => {
 
     const handleAddToCart = async () => {
         if (!isAuthenticated) return setShowLoginPrompt(true);
-        if (!selectedSize) return alert('Please select a size first');
+        if (product.sizes?.length > 0 && !selectedSize) return alert('Please select a size first');
         
         setAddingToCart(true);
         try {
-            await cartService.addToCart(id, 1, { size: selectedSize });
+            await cartService.addToCart(id, 1, { size: selectedSize || '' });
             alert('Added to cart successfully!');
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to add to cart');
@@ -109,10 +109,10 @@ const ProductDetails = () => {
 
     const handleBuyNow = async () => {
         if (!isAuthenticated) return setShowLoginPrompt(true);
-        if (!selectedSize) return alert('Please select a size first');
+        if (product.sizes?.length > 0 && !selectedSize) return alert('Please select a size first');
         
         try {
-            await cartService.addToCart(id, 1, { size: selectedSize });
+            await cartService.addToCart(id, 1, { size: selectedSize || '' });
             navigate('/cart');
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to process request');
@@ -254,33 +254,35 @@ const ProductDetails = () => {
                         </div>
 
                         {/* Size Section */}
-                        <div className="mb-8">
-                            <div className="flex justify-between items-center mb-4">
-                                <span className="text-base font-medium">Size:</span>
-                                <span className="text-sm font-medium underline text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">Size Guide</span>
+                        {product.sizes?.length > 0 && (
+                            <div className="mb-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-base font-medium">Size:</span>
+                                    <span className="text-sm font-medium underline text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">Size Guide</span>
+                                </div>
+                                <div className="flex flex-wrap gap-x-3 gap-y-5">
+                                    {product.sizes.map((size, idx) => {
+                                        const isLowStock = idx === 0 || idx === 2; // Mocking low stock for UI visually
+                                        const isSelected = selectedSize === size;
+                                        return (
+                                            <button
+                                                key={size}
+                                                onClick={() => setSelectedSize(size)}
+                                                className={`relative h-12 min-w-[3rem] px-3 rounded-full border text-sm font-medium flex items-center justify-center transition-all ${isSelected ? 'border-gray-900 border-2' : 'border-gray-300 hover:border-gray-900'}`}
+                                            >
+                                                {size}
+                                                {isLowStock && (
+                                                    <div className="absolute -bottom-2 bg-gray-900 text-white text-[10px] px-2 py-0.5 rounded shadow-sm whitespace-nowrap z-10 font-bold flex items-center gap-0.5">
+                                                        <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" /></svg>
+                                                        1 left
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="flex flex-wrap gap-x-3 gap-y-5">
-                                {(product.sizes?.length > 0 ? product.sizes : ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL']).map((size, idx) => {
-                                    const isLowStock = idx === 0 || idx === 2; // Mocking low stock for UI visually
-                                    const isSelected = selectedSize === size;
-                                    return (
-                                        <button
-                                            key={size}
-                                            onClick={() => setSelectedSize(size)}
-                                            className={`relative h-12 min-w-[3rem] px-3 rounded-full border text-sm font-medium flex items-center justify-center transition-all ${isSelected ? 'border-gray-900 border-2' : 'border-gray-300 hover:border-gray-900'}`}
-                                        >
-                                            {size}
-                                            {isLowStock && (
-                                                <div className="absolute -bottom-2 bg-gray-900 text-white text-[10px] px-2 py-0.5 rounded shadow-sm whitespace-nowrap z-10 font-bold flex items-center gap-0.5">
-                                                    <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" /></svg>
-                                                    1 left
-                                                </div>
-                                            )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                        )}
 
                         {/* CTA Buttons */}
                         <div className="space-y-3 mb-6">

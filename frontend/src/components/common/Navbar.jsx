@@ -11,6 +11,7 @@ import {
     UserIcon,
     HeartIcon
 } from '@heroicons/react/24/outline';
+import CategoryNav from './CategoryNav';
 
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -94,7 +95,7 @@ const Navbar = () => {
             </div>
 
             {/* Main Navbar */}
-            <nav className="bg-white lg:bg-[var(--athenic-bg)] border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
+            <nav className="bg-white border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -125,18 +126,8 @@ const Navbar = () => {
                             </Link>
                         </div>
 
-                        {/* Center: Navigation Links */}
-                        <div className="hidden lg:flex items-center justify-center flex-1 space-x-4 xl:space-x-6 px-4">
-                            {['WOMEN', 'MEN', 'SAREE', 'GIFTING'].map((cat) => (
-                                <Link
-                                    key={cat}
-                                    to={`/products?category=${encodeURIComponent(cat)}`}
-                                    className="text-[10px] xl:text-[11px] font-serif tracking-widest font-semibold text-gray-800 hover:text-[#d35400] transition-colors uppercase whitespace-nowrap"
-                                >
-                                    {cat}
-                                </Link>
-                            ))}
-                        </div>
+                        {/* Center Spacer */}
+                        <div className="hidden lg:flex flex-1"></div>
 
                         {/* Right: Actions */}
                         <div className="flex items-center justify-end w-1/4 lg:w-auto lg:space-x-4">
@@ -234,7 +225,7 @@ const Navbar = () => {
                                 <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
                             </form>
                             <div className="flex flex-col space-y-1">
-                                {['WOMEN', 'MEN', 'SAREE', 'GIFTING'].map((cat) => (
+                                {['WOMEN', 'MEN', 'KIDS', 'WEDDING', 'COUPLES'].map((cat) => (
                                     <Link
                                         key={cat}
                                         to={`/products?category=${encodeURIComponent(cat)}`}
@@ -274,6 +265,8 @@ const Navbar = () => {
                     </div>
                 )}
             </nav>
+
+            <CategoryNav />
         </div>
     );
 };

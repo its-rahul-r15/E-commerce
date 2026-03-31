@@ -53,17 +53,17 @@ const ProductCard = ({ product }) => {
             </div>
 
             {/* Product Metadata */}
-            <div className="px-1 text-left">
-                <h3 className="text-xs text-gray-800 font-medium line-clamp-1 mb-1 group-hover:text-gray-500 transition-colors uppercase pr-2">
+            <div className="px-1 text-left mt-2.5">
+                <h3 className="text-[14px] md:text-[15px] font-serif text-gray-900 font-medium tracking-wide line-clamp-1 mb-1 group-hover:text-[var(--athenic-gold)] transition-colors pr-2">
                     {product.name}
                 </h3>
 
-                <div className="flex items-baseline space-x-2">
-                    <span className="text-sm font-semibold text-gray-900">
+                <div className="flex items-center space-x-2.5">
+                    <span className="text-[15px] md:text-[16px] font-semibold text-gray-900">
                         ₹{price.toLocaleString()}
                     </span>
                     {product.discountedPrice && product.discountedPrice < product.price && (
-                        <span className="text-[10px] text-gray-400 line-through font-medium">
+                        <span className="text-[12px] text-gray-400 line-through font-medium">
                             ₹{product.price.toLocaleString()}
                         </span>
                     )}
