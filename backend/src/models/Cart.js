@@ -36,7 +36,7 @@ const cartSchema = new mongoose.Schema({
 });
 
 // Indexes
-cartSchema.index({ customerId: 1 }, { unique: true });
+// (customerId is made unique inside the schema definition)
 
 // Virtual for cart item count
 cartSchema.virtual('itemCount').get(function () {
