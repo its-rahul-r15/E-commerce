@@ -21,6 +21,7 @@ const AdminCoupons = () => {
     });
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchCoupons();
     }, []);
 

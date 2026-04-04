@@ -83,6 +83,7 @@ const CustomTailoring = () => {
 
     // ── Redirect if not logged in ─────────────────────────────────────────────
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (!isAuthenticated) navigate('/login');
     }, [isAuthenticated]);
 
