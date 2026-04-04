@@ -138,14 +138,14 @@ const Home = () => {
                     <div className="flex items-center space-x-4 mb-4 md:mb-0">
                         <span className="text-2xl">🏷️</span>
                         <div>
-                            <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-gray-500">For our Exclusive</p>
+                            <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-[var(--muted)]">For our Exclusive</p>
                             <p className="text-sm font-serif italic text-[var(--mehron)]">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">SAVE10</span></p>
                         </div>
                     </div>
                     <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>
                     <div className="flex items-center space-x-4">
                         <span className="text-2xl">🎓</span>
-                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-gray-600">15% OFF ON YOUR FIRST SHOP VISIT</p>
+                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--muted)]">15% OFF ON YOUR FIRST SHOP VISIT</p>
                     </div>
                 </div>
             </section>
@@ -233,19 +233,19 @@ const Home = () => {
                 <h2 className="text-4xl md:text-6xl font-serif tracking-[0.2em] text-[var(--athenic-blue)] mb-8 leading-tight uppercase">
                     Quality You Can Trust
                 </h2>
-                <p className="max-w-3xl text-xs md:text-sm font-serif italic text-gray-600 leading-[2em] mb-12 px-6">
+                <p className="max-w-3xl text-xs md:text-sm font-serif italic text-[var(--muted)] leading-[2em] mb-12 px-6">
                     Our clothes are made with care by local artisans. We use traditional techniques and high-quality fabrics to bring you comfortable and stylish clothing.
                 </p>
 
                 <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-20">
                     <div className="text-center">
                         <p className="text-2xl font-serif text-[var(--athenic-gold)] mb-1">100%</p>
-                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500">Pure Silk</p>
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-[var(--muted)]">Pure Silk</p>
                     </div>
                     <div className="h-px w-20 md:w-px md:h-12 bg-[var(--athenic-gold)] opacity-30"></div>
                     <div className="text-center">
                         <p className="text-2xl font-serif text-[var(--athenic-gold)] mb-1">ETHICAL</p>
-                        <p className="text-[9px] font-serif uppercase tracking-widest text-gray-500">Production</p>
+                        <p className="text-[9px] font-serif uppercase tracking-widest text-[var(--muted)]">Production</p>
                     </div>
                 </div>
             </section>

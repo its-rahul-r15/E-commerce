@@ -120,8 +120,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes for performance (unique indexes)
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ googleId: 1 }, { unique: true, sparse: true });
 userSchema.index({ 'addresses.location': '2dsphere' }); // Geospatial index for location queries
 
 // Virtual for full address
