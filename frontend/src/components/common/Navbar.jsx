@@ -11,6 +11,7 @@ import {
     UserIcon,
     HeartIcon
 } from '@heroicons/react/24/outline';
+import CategoryNav from './CategoryNav';
 
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -94,7 +95,7 @@ const Navbar = () => {
             </div>
 
             {/* Main Navbar */}
-            <nav className="bg-white lg:bg-[var(--athenic-bg)] border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
+            <nav className="bg-white border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -108,29 +109,8 @@ const Navbar = () => {
                             </button>
                         </div>
 
-                        {/* Left: Navigation Links */}
-                        <div className="hidden lg:flex items-center space-x-8">
-                            <Link to="/products" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                Products
-                            </Link>
-                            <Link to="/shops" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                Shops
-                            </Link>
-                            <Link to="/about" className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                About Us
-                            </Link>
-                            {/* AR Virtual Try-On link */}
-                            <Link
-                                to="/try-on"
-                                className="text-[11px] font-serif tracking-[0.2em] text-[var(--athenic-gold)] hover:opacity-70 transition-opacity uppercase flex items-center space-x-1 border border-[var(--athenic-gold)] border-opacity-40 px-3 py-1"
-                            >
-                                <span>✨</span>
-                                <span>Try On</span>
-                            </Link>
-                        </div>
-
-                        {/* Center: Logo */}
-                        <div className="flex-1 flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+                        {/* Logo (Left Desktop, Center Mobile) */}
+                        <div className="flex-1 lg:flex-none flex justify-center lg:justify-start lg:w-1/6">
                             {/* Mobile Logo */}
                             <Link to="/" className="lg:hidden flex flex-col items-center group">
                                 <span className="text-2xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
@@ -138,13 +118,16 @@ const Navbar = () => {
                                 </span>
                             </Link>
                             {/* Desktop Logo */}
-                            <Link to="/" className="hidden lg:flex flex-col items-center group">
-                                <span className="text-3xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
+                            <Link to="/" className="hidden lg:flex flex-col items-start group">
+                                <span className="text-2xl lg:text-3xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
                                     KLYRA
                                 </span>
                                 <div className="h-[1px] w-0 group-hover:w-full bg-[var(--athenic-gold)] transition-all duration-500"></div>
                             </Link>
                         </div>
+
+                        {/* Center Spacer */}
+                        <div className="hidden lg:flex flex-1"></div>
 
                         {/* Right: Actions */}
                         <div className="flex items-center justify-end w-1/4 lg:w-auto lg:space-x-4">
@@ -241,13 +224,21 @@ const Navbar = () => {
                                 />
                                 <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
                             </form>
-                            <Link to="/products" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Products</Link>
-                            <Link to="/shops" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">Shops</Link>
-                            <Link to="/about" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors">About Us</Link>
-                            <Link to="/try-on" className="px-4 py-3 text-base font-medium text-[#FF5A5F] bg-[#fae6e6] hover:bg-[#ffe4e4] rounded-xl transition-colors flex items-center space-x-2">
-                                <span className="text-xl">✨</span>
-                                <span>Virtual Try-On</span>
-                            </Link>
+                            <div className="flex flex-col space-y-1">
+                                {['WOMEN', 'MEN', 'KIDS', 'WEDDING', 'COUPLES'].map((cat) => (
+                                    <Link
+                                        key={cat}
+                                        to={`/products?category=${encodeURIComponent(cat)}`}
+                                        className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-[#FF5A5F] hover:bg-[#fae6e6] rounded-xl transition-colors uppercase"
+                                    >
+                                        {cat}
+                                    </Link>
+                                ))}
+                                <Link to="/try-on" className="px-4 py-3 text-sm font-medium text-[#FF5A5F] bg-[#fae6e6] hover:bg-[#ffe4e4] rounded-xl transition-colors flex items-center space-x-2 mt-2">
+                                    <span className="text-lg">✨</span>
+                                    <span>Virtual Try-On</span>
+                                </Link>
+                            </div>
 
                             <div className="border-t border-gray-100 mt-4 pt-4 space-y-2">
                                 {isAuthenticated ? (
@@ -274,6 +265,8 @@ const Navbar = () => {
                     </div>
                 )}
             </nav>
+
+            <CategoryNav />
         </div>
     );
 };

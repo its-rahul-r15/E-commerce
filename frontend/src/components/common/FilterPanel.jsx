@@ -41,6 +41,7 @@ const COLORS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [openSection, setOpenSection] = useState('PRODUCT');
     const [filters, setFilters] = useState({
         categories: initialFilters.categories || [],
         minPrice: initialFilters.minPrice || '',
@@ -115,177 +116,202 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
                 )}
             </button>
 
-            <div className={`${isOpen ? 'block' : 'hidden'} lg:block bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-6`}>
+            <div className={`${isOpen ? 'block' : 'hidden'} lg:block w-full`}>
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                        <FunnelIcon className="h-5 w-5 text-emerald-500" /> Filters
-                        {activeCount > 0 && (
-                            <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full">{activeCount}</span>
-                        )}
+                <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-[13px] font-bold tracking-widest text-gray-900 uppercase">
+                        Filter By
                     </h3>
                     {activeCount > 0 && (
-                        <button onClick={handleClear} className="text-xs text-red-500 hover:text-red-700 font-medium">
+                        <button onClick={handleClear} className="text-[10px] text-[#c34a36] hover:text-red-700 font-semibold uppercase tracking-wider">
                             Clear All
                         </button>
                     )}
                 </div>
 
-                {/* Sort */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
-                    <select
-                        value={filters.sort}
-                        onChange={(e) => applyFilter({ ...filters, sort: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    >
-                        <option value="">Default</option>
-                        <option value="price-asc">Price: Low → High</option>
-                        <option value="price-desc">Price: High → Low</option>
-                        <option value="newest">Newest First</option>
-                    </select>
-                </div>
-
-                {/* Categories */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                    <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
-                        {FASHION_CATEGORIES.map(cat => (
-                            <label key={cat.value} className="flex items-center gap-2 cursor-pointer hover:bg-emerald-50 px-2 py-1.5 rounded-lg transition-colors">
-                                <input
-                                    type="checkbox"
-                                    checked={filters.categories.includes(cat.value)}
-                                    onChange={() => toggleCategory(cat.value)}
-                                    className="w-4 h-4 accent-emerald-500 rounded"
-                                />
-                                <span className="text-sm text-gray-700">{cat.label}</span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Price Range (₹)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        <input
-                            type="number"
-                            placeholder="Min ₹"
-                            value={filters.minPrice}
-                            onChange={(e) => applyFilter({ ...filters, minPrice: e.target.value })}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                            min="0"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Max ₹"
-                            value={filters.maxPrice}
-                            onChange={(e) => applyFilter({ ...filters, maxPrice: e.target.value })}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                            min="0"
-                        />
-                    </div>
-                    {/* Quick price presets */}
-                    <div className="flex flex-wrap gap-1 mt-2">
-                        {[['Under ₹500', 0, 500], ['₹500-1500', 500, 1500], ['₹1500-3000', 1500, 3000], ['₹3000+', 3000, '']].map(([label, min, max]) => (
-                            <button
-                                key={label}
-                                onClick={() => applyFilter({ ...filters, minPrice: String(min), maxPrice: String(max) })}
-                                className="text-xs px-2 py-1 border border-emerald-200 text-emerald-700 rounded-full hover:bg-emerald-50 transition-colors"
-                            >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Style / Occasion */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Style / Occasion</label>
-                    <select
-                        value={filters.style}
-                        onChange={(e) => applyFilter({ ...filters, style: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    >
-                        <option value="">All Occasions</option>
-                        {STYLES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                </div>
-
-                {/* Sizes */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Size
-                        {filters.sizes.length > 0 && (
-                            <span className="ml-1 text-emerald-600 text-xs">({filters.sizes.length} selected)</span>
+                {/* Accordions Container */}
+                <div className="border-t border-gray-200 mt-4">
+                    
+                    {/* PRODUCT */}
+                    <div className="border-b border-gray-200">
+                        <button 
+                            className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                            onClick={() => setOpenSection(openSection === 'PRODUCT' ? '' : 'PRODUCT')}
+                        >
+                            <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">PRODUCT</span>
+                            <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                {openSection === 'PRODUCT' ? '−' : '+'}
+                            </span>
+                        </button>
+                        {openSection === 'PRODUCT' && (
+                            <div className="pb-4 space-y-2 max-h-60 overflow-y-auto no-scrollbar pr-1 animate-fade-in">
+                                {FASHION_CATEGORIES.map(cat => (
+                                    <label key={cat.value} className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={filters.categories.includes(cat.value)}
+                                            onChange={() => toggleCategory(cat.value)}
+                                            className="w-4 h-4 accent-gray-900 rounded border-gray-300 cursor-pointer"
+                                        />
+                                        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">{cat.label.replace(/[^a-zA-Z /]/g, '').trim()}</span>
+                                    </label>
+                                ))}
+                            </div>
                         )}
-                    </label>
-                    <p className="text-xs text-gray-400 mb-1">Clothing</p>
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                        {SIZES_CLOTHING.map(size => (
-                            <button
-                                key={size}
-                                onClick={() => toggleSize(size)}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${filters.sizes.includes(size)
-                                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                                    : 'border-gray-200 text-gray-600 hover:border-emerald-300'
-                                    }`}
-                            >
-                                {size}
-                            </button>
-                        ))}
                     </div>
-                    <p className="text-xs text-gray-400 mb-1">Numeric</p>
-                    <div className="flex flex-wrap gap-1.5">
-                        {SIZES_NUMERIC.map(size => (
-                            <button
-                                key={size}
-                                onClick={() => toggleSize(size)}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${filters.sizes.includes(size)
-                                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                                    : 'border-gray-200 text-gray-600 hover:border-emerald-300'
-                                    }`}
-                            >
-                                {size}
-                            </button>
-                        ))}
-                    </div>
-                </div>
 
-                {/* Colors */}
-                <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Color
-                        {filters.colors.length > 0 && (
-                            <span className="ml-1 text-emerald-600 text-xs">({filters.colors.join(', ')})</span>
+                    {/* SIZE */}
+                    <div className="border-b border-gray-200">
+                        <button 
+                            className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                            onClick={() => setOpenSection(openSection === 'SIZE' ? '' : 'SIZE')}
+                        >
+                            <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">SIZE</span>
+                            <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                {openSection === 'SIZE' ? '−' : '+'}
+                            </span>
+                        </button>
+                        {openSection === 'SIZE' && (
+                            <div className="pb-4 animate-fade-in">
+                                <div className="grid grid-cols-4 gap-2">
+                                    {SIZES_CLOTHING.map(size => (
+                                        <button
+                                            key={size}
+                                            onClick={() => toggleSize(size)}
+                                            className={`py-2 text-[10px] font-semibold uppercase tracking-wider rounded-sm border transition-all ${
+                                                filters.sizes.includes(size)
+                                                    ? 'bg-gray-900 border-gray-900 text-white'
+                                                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
+                                            }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         )}
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                        {COLORS.map(color => (
-                            <button
-                                key={color.name}
-                                onClick={() => toggleColor(color.name)}
-                                title={color.name}
-                                className="flex flex-col items-center gap-0.5"
-                            >
-                                <div
-                                    className={`w-7 h-7 rounded-full border-2 transition-all ${filters.colors.includes(color.name)
-                                        ? 'border-emerald-500 scale-110 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-400'
+                    </div>
+
+                    {/* COLOR */}
+                    <div className="border-b border-gray-200">
+                        <button 
+                            className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                            onClick={() => setOpenSection(openSection === 'COLOR' ? '' : 'COLOR')}
+                        >
+                            <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">COLOR</span>
+                            <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                {openSection === 'COLOR' ? '−' : '+'}
+                            </span>
+                        </button>
+                        {openSection === 'COLOR' && (
+                            <div className="pb-4 animate-fade-in flex flex-wrap gap-3">
+                                {COLORS.map(color => (
+                                    <button
+                                        key={color.name}
+                                        onClick={() => toggleColor(color.name)}
+                                        title={color.name}
+                                        className={`w-6 h-6 rounded-full border-2 transition-transform p-0.5 ${
+                                            filters.colors.includes(color.name) ? 'border-gray-900 scale-110' : 'border-gray-200 hover:scale-110'
                                         }`}
-                                    style={{ backgroundColor: color.hex }}
-                                />
-                                <span className={`text-[9px] font-medium leading-tight ${filters.colors.includes(color.name) ? 'text-emerald-600' : 'text-gray-400'
-                                    }`}>{color.name}</span>
-                            </button>
-                        ))}
+                                    >
+                                        <div className="w-full h-full rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
+
+                    {/* OCCASION / STYLE */}
+                    <div className="border-b border-gray-200">
+                        <button 
+                            className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                            onClick={() => setOpenSection(openSection === 'OCCASION' ? '' : 'OCCASION')}
+                        >
+                            <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">OCCASION</span>
+                            <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                {openSection === 'OCCASION' ? '−' : '+'}
+                            </span>
+                        </button>
+                        {openSection === 'OCCASION' && (
+                            <div className="pb-4 space-y-2 animate-fade-in">
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        type="radio"
+                                        name="style_filter"
+                                        checked={filters.style === ''}
+                                        onChange={() => applyFilter({ ...filters, style: '' })}
+                                        className="w-4 h-4 accent-gray-900 cursor-pointer"
+                                    />
+                                    <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">All</span>
+                                </label>
+                                {STYLES.map(s => (
+                                    <label key={s} className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            type="radio"
+                                            name="style_filter"
+                                            checked={filters.style === s}
+                                            onChange={() => applyFilter({ ...filters, style: s })}
+                                            className="w-4 h-4 accent-gray-900 cursor-pointer"
+                                        />
+                                        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">{s}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* PRICE RANGES */}
+                    <div className="border-b border-gray-200">
+                        <button 
+                            className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                            onClick={() => setOpenSection(openSection === 'PRICE' ? '' : 'PRICE')}
+                        >
+                            <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">PRICE RANGE</span>
+                            <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                {openSection === 'PRICE' ? '−' : '+'}
+                            </span>
+                        </button>
+                        {openSection === 'PRICE' && (
+                            <div className="pb-4 animate-fade-in">
+                                <div className="grid grid-cols-2 gap-3 mb-4">
+                                    <input
+                                        type="number"
+                                        placeholder="Min ₹"
+                                        value={filters.minPrice}
+                                        onChange={(e) => applyFilter({ ...filters, minPrice: e.target.value })}
+                                        className="w-full border-b border-gray-300 py-2 bg-transparent focus:outline-none focus:border-gray-900 text-xs text-gray-800"
+                                        min="0"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Max ₹"
+                                        value={filters.maxPrice}
+                                        onChange={(e) => applyFilter({ ...filters, maxPrice: e.target.value })}
+                                        className="w-full border-b border-gray-300 py-2 bg-transparent focus:outline-none focus:border-gray-900 text-xs text-gray-800"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {[['Under ₹1K', 0, 1000], ['₹1K - ₹3K', 1000, 3000], ['₹3K+', 3000, '']].map(([label, min, max]) => (
+                                        <button
+                                            key={label}
+                                            onClick={() => applyFilter({ ...filters, minPrice: String(min), maxPrice: String(max) })}
+                                            className="text-[10px] px-3 py-1.5 border border-gray-200 text-gray-600 font-semibold uppercase tracking-wide hover:bg-gray-50 transition-colors"
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
 
                 {/* Mobile Apply */}
                 <button
                     onClick={() => setIsOpen(false)}
-                    className="lg:hidden w-full py-2.5 bg-emerald-500 text-white rounded-xl font-semibold text-sm"
+                    className="lg:hidden mt-6 w-full py-3 bg-gray-900 text-white font-semibold text-xs tracking-widest uppercase shadow-md"
                 >
                     Apply Filters
                 </button>

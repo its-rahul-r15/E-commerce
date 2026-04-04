@@ -11,6 +11,7 @@ const AdminShops = () => {
     const [selectedShop, setSelectedShop] = useState(null);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchShops();
     }, [filter]);
 

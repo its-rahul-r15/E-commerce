@@ -13,6 +13,7 @@ const Cart = () => {
     const [couponError, setCouponError] = useState('');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchCart();
     }, []);
 

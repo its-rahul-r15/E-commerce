@@ -33,6 +33,7 @@ const AllProducts = () => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         // Sync filters from URL on component mount
         const urlCategories = searchParams.get('categories') || searchParams.get('category');
         const urlMinPrice = searchParams.get('minPrice');
@@ -93,11 +94,49 @@ const AllProducts = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col lg:flex-row gap-8">
+        <div className="min-h-screen bg-white pb-20 pt-6">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+                
+                {/* Header Area */}
+                <div className="mb-6">
+                    <nav className="text-[10px] md:text-xs text-gray-500 mb-6 flex items-center space-x-2 font-medium tracking-wide">
+                        <span className="hover:text-gray-900 cursor-pointer">Home</span>
+                        <span>&gt;</span>
+                        <span className="text-gray-900 capitalize">{searchParams.get('category') || 'All Products'}</span>
+                    </nav>
+
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+                        <h1 className="text-2xl md:text-3xl font-serif text-gray-900 uppercase tracking-widest flex items-center md:items-end gap-3">
+                            {searchParams.get('category') || 'WOMEN'} 
+                            <span className="text-[11px] md:text-xs font-sans text-gray-400 lowercase font-normal tracking-normal md:mb-1">
+                                - {products.length} products
+                            </span>
+                        </h1>
+                        
+                        {/* Sort Dropdown */}
+                        <div className="flex items-center space-x-3 bg-gray-100 px-4 py-2.5 text-[11px] font-semibold text-gray-800">
+                            <span className="tracking-widest uppercase">Sort By</span>
+                            <select
+                                value={filters.sort || ""}
+                                onChange={(e) => {
+                                    const nextFilters = { ...filters, sort: e.target.value };
+                                    setFilters(nextFilters);
+                                    handleFilterChange(nextFilters);
+                                }}
+                                className="bg-transparent border-none outline-none cursor-pointer tracking-wider focus:ring-0"
+                            >
+                                <option value="">Popular</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
+                                <option value="newest">Newest First</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-8 items-start pt-2">
                     {/* Sidebar Filters */}
-                    <div className="w-full lg:w-64 flex-shrink-0">
+                    <div className="w-full lg:w-[260px] flex-shrink-0 sticky top-4 max-h-[90vh] overflow-y-auto no-scrollbar">
                         <FilterPanel
                             onFilterChange={handleFilterChange}
                             onClearFilters={() => setFilters({})}
@@ -106,18 +145,9 @@ const AllProducts = () => {
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1">
-                        <div className="flex justify-between items-center mb-6">
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                Explore Products
-                            </h1>
-                            <span className="text-sm text-gray-500">
-                                Showing {products.length} results
-                            </span>
-                        </div>
-
+                    <div className="flex-1 w-full">
                         {loading ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                                 {[...Array(8)].map((_, i) => (
                                     <div key={i} className="bg-white rounded-xl h-80 animate-pulse"></div>
                                 ))}
@@ -158,7 +188,7 @@ const AllProducts = () => {
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                                     {products.map((product) => (
                                         <ProductCard key={product._id} product={product} />
                                     ))}

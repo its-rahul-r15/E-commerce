@@ -11,6 +11,7 @@ const SellerProducts = () => {
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         fetchProducts();
     }, []);
 
