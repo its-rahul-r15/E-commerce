@@ -77,7 +77,7 @@ const CategoryNav = () => {
     const [hoveredCategory, setHoveredCategory] = useState(null);
 
     return (
-        <div className="hidden lg:block bg-white border-b border-gray-100 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] relative z-40">
+        <div className="hidden lg:block shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] z-40">
             <div className="max-w-7xl mx-auto px-4">
                 <ul className="flex justify-center space-x-12">
                     {categoriesData.map((category) => (
@@ -90,7 +90,7 @@ const CategoryNav = () => {
                             <div className="py-4">
                                 <Link
                                     to={`/products?category=${encodeURIComponent(category.name)}`}
-                                    className={`text-[11px] font-serif tracking-widest font-semibold uppercase whitespace-nowrap cursor-pointer transition-all duration-300 pb-1 ${hoveredCategory === category.name ? 'text-[var(--athenic-gold)] border-b-2 border-[var(--athenic-gold)]' : 'text-gray-800 border-b-2 border-transparent hover:text-[var(--athenic-gold)]'}`}
+                                    className={`text-[11px] font-serif tracking-widest font-semibold uppercase whitespace-nowrap cursor-pointer transition-all duration-300 ${hoveredCategory === category.name ? 'text-[var(--athenic-gold)] ' : 'text-white  hover:text-[var(--athenic-gold)]'}`}
                                 >
                                     {category.name}
                                 </Link>
@@ -99,9 +99,9 @@ const CategoryNav = () => {
                             {/* Dropdown / Mega Menu */}
                             {category.subcategories && category.subcategories.length > 0 && (
                                 <div
-                                    className={`absolute left-0 w-full bg-white shadow-xl transition-all duration-300 ease-in-out border-t border-[var(--athenic-gold)] border-opacity-20 z-50 ${hoveredCategory === category.name
-                                            ? 'opacity-100 visible translate-y-0'
-                                            : 'opacity-0 invisible -translate-y-2 pointer-events-none'
+                                    className={`absolute left-0 w-full bg-white/5 shadow-xl transition-all duration-300 ease-in-out border-t border-[var(--athenic-gold)] border-opacity-20 z-50 ${hoveredCategory === category.name
+                                        ? 'opacity-100 visible translate-y-0'
+                                        : 'opacity-0 invisible -translate-y-2 pointer-events-none'
                                         }`}
                                     style={{ top: '100%' }}
                                 >

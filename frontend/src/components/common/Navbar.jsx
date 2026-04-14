@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { cartService } from '../../services/api';
+import { cartService, couponService } from '../../services/api';
 import {
     Bars3Icon,
     MapPinIcon,
@@ -19,13 +19,26 @@ const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [location, setLocation] = useState('Detecting location...');
+    const [activeCoupons, setActiveCoupons] = useState([]);
     const { user, isAuthenticated, logout } = useAuth();
     const { wishlistCount } = useWishlist();
     const navigate = useNavigate();
+    const routeLocation = useLocation();
+    const isHome = routeLocation.pathname === '/';
 
     useEffect(() => {
         getUserLocation();
+        fetchActiveCoupons();
     }, []);
+
+    const fetchActiveCoupons = async () => {
+        try {
+            const data = await couponService.getActiveCoupons();
+            if (Array.isArray(data)) setActiveCoupons(data);
+        } catch (e) {
+            // silently fail
+        }
+    };
 
     useEffect(() => {
         if (isAuthenticated && ['customer', 'seller'].includes(user?.role)) {
@@ -81,56 +94,133 @@ const Navbar = () => {
     };
 
     return (
-        <div className="relative z-50">
-            {/* Top Location Bar - Mehron Gradient */}
-            <div className="hidden lg:block bg-gradient-to-r from-[var(--mehron-deep)] to-[var(--mehron)] py-2">
-                <div className="max-w-7xl mx-auto px-4 flex justify-center items-center">
-                    <button className="flex items-center space-x-2 text-[var(--gold-pale)] hover:text-white transition-colors group">
-                        <MapPinIcon className="w-4 h-4" />
-                        <span className="text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em]">
-                            Your Location: <span className="font-bold">{location}</span>
-                        </span>
-                    </button>
+        <header className="sticky top-0 z-[100] w-full">
+            {/* ── Announcement Ticker ── exact Libas.in style ── */}
+            <div
+                style={{
+                    background: '#1a1a1a',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    position: 'relative',
+                }}
+            >
+                {/* Scrolling track */}
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: 'max-content',
+                        animation: 'ticker-scroll 35s linear infinite',
+                        willChange: 'transform',
+                    }}
+                >
+                    {(activeCoupons.length > 0
+                        ? [...activeCoupons, ...activeCoupons]
+                        : [...Array(2)]
+                    ).map((item, i) => {
+                        const isPlaceholder = activeCoupons.length === 0;
+                        return (
+                            <span
+                                key={i}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '0 48px',
+                                    whiteSpace: 'nowrap',
+                                    borderRight: '1px solid rgba(255,255,255,0.12)',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontSize: '11px',
+                                    letterSpacing: '0.05em',
+                                    color: 'rgba(255,255,255,0.9)',
+                                }}
+                            >
+                                {isPlaceholder ? (
+                                    [
+                                        'Free Shipping on orders above ₹999',
+                                        'Handcrafted by local artisans',
+                                        'New arrivals every week',
+                                        'Premium ethnic wear curated for you',
+                                    ][i % 4]
+                                ) : (
+                                    <>
+                                        <span style={{ fontWeight: 700, color: '#fff' }}>
+                                            {item.discountType === 'percentage'
+                                                ? `Buy & get ${item.discountValue}% OFF`
+                                                : `Get ₹${item.discountValue} OFF`}
+                                        </span>
+                                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>|</span>
+                                        <span>Use Code:</span>
+                                        <span
+                                            style={{
+                                                fontWeight: 800,
+                                                color: '#fff',
+                                                background: 'rgba(255,255,255,0.15)',
+                                                padding: '1px 8px',
+                                                borderRadius: '2px',
+                                                letterSpacing: '0.12em',
+                                                border: '1px solid rgba(255,255,255,0.25)',
+                                            }}
+                                        >
+                                            {item.code}
+                                        </span>
+                                        {item.minPurchase > 0 && (
+                                            <span style={{ color: 'rgba(255,255,255,0.6)' }}>
+                                                on orders above ₹{item.minPurchase}
+                                            </span>
+                                        )}
+                                    </>
+                                )}
+                            </span>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Main Navbar */}
-            <nav className="bg-white border-b border-gray-100 lg:border-[var(--athenic-gold)] lg:border-opacity-30 relative z-50">
+            <nav className={`${isHome ? 'absolute top-[36px] left-0 right-0 bg-black/10 backdrop-blur-sm border-white/20 hover:transparent' : 'relative bg-white/95 backdrop-blur-sm border-gray-100 lg:border-[var(--athenic-gold)] border-opacity-30'} border-b z-50 transition-all duration-300 group`}>
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16 lg:h-20">
 
-                        {/* Mobile Hamburger Menu icon */}
+                        {/* Mobile Hamburger (Left Mobile) */}
                         <div className="flex items-center lg:hidden w-1/4">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="text-[#FF5A5F] hover:text-[#e0484d] transition-colors p-2 -ml-2 rounded-lg"
+                                className={`${isHome ? 'text-white group-hover:text-[#FF5A5F]' : 'text-[#FF5A5F]'} hover:text-[#e0484d] transition-colors p-2 -ml-2 rounded-lg`}
                             >
-                                <Bars3Icon className="w-7 h-7" />
+                                {isMobileMenuOpen ? (
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                ) : (
+                                    <Bars3Icon className="w-7 h-7" />
+                                )}
                             </button>
                         </div>
 
-                        {/* Logo (Left Desktop, Center Mobile) */}
-                        <div className="flex-1 lg:flex-none flex justify-center lg:justify-start lg:w-1/6">
+                        {/* Category Navigation (Left Desktop) */}
+                        {/* <div className="hidden lg:flex flex-1 justify-start h-full items-center">
+                            <CategoryNav />
+                        </div> */}
+
+                        {/* Logo (Center Desktop & Mobile) */}
+                        <div className="flex-1 flex justify-center items-start">
                             {/* Mobile Logo */}
-                            <Link to="/" className="lg:hidden flex flex-col items-center group">
-                                <span className="text-2xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
+                            <Link to="/" className="lg:hidden flex flex-col items-center">
+                                <span className={`text-2xl font-serif-decorative tracking-[0.1em] ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} hover:text-[var(--athenic-gold)] transition-all`}>
                                     KLYRA
                                 </span>
                             </Link>
                             {/* Desktop Logo */}
-                            <Link to="/" className="hidden lg:flex flex-col items-start group">
-                                <span className="text-2xl lg:text-3xl font-serif-decorative tracking-[0.1em] text-[var(--athenic-blue)] group-hover:text-[var(--athenic-gold)] transition-all">
+                            <Link to="/" className="hidden lg:flex flex-col items-center hover:opacity-80 transition-opacity">
+                                <span className={`text-2xl lg:text-4xl font-serif-decorative tracking-[0.1em] ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} hover:text-[var(--athenic-gold)] transition-all`}>
                                     KLYRA
                                 </span>
-                                <div className="h-[1px] w-0 group-hover:w-full bg-[var(--athenic-gold)] transition-all duration-500"></div>
                             </Link>
                         </div>
 
-                        {/* Center Spacer */}
-                        <div className="hidden lg:flex flex-1"></div>
-
                         {/* Right: Actions */}
-                        <div className="flex items-center justify-end w-1/4 lg:w-auto lg:space-x-4">
+                        <div className="flex items-center justify-end w-1/4 lg:flex-1 lg:space-x-4">
                             {/* Desktop-only Actions */}
                             <div className="hidden lg:flex items-center space-x-4 sm:space-x-6">
                                 {/* Search */}
@@ -140,15 +230,15 @@ const Navbar = () => {
                                         placeholder="Search for products..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-48 lg:w-64 bg-transparent border-b border-[var(--athenic-blue)] border-opacity-20 py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] placeholder:italic placeholder:opacity-50 transition-all"
+                                        className={`w-48 lg:w-64 bg-transparent border-b py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] transition-all ${isHome ? 'border-white/50 text-white placeholder:text-white/60 group-hover:text-[var(--athenic-blue)] group-hover:border-[var(--athenic-blue)] group-hover:border-opacity-20 group-hover:placeholder:text-[var(--athenic-blue)] group-hover:placeholder:opacity-50' : 'border-[var(--athenic-blue)] border-opacity-20 text-[var(--athenic-blue)] placeholder:italic placeholder:opacity-50'}`}
                                     />
-                                    <MagnifyingGlassIcon className="w-4 h-4 absolute right-2 top-1.5 text-[var(--athenic-blue)] opacity-50" />
+                                    <MagnifyingGlassIcon className={`w-4 h-4 absolute right-2 top-1.5 ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} opacity-50`} />
                                 </form>
 
                                 {/* Wishlist */}
                                 <button
                                     onClick={() => navigate('/wishlist')}
-                                    className="relative text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
+                                    className={`relative transition-colors ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)] hover:!text-[var(--athenic-gold)]' : 'text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)]'}`}
                                 >
                                     <HeartIcon className="w-5 h-5" />
                                     {wishlistCount > 0 && (
@@ -158,16 +248,29 @@ const Navbar = () => {
                                     )}
                                 </button>
 
+
+                                {/* Cart (Visible on both) */}
+                                <button
+                                    onClick={() => navigate('/cart')}
+                                    className={`relative flex items-center justify-center w-10 h-10 lg:w-auto lg:h-auto rounded-xl lg:rounded-none bg-[#fae6e6] lg:bg-transparent ${isHome ? 'text-[#FF5A5F] group-hover:text-[var(--athenic-blue)] lg:text-white' : 'text-[#FF5A5F] lg:text-[var(--athenic-blue)]'} hover:bg-[#ffe4e4] lg:hover:text-[var(--athenic-gold)] transition-colors ml-2 lg:ml-0`}
+                                >
+                                    <ShoppingBagIcon className="w-5 h-5 lg:w-5 lg:h-5" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#FF5A5F] lg:bg-[var(--athenic-gold)] text-white text-[9px] rounded-full flex items-center justify-center font-bold">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </button>
                                 {/* Profile */}
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowProfileMenu(!showProfileMenu)}
-                                        className="text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)] transition-colors"
+                                        className={`transition-colors ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)] hover:!text-[var(--athenic-gold)]' : 'text-[var(--athenic-blue)] hover:text-[var(--athenic-gold)]'}`}
                                     >
                                         <UserIcon className="w-5 h-5" />
                                     </button>
                                     {showProfileMenu && (
-                                        <div className="absolute right-0 mt-4 w-48 bg-white border border-[var(--athenic-gold)] shadow-xl z-[60] py-2">
+                                        <div className="absolute right-0 mt-4 w-48 bg-white text-gray-800 border border-[var(--athenic-gold)] shadow-xl z-[60] py-2">
                                             {isAuthenticated ? (
                                                 <>
                                                     <div className="px-4 py-2 border-b border-gray-100 mb-2">
@@ -194,18 +297,6 @@ const Navbar = () => {
                                 </div>
                             </div>
 
-                            {/* Cart (Visible on both) */}
-                            <button
-                                onClick={() => navigate('/cart')}
-                                className="relative flex items-center justify-center w-10 h-10 lg:w-auto lg:h-auto rounded-xl lg:rounded-none bg-[#fae6e6] lg:bg-transparent text-[#FF5A5F] lg:text-[var(--athenic-blue)] hover:bg-[#ffe4e4] lg:hover:text-[var(--athenic-gold)] transition-colors ml-2 lg:ml-0"
-                            >
-                                <ShoppingBagIcon className="w-5 h-5 lg:w-5 lg:h-5" />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#FF5A5F] lg:bg-[var(--athenic-gold)] text-white text-[9px] rounded-full flex items-center justify-center font-bold">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -266,8 +357,7 @@ const Navbar = () => {
                 )}
             </nav>
 
-            <CategoryNav />
-        </div>
+        </header>
     );
 };
 

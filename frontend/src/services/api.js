@@ -256,7 +256,7 @@ export const couponService = {
     // Get active coupons
     getActiveCoupons: async () => {
         const response = await axios.get('/coupons/active');
-        return response.data.data;
+        return response.data.data?.coupons || response.data.data || [];
     },
 
     // Validate coupon

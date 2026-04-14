@@ -76,9 +76,15 @@ const AdminCoupons = () => {
                     });
                 }
             } else {
-                // Send as JSON if no image
+                // Send as JSON if no image — strip empty optional fields
                 const data = { ...formData };
-                delete data.posterImage; // Remove null posterImage field
+                delete data.posterImage;
+                // Convert empty strings to proper types or remove them
+                if (data.minPurchase === '' || data.minPurchase === null) data.minPurchase = 0;
+                if (data.usageLimit === '' || data.usageLimit === null) delete data.usageLimit;
+                else data.usageLimit = Number(data.usageLimit);
+                data.discountValue = Number(data.discountValue);
+                data.minPurchase = Number(data.minPurchase);
 
                 if (editingId) {
                     response = await axios.patch(`/coupons/${editingId}`, data);
