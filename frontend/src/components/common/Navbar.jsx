@@ -180,7 +180,7 @@ const Navbar = () => {
             </div>
 
             {/* Main Navbar */}
-            <nav className={`${isHome ? 'absolute top-[36px] left-0 right-0 bg-black/10 backdrop-blur-sm border-white/20 hover:transparent' : 'relative bg-white/95 backdrop-blur-sm border-gray-100 lg:border-[var(--athenic-gold)] border-opacity-30'} border-b z-50 transition-all duration-300 group`}>
+            <nav className={`${isHome ? 'absolute top-[36px] left-0 right-0 bg-black/10 backdrop-blur-xl border-white/20 hover:transparent' : 'relative bg-white/95 backdrop-blur-sm border-gray-100 lg:border-[var(--athenic-gold)] border-opacity-30'} border-b z-50 transition-all duration-300 group`}>
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16 lg:h-20">
 
@@ -199,9 +199,14 @@ const Navbar = () => {
                         </div>
 
                         {/* Category Navigation (Left Desktop) */}
-                        {/* <div className="hidden lg:flex flex-1 justify-start h-full items-center">
-                            <CategoryNav />
-                        </div> */}
+                        <div className="hidden lg:flex flex-1 justify-start h-full items-center">
+                            {/* Desktop Logo */}
+                            <Link to="/" className="hidden lg:flex flex-col items-center hover:opacity-80 transition-opacity">
+                                <span className={`text-2xl lg:text-4xl font-serif-decorative tracking-[0.1em] ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} hover:text-[var(--athenic-gold)] transition-all`}>
+                                    KLYRA
+                                </span>
+                            </Link>
+                        </div>
 
                         {/* Logo (Center Desktop & Mobile) */}
                         <div className="flex-1 flex justify-center items-start">
@@ -211,12 +216,7 @@ const Navbar = () => {
                                     KLYRA
                                 </span>
                             </Link>
-                            {/* Desktop Logo */}
-                            <Link to="/" className="hidden lg:flex flex-col items-center hover:opacity-80 transition-opacity">
-                                <span className={`text-2xl lg:text-4xl font-serif-decorative tracking-[0.1em] ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} hover:text-[var(--athenic-gold)] transition-all`}>
-                                    KLYRA
-                                </span>
-                            </Link>
+
                         </div>
 
                         {/* Right: Actions */}
