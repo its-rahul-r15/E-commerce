@@ -446,22 +446,22 @@ const Home = () => {
                                 <Link
                                     key={product._id}
                                     to={`/product/${product._id}`}
-                                    className="flex-shrink-0 w-[240px] md:w-[280px] group/card cursor-pointer snap-start"
+                                    className="flex-shrink-0 w-[280px] md:w-[325px] group/card cursor-pointer snap-start"
                                 >
-                                    <div className="w-full aspect-[3/4] bg-gray-100 mb-4 overflow-hidden relative">
+                                    <div className="w-full h-[360px] md:h-[425px] bg-gray-100 mb-5 overflow-hidden relative shadow-sm">
                                         <img
                                             src={product.images?.[0] || '/placeholder-product.png'}
                                             alt={product.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
                                         />
                                     </div>
-                                    <h3 className="text-xs font-sans text-gray-800 line-clamp-1 mb-1.5 leading-snug">{product.name}</h3>
-                                    <div className="flex items-center space-x-2">
-                                        <p className="text-sm font-semibold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
+                                    <h3 className="text-sm md:text-base font-sans font-medium text-gray-800 line-clamp-1 mb-2 leading-relaxed tracking-wide">{product.name}</h3>
+                                    <div className="flex items-center space-x-3">
+                                        <p className="text-base md:text-lg font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
                                         {product.discountedPrice && product.discountedPrice < product.price && (
                                             <>
-                                                <p className="text-xs text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
-                                                <p className="text-xs font-semibold text-[#d03c3f]">
+                                                <p className="text-xs md:text-sm text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
+                                                <p className="text-xs md:text-sm font-bold text-[#d03c3f] tracking-wider">
                                                     {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
                                                 </p>
                                             </>
@@ -578,22 +578,22 @@ const Home = () => {
                                 <Link
                                     key={product._id}
                                     to={`/product/${product._id}`}
-                                    className="w-[240px] md:w-[280px] group/card cursor-pointer snap-start"
+                                    className="w-[280px] md:w-[325px] group/card cursor-pointer snap-start"
                                 >
-                                    <div className="w-full aspect-[3/4] bg-gray-100 mb-4 overflow-hidden relative">
+                                    <div className="w-full h-[360px] md:h-[425px] bg-gray-100 mb-5 overflow-hidden relative shadow-sm">
                                         <img
                                             src={product.images?.[0] || '/placeholder-product.png'}
                                             alt={product.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
                                         />
                                     </div>
-                                    <h3 className="text-xs font-sans text-gray-800 line-clamp-1 mb-1.5 leading-snug">{product.name}</h3>
-                                    <div className="flex items-center space-x-2">
-                                        <p className="text-sm font-semibold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
+                                    <h3 className="text-sm md:text-base font-sans font-medium text-gray-800 line-clamp-1 mb-2 leading-relaxed tracking-wide">{product.name}</h3>
+                                    <div className="flex items-center space-x-3">
+                                        <p className="text-base md:text-lg font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
                                         {product.discountedPrice && product.discountedPrice < product.price && (
                                             <>
-                                                <p className="text-xs text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
-                                                <p className="text-xs font-semibold text-[#d03c3f]">
+                                                <p className="text-xs md:text-sm text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
+                                                <p className="text-xs md:text-sm font-bold text-[#d03c3f] tracking-wider">
                                                     {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
                                                 </p>
                                             </>
