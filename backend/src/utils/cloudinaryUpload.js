@@ -18,9 +18,9 @@ export const upload = multer({
     },
     fileFilter: (req, file, cb) => {
         // Accept images for image fields, videos for video360 field
-        if (file.fieldname === 'video360') {
+        if (file.fieldname === 'video360' || file.fieldname === 'video') {
             if (!file.mimetype.startsWith('video/')) {
-                return cb(new Error('Only video files are allowed for 360° view'), false);
+                return cb(new Error('Only video files are allowed here'), false);
             }
         } else {
             if (!file.mimetype.startsWith('image/')) {

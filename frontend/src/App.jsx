@@ -34,6 +34,7 @@ import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminLoyaltyGifts from './pages/admin/AdminLoyaltyGifts';
+import AdminShoppableVideos from './pages/admin/AdminShoppableVideos';
 import CustomerAIAssistant from './components/customer/CustomerAIAssistant';
 import VirtualTryOn from './pages/customer/VirtualTryOn';
 import CustomTailoring from './pages/customer/CustomTailoring';
@@ -105,6 +106,7 @@ function App() {
               <Route path="/admin/shops" element={<ProtectedRoute allowedRoles={['admin']}><AdminShops /></ProtectedRoute>} />
               <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/loyalty-gifts" element={<ProtectedRoute allowedRoles={['admin']}><AdminLoyaltyGifts /></ProtectedRoute>} />
+              <Route path="/admin/shoppable-videos" element={<ProtectedRoute allowedRoles={['admin']}><AdminShoppableVideos /></ProtectedRoute>} />
 
             </Routes>
           </Layout>

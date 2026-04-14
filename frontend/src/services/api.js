@@ -349,3 +349,30 @@ export const wishlistService = {
         return response.data;
     }
 };
+
+export const shoppableVideoService = {
+    getVideos: async () => {
+        const response = await axios.get('/shoppable-videos');
+        return response.data.data;
+    },
+    getAdminVideos: async () => {
+        const response = await axios.get('/shoppable-videos/admin');
+        return response.data.data;
+    },
+    createVideo: async (formData) => {
+        const response = await axios.post('/shoppable-videos', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data.data;
+    },
+    updateVideo: async (id, formData) => {
+        const response = await axios.put(`/shoppable-videos/${id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data.data;
+    },
+    deleteVideo: async (id) => {
+        const response = await axios.delete(`/shoppable-videos/${id}`);
+        return response.data.data;
+    }
+};
