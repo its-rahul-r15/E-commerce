@@ -5,40 +5,40 @@ import { ChevronRightIcon, XMarkIcon, ChevronLeftIcon } from '@heroicons/react/2
 import ProductCard from '../../components/customer/ProductCard';
 
 const POPULAR_CATEGORIES = [
-    { title: 'DESIGNER SAREES', defaultImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=500', path: '/products?category=Saree', aspect: 'aspect-square', categoryName: 'Saree' },
-    { title: 'KURTAS & KURTIES', defaultImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500', path: '/products?category=Kurta', aspect: 'aspect-[4/3]', categoryName: 'Kurta' },
-    { title: 'BRIDAL LEHENGAS', defaultImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=500', path: '/products?category=Lehenga', aspect: 'aspect-[3/4]', categoryName: 'Lehenga' },
-    { title: 'ELEGANT SALWAR SUITS', defaultImage: 'https://images.unsplash.com/photo-1610189013231-01741164ed2e?auto=format&fit=crop&q=80&w=500', path: '/products?category=Salwar%20Suit', aspect: 'aspect-[3/4]', categoryName: 'Salwar Suit' },
-    { title: 'WESTERN WEAR', defaultImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=500', path: '/products?category=Western%20Wear', aspect: 'aspect-square', categoryName: 'Western Wear' },
-    { title: "MEN'S SHERWANIS", defaultImage: 'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&q=80&w=500', path: '/products?category=Sherwani', aspect: 'aspect-square', categoryName: 'Sherwani' },
-    { title: 'TRENDY SHIRTS', defaultImage: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ce3?auto=format&fit=crop&q=80&w=500', path: '/products?category=Shirt', aspect: 'aspect-[3/4]', categoryName: 'Shirt' }
+    { title: 'SUITS & SETS', defaultImage: 'https://images.unsplash.com/photo-1610189013231-01741164ed2e?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Salwar%20Suit', categoryName: 'Salwar Suit' },
+    { title: 'LEHENGAS', defaultImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Lehenga', categoryName: 'Lehenga' },
+    { title: 'KURTAS', defaultImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Kurta', categoryName: 'Kurta' },
+    { title: 'SAREES', defaultImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Saree', categoryName: 'Saree' },
+    { title: 'WESTERN WEAR', defaultImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Western%20Wear', categoryName: 'Western Wear' },
+    { title: 'SHERWANIS', defaultImage: 'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Sherwani', categoryName: 'Sherwani' }
 ];
+
+import banner1Desktop from '../../assets/desktop-libas_a86e3f1e-d958-4188-b211-63bb00f5ece1.webp';
+import banner1Mobile from '../../assets/mobile-libas.webp';
+import banner2Desktop from '../../assets/desktop-shoplibas_optimized_f332afd5-d707-4010-ac4e-3bae60d42864.webp';
+import banner2Mobile from '../../assets/mobile-banner-copy_optimized_e7437d56-a6a4-4089-8dee-2861f5756da4.webp';
+import banner3Desktop from '../../assets/trend-banner_more_compressed.webp';
+import banner3Mobile from '../../assets/banner-1_mobile_extra_optimized.webp';
 
 const HERO_SLIDES = [
     {
         id: 1,
-        image: 'https://res.cloudinary.com/dpfls0d1n/image/upload/v1774637447/85-1353-20562_lqfxfo.avif',
-        category: '',
-        title: '',
-        buttonText: '',
-        link: '/products?category=Home'
+        desktopImage: banner1Desktop,
+        mobileImage: banner1Mobile,
+        link: '/products',
     },
     {
         id: 2,
-        image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=2000',
-        category: 'NEW ARRIVALS',
-        title: 'MODERN ETHNIC WEAR',
-        buttonText: 'EXPLORE COLLECTION',
-        link: '/products?category=Women'
+        desktopImage: banner2Desktop,
+        mobileImage: banner2Mobile,
+        link: '/products',
     },
     {
         id: 3,
-        image: 'https://res.cloudinary.com/dpfls0d1n/image/upload/v1774605726/Rass_WebBanner__Web_idjg5p.webp',
-        category: '',
-        title: '',
-        buttonText: '',
-        link: '/products?category=Saree'
-    }
+        desktopImage: banner3Desktop,
+        mobileImage: banner3Mobile,
+        link: '/products',
+    },
 ];
 
 
@@ -188,12 +188,7 @@ const Home = () => {
         setSelectedVideoIndex((prev) => (prev - 1 + SHOP_THE_LOOK_VIDEOS.length) % SHOP_THE_LOOK_VIDEOS.length);
     };
 
-    // Show all categories in POPULAR_CATEGORIES list
-    const activeCategories = POPULAR_CATEGORIES;
-    const categoryColumns = [];
-    for (let i = 0; i < activeCategories.length; i += 2) {
-        categoryColumns.push(activeCategories.slice(i, i + 2));
-    }
+    // We no longer need masonry columns, POPULAR_CATEGORIES array is used directly
 
     if (loading && products.length === 0) {
         return (
@@ -207,94 +202,70 @@ const Home = () => {
         <div className="min-h-screen bg-[var(--athenic-bg)] selection:bg-[var(--athenic-gold)] selection:text-white">
 
             {/* Hero Section Carousel */}
-            <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden flex items-center justify-center group">
+            <section className="relative w-full overflow-hidden group" style={{ height: 'calc(100vh - 72px)', maxHeight: '780px', minHeight: '420px' }}>
 
                 {/* Slides Container */}
                 <div
-                    className="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
+                    className="absolute inset-0 flex transition-transform duration-700 ease-in-out"
                     style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                     {HERO_SLIDES.map((slide) => (
-                        <div key={slide.id} className="min-w-full h-full relative flex items-center justify-end px-12 md:px-32">
-                            {/* Slide Background Image */}
-                            <div className="absolute inset-0 z-0">
-                                <img
-                                    src={slide.image}
-                                    alt={slide.title}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/30 md:bg-black/10"></div>
-                            </div>
-
-                            {/* Slide Content Overlay */}
-                            <div className="relative z-20 text-right max-w-lg hidden md:block">
-                                <p className="text-xl md:text-3xl font-serif tracking-[0.2em] text-white mb-4 uppercase drop-shadow-sm">
-                                    {slide.category}
-                                </p>
-                                <h1 className="text-2xl md:text-5xl font-serif tracking-[0.1em] text-white italic mb-8 drop-shadow-sm border-b border-white pb-6 inline-block">
-                                    {slide.title}
-                                </h1>
-                                <br />
-                                <button
-                                    onClick={() => navigate(slide.link)}
-                                    className="border border-white text-white hover:bg-white hover:text-black transition-colors px-10 py-3 text-sm tracking-widest uppercase"
-                                >
-                                    {slide.buttonText}
-                                </button>
-                            </div>
-
-                            {/* Mobile Content Display */}
-                            <div className="relative z-20 text-center w-full md:hidden flex flex-col items-center justify-center h-full">
-                                <p className="text-sm font-serif tracking-[0.2em] text-white mb-2 uppercase drop-shadow-sm">
-                                    {slide.category}
-                                </p>
-                                <h1 className="text-2xl font-serif tracking-[0.1em] text-white italic mb-6 drop-shadow-sm">
-                                    {slide.title}
-                                </h1>
-                                <button
-                                    onClick={() => navigate(slide.link)}
-                                    className="border border-white text-white hover:bg-white hover:text-black transition-colors px-6 py-2 text-xs tracking-widest uppercase"
-                                >
-                                    {slide.buttonText}
-                                </button>
-                            </div>
+                        <div
+                            key={slide.id}
+                            className="min-w-full h-full relative cursor-pointer"
+                            onClick={() => navigate(slide.link)}
+                        >
+                            {/* Desktop Image */}
+                            <img
+                                src={slide.desktopImage}
+                                alt="Banner"
+                                className="hidden md:block w-full h-full object-cover object-top"
+                            />
+                            {/* Mobile Image */}
+                            <img
+                                src={slide.mobileImage}
+                                alt="Banner"
+                                className="block md:hidden w-full h-full object-cover object-top"
+                            />
                         </div>
                     ))}
                 </div>
 
                 {/* Left Arrow */}
                 <button
-                    onClick={prevSlide}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-3 shadow-sm z-30 transition-all text-gray-800 opacity-0 group-hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white p-2.5 shadow-md z-30 transition-all text-gray-800 opacity-0 group-hover:opacity-100 rounded-sm"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
 
                 {/* Right Arrow */}
                 <button
-                    onClick={nextSlide}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-3 shadow-sm z-30 transition-all text-gray-800 opacity-0 group-hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white p-2.5 shadow-md z-30 transition-all text-gray-800 opacity-0 group-hover:opacity-100 rounded-sm"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
 
                 {/* Dots Indicator */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
                     {HERO_SLIDES.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => setCurrentSlide(index)}
-                            className={`w-2.5 h-2.5 transform rotate-45 border ${currentSlide === index
-                                ? 'bg-white border-white scale-125'
-                                : 'bg-transparent border-white/70 hover:bg-white/50'
-                                } transition-all duration-300`}
+                            className={`w-6 h-[3px] transition-all duration-300 ${currentSlide === index
+                                ? 'bg-gray-800 w-8'
+                                : 'bg-gray-400/60 hover:bg-gray-600'
+                                }`}
                             aria-label={`Go to slide ${index + 1}`}
-                        ></button>
+                        />
                     ))}
                 </div>
             </section>
 
-            <div className="h-10"></div> {/* Spacer */}
+
+            <div className="h-6"></div> {/* Spacer */}
+
 
             {/* Shop The Look Section */}
             <section className="max-w-[1400px] mx-auto px-4 py-8">
@@ -449,62 +420,38 @@ const Home = () => {
             )}
 
             {/* Popular Categories Section */}
-            {categoryColumns.length > 0 && (
-                <section className="max-w-[1400px] mx-auto px-4 py-16">
-                    <h2 className="text-4xl font-serif text-center mb-12 text-gray-900 leading-tight">Popular Categories</h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                        {categoryColumns.map((col, colIndex) => (
-                            <div key={colIndex} className="flex flex-col space-y-8">
-                                {col.map((item, itemIndex) => {
-                                    const isFirstItem = colIndex === 0 && itemIndex === 0;
-                                    return (
-                                        <Link
-                                            key={itemIndex}
-                                            to={item.path}
-                                            className="flex flex-col group cursor-pointer"
-                                        >
-                                            <div className={`w-full overflow-hidden bg-gray-100 ${item.aspect} ${isFirstItem ? 'rounded-tl-[4rem]' : ''}`}>
-                                                <img
-                                                    src={categoryImages[item.categoryName] || item.defaultImage}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                />
-                                            </div>
-                                            <h3 className="text-center mt-4 text-xs font-bold font-sans tracking-widest text-[#2d2d2d] group-hover:text-[var(--athenic-gold)] transition-colors uppercase">
-                                                {item.title}
-                                            </h3>
-                                        </Link>
-                                    );
-                                })}
+            <section className="max-w-[1400px] mx-auto px-4 py-8 mt-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-extrabold text-center mb-8 text-black uppercase tracking-widest">SHOP BY CATEGORIES</h2>
+                <div className="flex flex-wrap justify-center gap-3 md:gap-5 px-0 md:px-4">
+                    {POPULAR_CATEGORIES.map((item, itemIndex) => (
+                        <Link
+                            key={itemIndex}
+                            to={item.path}
+                            className="flex flex-col items-center group cursor-pointer w-[46%] sm:w-[30%] md:w-[28%] lg:w-[15%] max-w-[220px]"
+                        >
+                            <div
+                                className="relative w-full aspect-square rounded-full overflow-hidden bg-gray-100 mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1"
+                                style={{ background: 'linear-gradient(110deg, #bc2c3d 50%, #006093 50%)' }}
+                            >
+                                <img
+                                    src={categoryImages[item.categoryName] || item.defaultImage}
+                                    alt={item.title}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-10 opacity-95"
+                                />
+                                <div className="absolute bottom-0 inset-x-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 flex items-end justify-center pb-6 md:pb-8 transition-opacity duration-300">
+                                    <h3 className="text-center text-white text-[11px] md:text-sm font-bold font-sans tracking-widest uppercase px-2 z-30 drop-shadow-md">
+                                        {item.title}
+                                    </h3>
+                                </div>
                             </div>
-                        ))}
-                    </div>
-                </section>
-            )}
+                        </Link>
+                    ))}
+                </div>
+            </section>
 
             {/* Meander Divider */}
             <div className="meander-border opacity-10 my-6"></div>
 
-
-
-            {/* Promotion / Coupon Bar */}
-            <section className="bg-gradient-to-r from-[var(--mehron-blush)] to-[var(--mehron-soft)] py-4 border-y border-[var(--athenic-gold)] border-opacity-20 my-10">
-                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
-                    <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                        <span className="text-2xl">🏷️</span>
-                        <div>
-                            <p className="text-[10px] font-serif uppercase tracking-[0.1em] text-[var(--muted)]">For our Exclusive</p>
-                            <p className="text-sm font-serif italic text-[var(--mehron)]">Use Code: <span className="font-bold font-serif not-italic tracking-wider uppercase">SAVE10</span></p>
-                        </div>
-                    </div>
-                    <div className="h-px w-full md:w-px md:h-8 bg-[var(--athenic-gold)] opacity-30 hidden md:block"></div>
-                    <div className="flex items-center space-x-4">
-                        <span className="text-2xl">🎓</span>
-                        <p className="text-[10px] font-serif uppercase tracking-[0.2em] text-[var(--muted)]">15% OFF ON YOUR FIRST SHOP VISIT</p>
-                    </div>
-                </div>
-            </section>
 
             {/* Featured Collection styled as Bestselling Styles */}
             {featuredProducts.length > 0 && (

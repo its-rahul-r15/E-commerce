@@ -5,23 +5,23 @@
 @tailwind utilities;
 
 :root {
-  /* HSL Tailored Dark Mode Palette */
-  --mehron: hsl(270, 50%, 60%);     /* elegant violet accent */
-  --mehron-deep: hsl(270, 60%, 40%);
-  --mehron-light: hsl(270, 70%, 80%);
-  --mehron-blush: hsl(220, 20%, 15%); /* dark slate for cards/banners */
-  --mehron-soft: hsl(220, 25%, 10%);  /* darker slate */
+  /* HSL Tailored Light Mode Palette */
+  --mehron: hsl(270, 50%, 50%);       /* elegant violet accent */
+  --mehron-deep: hsl(270, 60%, 35%);
+  --mehron-light: hsl(270, 70%, 75%);
+  --mehron-blush: hsl(30, 50%, 95%);  /* warm cream for cards/banners */
+  --mehron-soft: hsl(30, 40%, 97%);   /* very light warm white */
   
-  --gold: hsl(35, 90%, 65%);        /* glowing warm gold */
-  --gold-light: hsl(35, 95%, 80%);
-  --gold-pale: hsl(220, 15%, 8%);   /* very dark blue-gray */
+  --gold: hsl(35, 80%, 45%);          /* rich warm gold */
+  --gold-light: hsl(35, 90%, 65%);
+  --gold-pale: hsl(40, 60%, 96%);     /* very light gold tint */
   
-  --cream: hsl(220, 18%, 6%);       /* rich black background */
-  --ivory: hsl(220, 15%, 12%);      /* elevated surface */
+  --cream: hsl(0, 0%, 100%);          /* pure white background */
+  --ivory: hsl(30, 30%, 97%);         /* slightly warm white surface */
   
-  --charcoal: hsl(210, 15%, 95%);   /* high contrast text (almost white) */
-  --muted: hsl(210, 10%, 65%);      /* secondary text */
-  --border-mehron: rgba(230, 180, 80, 0.15);
+  --charcoal: hsl(220, 20%, 12%);     /* deep dark text */
+  --muted: hsl(220, 10%, 45%);        /* secondary text */
+  --border-mehron: rgba(180, 130, 40, 0.2);
 
   /* Legacy Mapping for compatibility */
   --athenic-bg: var(--cream);
@@ -133,4 +133,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

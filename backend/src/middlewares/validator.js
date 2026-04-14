@@ -272,22 +272,25 @@ export const createCouponValidator = [
         .isIn(['percentage', 'fixed']).withMessage('Invalid discount type'),
 
     body('discountValue')
-        .isFloat({ min: 0 }).withMessage('Discount value must be positive'),
+        .isFloat({ min: 0 }).withMessage('Discount value must be a positive number'),
 
     body('minPurchase')
-        .optional()
-        .isFloat({ min: 0 }).withMessage('Min purchase must be positive'),
+        .optional({ checkFalsy: true })  // treats '', null, undefined, 0 as optional
+        .toFloat()
+        .isFloat({ min: 0 }).withMessage('Min purchase must be 0 or more'),
 
     body('maxDiscount')
-        .optional()
-        .isFloat({ min: 0 }).withMessage('Max discount must be positive'),
+        .optional({ checkFalsy: true })
+        .toFloat()
+        .isFloat({ min: 0 }).withMessage('Max discount must be a positive number'),
 
     body('expiryDate')
         .notEmpty().withMessage('Expiry date is required')
         .isISO8601().withMessage('Invalid date format'),
 
     body('usageLimit')
-        .optional()
+        .optional({ checkFalsy: true })
+        .toInt()
         .isInt({ min: 1 }).withMessage('Usage limit must be at least 1'),
 
     body('description')
