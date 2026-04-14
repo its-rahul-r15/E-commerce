@@ -81,6 +81,7 @@ import couponRoutes from './src/routes/couponRoutes.js';
 import tailoringRoutes from './src/routes/tailoringRoutes.js';
 import loyaltyRoutes from './src/routes/loyaltyRoutes.js';
 import wishlistRoutes from './src/routes/wishlistRoutes.js';
+import shoppableVideoRoutes from './src/routes/shoppableVideoRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -93,6 +94,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/tailoring', tailoringRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/shoppable-videos', shoppableVideoRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

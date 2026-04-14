@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { productService, cartService } from '../../services/api';
+import { productService, cartService, shoppableVideoService } from '../../services/api';
 import { ChevronRightIcon, XMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import ProductCard from '../../components/customer/ProductCard';
 
@@ -42,44 +42,12 @@ const HERO_SLIDES = [
 ];
 
 
-const SHOP_THE_LOOK_VIDEOS = [
-    {
-        id: 1,
-        video: 'https://res.cloudinary.com/dpfls0d1n/video/upload/v1774606018/8f34ce37db_fieoxp.mp4',
-
-        title: 'Off White Pure Silk Cotton'
-    },
-    {
-        id: 2,
-        video: 'https://res.cloudinary.com/dpfls0d1n/video/upload/v1774606032/f97b632f51_1_eftlcm.mp4',
-
-        title: 'Red Handwoven Silk'
-    },
-    {
-        id: 3,
-        video: 'https://res.cloudinary.com/dpfls0d1n/video/upload/v1774606039/ca618432c7_lk5uqn.mp4',
-
-        title: 'Yellow Gradient Tissue'
-    },
-    {
-        id: 4,
-        video: 'https://res.cloudinary.com/dpfls0d1n/video/upload/v1774606039/1e0a30b0b3_au7j4c.mp4',
-
-        title: 'Green Checked Saree'
-    },
-    {
-        id: 5,
-        video: 'https://res.cloudinary.com/dpfls0d1n/video/upload/v1774606018/8f34ce37db_fieoxp.mp4',
-
-        title: 'Classic White Silk'
-    }
-];
-
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [randomProducts, setRandomProducts] = useState([]);
     const [categoryImages, setCategoryImages] = useState({});
+    const [shoppableVideos, setShoppableVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [selectedVideoIndex, setSelectedVideoIndex] = useState(null);
@@ -128,14 +96,16 @@ const Home = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [trendingData, featuredData, randomData] = await Promise.all([
+            const [trendingData, featuredData, randomData, videosData] = await Promise.all([
                 productService.getProducts({ limit: 10 }),
                 productService.getFeaturedProducts(10),
-                productService.getRandomProducts(10)
+                productService.getRandomProducts(10),
+                shoppableVideoService.getVideos().catch(() => []) // Catch error specifically for videos and return empty array
             ]);
             setProducts(trendingData?.data || []);
             setFeaturedProducts(featuredData || []);
             setRandomProducts(randomData || []);
+            setShoppableVideos(videosData || []);
 
             // Fetch first product image for popular categories
             const cats = POPULAR_CATEGORIES.map(c => c.categoryName);
@@ -180,12 +150,12 @@ const Home = () => {
 
     const nextVideo = (e) => {
         e.stopPropagation();
-        setSelectedVideoIndex((prev) => (prev + 1) % SHOP_THE_LOOK_VIDEOS.length);
+        setSelectedVideoIndex((prev) => (prev + 1) % shoppableVideos.length);
     };
 
     const prevVideo = (e) => {
         e.stopPropagation();
-        setSelectedVideoIndex((prev) => (prev - 1 + SHOP_THE_LOOK_VIDEOS.length) % SHOP_THE_LOOK_VIDEOS.length);
+        setSelectedVideoIndex((prev) => (prev - 1 + shoppableVideos.length) % shoppableVideos.length);
     };
 
     // We no longer need masonry columns, POPULAR_CATEGORIES array is used directly
@@ -267,20 +237,20 @@ const Home = () => {
             <div className="h-6"></div> {/* Spacer */}
 
 
-            {/* Shop The Look Section */}
+            {shoppableVideos.length > 0 && (
             <section className="max-w-[1400px] mx-auto px-4 py-8">
                 <h2 className="text-3xl font-serif text-center mb-10 text-gray-800">Shop The Look</h2>
 
                 <div className="flex overflow-x-auto space-x-6 pb-6 px-4 no-scrollbar items-center justify-start xl:justify-center">
-                    {SHOP_THE_LOOK_VIDEOS.map((item, index) => (
+                    {shoppableVideos.map((item, index) => (
                         <div
-                            key={item.id}
+                            key={item._id}
                             onClick={() => setSelectedVideoIndex(index)}
                             className="relative group flex-shrink-0 w-[240px] h-[400px] rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
                         >
                             {/* Video Background */}
                             <video
-                                src={item.video}
+                                src={item.videoUrl}
                                 className="w-full h-full object-cover"
                                 autoPlay
                                 muted
@@ -302,17 +272,15 @@ const Home = () => {
 
                             {/* Text and Thumbnail */}
                             <div className="absolute bottom-4 left-4 right-4 text-white">
-                                {item.id === 1 && (
-                                    <p className="text-xs font-serif leading-tight mb-3 w-[70%] font-medium">
-                                        Off White Pure<br />Silk Cotton<br />Fabric
-                                    </p>
-                                )}
-
+                                <p className="text-xs font-serif leading-tight mb-3 w-[80%] font-medium">
+                                    {item.title}
+                                </p>
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
+            )}
 
             {/* Shop The Look Modal */}
             {selectedVideoIndex !== null && (
@@ -347,7 +315,7 @@ const Home = () => {
                         {/* Left: Video */}
                         <div className="w-full md:w-[45%] h-[40%] md:h-full bg-black relative">
                             <video
-                                src={SHOP_THE_LOOK_VIDEOS[selectedVideoIndex].video}
+                                src={shoppableVideos[selectedVideoIndex]?.videoUrl}
                                 className="w-full h-full object-cover"
                                 autoPlay
                                 loop
@@ -356,7 +324,7 @@ const Home = () => {
                             ></video>
                             <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
                                 <p className="text-white font-serif font-medium drop-shadow-md text-sm md:text-base max-w-[70%]">
-                                    {SHOP_THE_LOOK_VIDEOS[selectedVideoIndex].title}
+                                    {shoppableVideos[selectedVideoIndex]?.title}
                                 </p>
                             </div>
                         </div>
@@ -364,55 +332,65 @@ const Home = () => {
                         {/* Right: Product Details */}
                         <div className="w-full md:w-[55%] h-[60%] md:h-full p-6 md:p-10 flex flex-col overflow-y-auto bg-gray-50">
 
-                            {/* Product Images Carousel (Dummy real images) */}
-                            <div className="flex space-x-3 mb-6 overflow-x-auto pb-2 no-scrollbar">
-                                {[1, 2, 3].map((num) => {
-                                    const prodImg = products[selectedVideoIndex]?.images?.[num - 1] || SHOP_THE_LOOK_VIDEOS[selectedVideoIndex].thumbnail;
-                                    return (
-                                        <div key={num} className="w-24 h-32 md:w-32 md:h-44 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                                            <img src={prodImg} className="w-full h-full object-cover" alt="Product Angle" />
+                            {shoppableVideos[selectedVideoIndex]?.products?.length > 0 ? (
+                                shoppableVideos[selectedVideoIndex].products.map((videoProduct, vpIndex) => (
+                                    <div key={videoProduct._id || vpIndex} className="mb-8 border-b border-gray-200 last:border-b-0 pb-6 last:pb-0">
+                                        {/* Product Images Carousel */}
+                                        <div className="flex space-x-3 mb-6 overflow-x-auto pb-2 no-scrollbar">
+                                            {videoProduct.images?.slice(0, 3).map((img, idx) => (
+                                                <div key={idx} className="w-24 h-32 md:w-32 md:h-44 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                                                    <img src={img} className="w-full h-full object-cover" alt="Product Angle" />
+                                                </div>
+                                            ))}
                                         </div>
-                                    )
-                                })}
-                            </div>
 
-                            {/* Product Info */}
-                            <div className="flex-1">
-                                <h2 className="text-xl md:text-3xl font-serif text-gray-900 mb-2 leading-tight">
-                                    {products[selectedVideoIndex]?.name || `${SHOP_THE_LOOK_VIDEOS[selectedVideoIndex].title} Saree`}
-                                </h2>
+                                        {/* Product Info */}
+                                        <div className="flex-1">
+                                            <h2 className="text-xl md:text-3xl font-serif text-gray-900 mb-2 leading-tight">
+                                                {videoProduct.name}
+                                            </h2>
 
-                                <p className="text-2xl font-serif font-bold text-[var(--athenic-blue)] mb-6">
-                                    ₹{(products[selectedVideoIndex]?.price || 4999).toLocaleString()}
-                                </p>
+                                            <div className="flex items-center space-x-3 mb-6">
+                                                <p className="text-2xl font-serif font-bold text-[var(--athenic-blue)]">
+                                                    ₹{(videoProduct.discountedPrice || videoProduct.price).toLocaleString()}
+                                                </p>
+                                                {videoProduct.discountedPrice && videoProduct.discountedPrice < videoProduct.price && (
+                                                    <p className="text-lg text-gray-400 line-through">₹{videoProduct.price.toLocaleString()}</p>
+                                                )}
+                                            </div>
 
-                                <div className="space-y-4 mb-8">
-                                    <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">Description</h4>
-                                    <p className="text-gray-600 text-sm md:text-base leading-relaxed font-serif">
-                                        {products[selectedVideoIndex]?.description ||
-                                            `Stunning handwoven ${SHOP_THE_LOOK_VIDEOS[selectedVideoIndex].title.toLowerCase()} featuring traditional craftsmanship and contemporary elegance. Perfect for festive occasions and celebrations. Includes unstitched blouse piece.`}
-                                    </p>
+                                            <div className="space-y-4 mb-8">
+                                                <p className="text-gray-600 text-sm md:text-base leading-relaxed font-serif">
+                                                    {videoProduct.description}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="mt-auto pt-4 flex space-x-4">
+                                            <button
+                                                onClick={() => handleAddToCart(videoProduct._id)}
+                                                disabled={addingToCart}
+                                                className="flex-1 bg-[#8e2b4f] hover:bg-[#7a2443] text-white py-4 rounded-xl font-serif uppercase tracking-widest text-sm transition-colors shadow-md disabled:opacity-70 flex justify-center items-center"
+                                            >
+                                                {addingToCart ? (
+                                                    <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                                                ) : 'Add to cart'}
+                                            </button>
+                                            <button
+                                                onClick={() => navigate(`/product/${videoProduct._id}`)}
+                                                className="w-16 h-14 md:w-20 md:h-[52px] flex items-center justify-center border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-100 transition-colors title='View Details'"
+                                            >
+                                                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="flex-1 flex items-center justify-center text-gray-500 font-serif">
+                                    No products linked to this video.
                                 </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="mt-auto pt-4 border-t border-gray-200 flex space-x-4">
-                                <button
-                                    onClick={() => handleAddToCart(products[selectedVideoIndex]?._id || 'dummy')}
-                                    disabled={addingToCart}
-                                    className="flex-1 bg-[#8e2b4f] hover:bg-[#7a2443] text-white py-4 rounded-xl font-serif uppercase tracking-widest text-sm transition-colors shadow-md disabled:opacity-70 flex justify-center items-center"
-                                >
-                                    {addingToCart ? (
-                                        <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
-                                    ) : 'Add to cart'}
-                                </button>
-                                <button
-                                    onClick={() => navigate(`/product/${products[selectedVideoIndex]?._id || 'dummy'}`)}
-                                    className="w-16 h-14 md:w-20 md:h-[52px] flex items-center justify-center border-2 border-gray-200 rounded-xl hover:border-gray-400 hover:bg-gray-100 transition-colors"
-                                >
-                                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                </button>
-                            </div>
+                            )}
 
                         </div>
                     </div>
