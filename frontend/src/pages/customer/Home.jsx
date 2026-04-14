@@ -586,9 +586,7 @@ const Home = () => {
                         <div className="flex-1 hidden md:block"></div>
                         <h2 className="text-2xl md:text-3xl font-sans font-medium text-center text-gray-900 leading-tight">Hidden Gems</h2>
                         <div className="flex-1 flex md:justify-end mt-4 md:mt-0">
-                            <button onClick={fetchData} className="text-[10px] font-sans font-bold uppercase tracking-widest border border-gray-900 px-4 py-2 hover:bg-gray-900 hover:text-white transition-colors flex items-center gap-2">
-                                <span>🔄</span> Refresh
-                            </button>
+
                         </div>
                     </div>
 
