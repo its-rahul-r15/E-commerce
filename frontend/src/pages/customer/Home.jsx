@@ -19,6 +19,7 @@ import banner2Desktop from '../../assets/desktop-shoplibas_optimized_f332afd5-d7
 import banner2Mobile from '../../assets/mobile-banner-copy_optimized_e7437d56-a6a4-4089-8dee-2861f5756da4.webp';
 import banner3Desktop from '../../assets/trend-banner_more_compressed.webp';
 import banner3Mobile from '../../assets/banner-1_mobile_extra_optimized.webp';
+import webBackground from '../../assets/web_background.png';
 
 const HERO_SLIDES = [
     {
@@ -46,6 +47,7 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [randomProducts, setRandomProducts] = useState([]);
+    const [sareeProducts, setSareeProducts] = useState([]);
     const [categoryImages, setCategoryImages] = useState({});
     const [shoppableVideos, setShoppableVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -96,16 +98,18 @@ const Home = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [trendingData, featuredData, randomData, videosData] = await Promise.all([
+            const [trendingData, featuredData, randomData, videosData, sareeData] = await Promise.all([
                 productService.getProducts({ limit: 10 }),
                 productService.getFeaturedProducts(10),
                 productService.getRandomProducts(10),
-                shoppableVideoService.getVideos().catch(() => []) // Catch error specifically for videos and return empty array
+                shoppableVideoService.getVideos().catch(() => []), // Catch error specifically for videos and return empty array
+                productService.getProducts({ categories: ['Saree'], limit: 2 }) // Fetch 4 saree products
             ]);
             setProducts(trendingData?.data || []);
             setFeaturedProducts(featuredData || []);
             setRandomProducts(randomData || []);
             setShoppableVideos(videosData || []);
+            setSareeProducts(sareeData?.data || []);
 
             // Fetch first product image for popular categories
             const cats = POPULAR_CATEGORIES.map(c => c.categoryName);
@@ -433,57 +437,46 @@ const Home = () => {
 
             {/* Featured Collection styled as Bestselling Styles */}
             {featuredProducts.length > 0 && (
-                <section className="max-w-[1400px] mx-auto px-4 py-8 md:py-16 relative group">
-                    <h2 className="text-2xl md:text-3xl font-sans font-medium text-center mb-10 text-gray-900 leading-tight">Bestselling Styles</h2>
+                <section className="max-w-[1400px] mx-auto px-4 py-8 md:py-16 group">
+                    <h2 className="text-2xl md:text-3xl font-serif font-extrabold text-center mb-10 text-gray-900 uppercase tracking-widest">Bestselling Styles</h2>
 
-                    <div className="relative">
-                        {/* Custom Scrollable Carousel */}
-                        <div
-                            ref={featuredScrollRef}
-                            className="flex overflow-x-auto space-x-4 md:space-x-6 pb-6 no-scrollbar snap-x snap-mandatory"
-                        >
-                            {featuredProducts.map((product) => (
+                    {/* Grid Layout */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 items-start pb-12 lg:pb-24">
+                        {featuredProducts.map((product, index) => {
+                            // Determine aspect ratio for "koi bada koi chota" effect
+                            const aspectRatios = ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-[3/5]', 'aspect-square', 'aspect-[4/5]', 'aspect-[3/4]', 'aspect-[2/3]', 'aspect-[5/7]'];
+                            const ratioClass = aspectRatios[index % aspectRatios.length];
+                            
+                            // Zig-zag offset
+                            const offsetClass = index % 2 !== 0 ? 'mt-10 lg:mt-20' : '';
+
+                            return (
                                 <Link
                                     key={product._id}
                                     to={`/product/${product._id}`}
-                                    className="flex-shrink-0 w-[280px] md:w-[325px] group/card cursor-pointer snap-start"
+                                    className={`w-full group/card cursor-pointer flex flex-col items-center text-center ${offsetClass}`}
                                 >
-                                    <div className="w-full h-[360px] md:h-[425px] bg-gray-100 mb-5 overflow-hidden relative shadow-sm">
+                                    <div className={`w-full ${ratioClass} bg-[#f5f5f5] mb-4 overflow-hidden relative shadow-sm rounded-xl md:rounded-2xl transition-all duration-500 hover:shadow-xl`}>
                                         <img
                                             src={product.images?.[0] || '/placeholder-product.png'}
                                             alt={product.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
+                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
                                         />
+                                        {/* Overlay gradient for premium feel */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
                                     </div>
-                                    <h3 className="text-sm md:text-base font-sans font-medium text-gray-800 line-clamp-1 mb-2 leading-relaxed tracking-wide">{product.name}</h3>
-                                    <div className="flex items-center space-x-3">
-                                        <p className="text-base md:text-lg font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
+                                    <h3 className="text-xs md:text-sm font-sans font-bold text-gray-800 uppercase tracking-widest line-clamp-1 mb-1 md:mb-2">{product.name}</h3>
+                                    <div className="flex justify-center items-center space-x-2">
+                                        <p className="text-sm md:text-base font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
                                         {product.discountedPrice && product.discountedPrice < product.price && (
                                             <>
-                                                <p className="text-xs md:text-sm text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
-                                                <p className="text-xs md:text-sm font-bold text-[#d03c3f] tracking-wider">
-                                                    {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                                                </p>
+                                                <p className="text-xs md:text-sm text-gray-500 line-through">₹{product.price.toLocaleString()}</p>
                                             </>
                                         )}
                                     </div>
                                 </Link>
-                            ))}
-                        </div>
-
-                        {/* Navigation Arrows */}
-                        <button
-                            onClick={(e) => { e.preventDefault(); scrollFeatured('left'); }}
-                            className="absolute left-0 top-[40%] -translate-y-1/2 -ml-2 md:-ml-4 bg-white shadow-md border border-gray-100 p-2 md:p-3 hover:bg-gray-50 z-10 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                            <ChevronLeftIcon className="w-6 h-6 text-gray-500" strokeWidth={1} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.preventDefault(); scrollFeatured('right'); }}
-                            className="absolute right-0 top-[40%] -translate-y-1/2 -mr-2 md:-mr-4 bg-white shadow-md border border-gray-100 p-2 md:p-3 hover:bg-gray-50 z-10 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                            <ChevronRightIcon className="w-6 h-6 text-gray-500" strokeWidth={1} />
-                        </button>
+                            )
+                        })}
                     </div>
                 </section>
             )}
@@ -491,6 +484,43 @@ const Home = () => {
             {/* Meander Divider */}
             {featuredProducts.length > 0 && (
                 <div className="meander-border opacity-20 my-4"></div>
+            )}
+
+            {/* Saree Banner Section - Full Width with Background */}
+            {sareeProducts.length > 0 && (
+                <section className="w-full py-8 md:py-12 mb-8 px-0 relative bg-cover bg-center h-[550px] md:h-[730px]" style={{ backgroundImage: `url(${webBackground})` }}>
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-transparent"></div>
+
+                    {/* Products Container - Positioned on Right */}
+                    <div className="relative h-full flex items-center justify-end">
+                        <div className="px-4 md:px-12 w-full md:w-[60%] grid grid-cols-2 gap-3 md:gap-4">
+                            {sareeProducts.slice(0, 2).map((saree) => (
+                                <Link
+                                    key={saree._id}
+                                    to={`/product/${saree._id}`}
+                                    className="group/card cursor-pointer flex flex-col items-start text-left hover:no-underline"
+                                >
+                                    <div className="w-full aspect-[2/3] bg-gray-100 mb-2 overflow-hidden relative shadow-md rounded-lg transition-all duration-500 hover:shadow-lg">
+                                        <img
+                                            src={saree.images?.[0] || '/placeholder-product.png'}
+                                            alt={saree.name}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500"></div>
+                                    </div>
+                                    <h3 className="text-xs md:text-sm font-sans font-bold text-white uppercase tracking-widest line-clamp-1 mb-1">{saree.name}</h3>
+                                    <div className="flex items-center space-x-1 flex-wrap">
+                                        <p className="text-xs md:text-base font-bold text-white">₹{(saree.discountedPrice || saree.price).toLocaleString()}</p>
+                                        {saree.discountedPrice && saree.discountedPrice < saree.price && (
+                                            <p className="text-xs text-gray-500 line-through">₹{saree.price.toLocaleString()}</p>
+                                        )}
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
             )}
 
             {/* Trending Collection styled as Bestselling Styles */}
@@ -553,9 +583,6 @@ const Home = () => {
                     </button>
                 </div>
             </section>
-
-            {/* Meander Divider */}
-            <div className="meander-border opacity-20 my-4"></div>
 
             {/* Discovery / Random Collection styled as Bestselling Styles */}
             {randomProducts.length > 0 && (
