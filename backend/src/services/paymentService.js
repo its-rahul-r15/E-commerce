@@ -70,7 +70,7 @@ export const verifyPaymentSignature = (razorpayOrderId, razorpayPaymentId, razor
 export const processSuccessfulPayment = async (orderId, paymentData) => {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = paymentData;
 
-    // Verify signature
+   
     const isValid = verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
 
     if (!isValid) {
