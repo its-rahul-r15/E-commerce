@@ -19,7 +19,7 @@ import banner2Desktop from '../../assets/desktop-shoplibas_optimized_f332afd5-d7
 import banner2Mobile from '../../assets/mobile-banner-copy_optimized_e7437d56-a6a4-4089-8dee-2861f5756da4.webp';
 import banner3Desktop from '../../assets/trend-banner_more_compressed.webp';
 import banner3Mobile from '../../assets/banner-1_mobile_extra_optimized.webp';
-import webBackground from '../../assets/web_background.png';
+import webBackground from '../../assets/Web_background.png';
 
 const HERO_SLIDES = [
     {
