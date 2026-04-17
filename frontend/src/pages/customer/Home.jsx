@@ -595,55 +595,133 @@ const Home = () => {
                         </div>
                     </div>
 
-                    <div className="relative">
-                        {/* Custom Scrollable Carousel (2 Rows) */}
-                        <div
-                            ref={randomScrollRef}
-                            className="grid grid-rows-2 grid-flow-col gap-x-4 gap-y-8 md:gap-x-6 pb-6 overflow-x-auto no-scrollbar snap-x snap-mandatory"
-                        >
-                            {randomProducts.map((product) => (
-                                <Link
-                                    key={product._id}
-                                    to={`/product/${product._id}`}
-                                    className="w-[280px] md:w-[325px] group/card cursor-pointer snap-start"
-                                >
-                                    <div className="w-full h-[360px] md:h-[425px] bg-gray-100 mb-5 overflow-hidden relative shadow-sm">
-                                        <img
-                                            src={product.images?.[0] || '/placeholder-product.png'}
-                                            alt={product.name}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
-                                        />
-                                    </div>
-                                    <h3 className="text-sm md:text-base font-sans font-medium text-gray-800 line-clamp-1 mb-2 leading-relaxed tracking-wide">{product.name}</h3>
-                                    <div className="flex items-center space-x-3">
-                                        <p className="text-base md:text-lg font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
+                    {/* Mosaic Grid — Col 1 & 4: two stacked; Col 2 & 3: one tall */}
+                    <div className="hidden md:grid grid-cols-4 gap-6">
+
+                        {/* Column 1 — two stacked items */}
+                        <div className="flex flex-col gap-6">
+                            {[randomProducts[0], randomProducts[4]].map((product) => product && (
+                                <Link key={product._id} to={`/product/${product._id}`} className="group/card cursor-pointer flex flex-col">
+                                    <div className="w-full h-[280px] bg-gray-100 overflow-hidden relative shadow-md rounded-xl">
+                                        <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                                         {product.discountedPrice && product.discountedPrice < product.price && (
-                                            <>
-                                                <p className="text-xs md:text-sm text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
-                                                <p className="text-xs md:text-sm font-bold text-[#d03c3f] tracking-wider">
-                                                    {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                                                </p>
-                                            </>
+                                            <span className="absolute top-2 left-2 bg-[#d03c3f] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 shadow">{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF</span>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] font-sans font-semibold uppercase tracking-widest text-gray-800 line-clamp-1 mt-3 mb-1">{product.name}</p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-sm font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</span>
+                                        {product.discountedPrice && product.discountedPrice < product.price && (
+                                            <span className="text-xs text-gray-400 line-through">₹{product.price.toLocaleString()}</span>
                                         )}
                                     </div>
                                 </Link>
                             ))}
                         </div>
 
-                        {/* Navigation Arrows */}
-                        <button
-                            onClick={(e) => { e.preventDefault(); scrollRandom('left'); }}
-                            className="absolute left-0 top-[40%] -translate-y-1/2 -ml-2 md:-ml-4 bg-white shadow-md border border-gray-100 p-2 md:p-3 hover:bg-gray-50 z-10 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                            <ChevronLeftIcon className="w-6 h-6 text-gray-500" strokeWidth={1} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.preventDefault(); scrollRandom('right'); }}
-                            className="absolute right-0 top-[40%] -translate-y-1/2 -mr-2 md:-mr-4 bg-white shadow-md border border-gray-100 p-2 md:p-3 hover:bg-gray-50 z-10 hidden md:block opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                            <ChevronRightIcon className="w-6 h-6 text-gray-500" strokeWidth={1} />
-                        </button>
+                        {/* Column 2 — one tall hero item */}
+                        {randomProducts[1] && (
+                            <Link to={`/product/${randomProducts[1]._id}`} className="group/card cursor-pointer flex flex-col">
+                                <div className="w-full h-[584px] bg-gray-100 overflow-hidden relative shadow-md rounded-xl">
+                                    <img src={randomProducts[1].images?.[0] || '/placeholder-product.png'} alt={randomProducts[1].name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                    {randomProducts[1].discountedPrice && randomProducts[1].discountedPrice < randomProducts[1].price && (
+                                        <span className="absolute top-3 left-3 bg-[#d03c3f] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 shadow">{Math.round(((randomProducts[1].price - randomProducts[1].discountedPrice) / randomProducts[1].price) * 100)}% OFF</span>
+                                    )}
+                                </div>
+                                <p className="text-[11px] font-sans font-semibold uppercase tracking-widest text-gray-800 line-clamp-1 mt-3 mb-1">{randomProducts[1].name}</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-bold text-gray-900">₹{(randomProducts[1].discountedPrice || randomProducts[1].price).toLocaleString()}</span>
+                                    {randomProducts[1].discountedPrice && randomProducts[1].discountedPrice < randomProducts[1].price && (
+                                        <span className="text-xs text-gray-400 line-through">₹{randomProducts[1].price.toLocaleString()}</span>
+                                    )}
+                                </div>
+                            </Link>
+                        )}
+
+                        {/* Column 3 — one tall hero item */}
+                        {randomProducts[2] && (
+                            <Link to={`/product/${randomProducts[2]._id}`} className="group/card cursor-pointer flex flex-col">
+                                <div className="w-full h-[584px] bg-gray-100 overflow-hidden relative shadow-md rounded-xl">
+                                    <img src={randomProducts[2].images?.[0] || '/placeholder-product.png'} alt={randomProducts[2].name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                    {randomProducts[2].discountedPrice && randomProducts[2].discountedPrice < randomProducts[2].price && (
+                                        <span className="absolute top-3 left-3 bg-[#d03c3f] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 shadow">{Math.round(((randomProducts[2].price - randomProducts[2].discountedPrice) / randomProducts[2].price) * 100)}% OFF</span>
+                                    )}
+                                </div>
+                                <p className="text-[11px] font-sans font-semibold uppercase tracking-widest text-gray-800 line-clamp-1 mt-3 mb-1">{randomProducts[2].name}</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-bold text-gray-900">₹{(randomProducts[2].discountedPrice || randomProducts[2].price).toLocaleString()}</span>
+                                    {randomProducts[2].discountedPrice && randomProducts[2].discountedPrice < randomProducts[2].price && (
+                                        <span className="text-xs text-gray-400 line-through">₹{randomProducts[2].price.toLocaleString()}</span>
+                                    )}
+                                </div>
+                            </Link>
+                        )}
+
+                        {/* Column 4 — two stacked items */}
+                        <div className="flex flex-col gap-6">
+                            {[randomProducts[3], randomProducts[5]].map((product) => product && (
+                                <Link key={product._id} to={`/product/${product._id}`} className="group/card cursor-pointer flex flex-col">
+                                    <div className="w-full h-[280px] bg-gray-100 overflow-hidden relative shadow-md rounded-xl">
+                                        <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                        {product.discountedPrice && product.discountedPrice < product.price && (
+                                            <span className="absolute top-2 left-2 bg-[#d03c3f] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 shadow">{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF</span>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] font-sans font-semibold uppercase tracking-widest text-gray-800 line-clamp-1 mt-3 mb-1">{product.name}</p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-sm font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</span>
+                                        {product.discountedPrice && product.discountedPrice < product.price && (
+                                            <span className="text-xs text-gray-400 line-through">₹{product.price.toLocaleString()}</span>
+                                        )}
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
+
+                    {/* Mobile: simple 2-col grid */}
+                    <div className="grid grid-cols-2 gap-4 md:hidden">
+                        {randomProducts.map((product) => (
+                            <Link key={product._id} to={`/product/${product._id}`} className="group/card cursor-pointer flex flex-col">
+                                <div className="w-full h-[240px] bg-gray-100 overflow-hidden relative shadow-sm rounded-xl">
+                                    <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                    {product.discountedPrice && product.discountedPrice < product.price && (
+                                        <span className="absolute top-2 left-2 bg-[#d03c3f] text-white text-[10px] font-bold uppercase px-1.5 py-0.5">{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF</span>
+                                    )}
+                                </div>
+                                <p className="text-[10px] font-sans font-semibold uppercase tracking-wider text-gray-800 line-clamp-1 mt-2 mb-1">{product.name}</p>
+                                <span className="text-sm font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</span>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Row 2: Remaining products (index 6–9) in a 4-col grid */}
+                    {randomProducts.length > 6 && (
+                        <div className="hidden md:grid grid-cols-4 gap-6 mt-6">
+                            {randomProducts.slice(6).map((product) => (
+                                <Link key={product._id} to={`/product/${product._id}`} className="group/card cursor-pointer flex flex-col">
+                                    <div className="w-full h-[340px] bg-gray-100 overflow-hidden relative shadow-md rounded-xl">
+                                        <img src={product.images?.[0] || '/placeholder-product.png'} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                        {product.discountedPrice && product.discountedPrice < product.price && (
+                                            <span className="absolute top-3 left-3 bg-[#d03c3f] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 shadow">{Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF</span>
+                                        )}
+                                    </div>
+                                    <p className="text-[11px] font-sans font-semibold uppercase tracking-widest text-gray-800 line-clamp-1 mt-3 mb-1">{product.name}</p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-sm font-bold text-gray-900">₹{(product.discountedPrice || product.price).toLocaleString()}</span>
+                                        {product.discountedPrice && product.discountedPrice < product.price && (
+                                            <span className="text-xs text-gray-400 line-through">₹{product.price.toLocaleString()}</span>
+                                        )}
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </section>
             )}
 
