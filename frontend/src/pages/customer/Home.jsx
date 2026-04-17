@@ -442,21 +442,14 @@ const Home = () => {
 
                     {/* Grid Layout */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 items-start pb-12 lg:pb-24">
-                        {featuredProducts.map((product, index) => {
-                            // Determine aspect ratio for "koi bada koi chota" effect
-                            const aspectRatios = ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-[3/5]', 'aspect-square', 'aspect-[4/5]', 'aspect-[3/4]', 'aspect-[2/3]', 'aspect-[5/7]'];
-                            const ratioClass = aspectRatios[index % aspectRatios.length];
-                            
-                            // Zig-zag offset
-                            const offsetClass = index % 2 !== 0 ? 'mt-10 lg:mt-20' : '';
-
+                        {featuredProducts.map((product) => {
                             return (
                                 <Link
                                     key={product._id}
                                     to={`/product/${product._id}`}
-                                    className={`w-full group/card cursor-pointer flex flex-col items-center text-center ${offsetClass}`}
+                                    className="w-full group/card cursor-pointer flex flex-col items-center text-center"
                                 >
-                                    <div className={`w-full ${ratioClass} bg-[#f5f5f5] mb-4 overflow-hidden relative shadow-sm rounded-xl md:rounded-2xl transition-all duration-500 hover:shadow-xl`}>
+                                    <div className="w-full aspect-[3/4] bg-[#f5f5f5] mb-4 overflow-hidden relative shadow-sm rounded-xl md:rounded-2xl transition-all duration-500 hover:shadow-xl">
                                         <img
                                             src={product.images?.[0] || '/placeholder-product.png'}
                                             alt={product.name}
