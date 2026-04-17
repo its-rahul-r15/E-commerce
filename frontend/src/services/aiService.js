@@ -1,13 +1,6 @@
-/**
- * aiService.js — AI service powered by Groq (llama-3.3-70b)
- *
- * SETUP: frontend/.env already has VITE_GROQ_API_KEY set.
- * Works WITHOUT API key using the built-in rule-based parser as fallback.
- */
-
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile'; // fast, free, accurate
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const responseCache = new Map();
 
