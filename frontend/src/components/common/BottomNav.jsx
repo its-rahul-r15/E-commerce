@@ -1,22 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import {
     HomeIcon as HomeOutline,
-    Squares2X2Icon as CatalogOutline,
+    ShoppingBagIcon as CartOutline,
     HeartIcon as HeartOutline,
     UserIcon as UserOutline,
     SparklesIcon
 } from '@heroicons/react/24/outline';
 import {
     HomeIcon as HomeSolid,
-    Squares2X2Icon as CatalogSolid,
+    ShoppingBagIcon as CartSolid,
     HeartIcon as HeartSolid,
     UserIcon as UserSolid
 } from '@heroicons/react/24/solid';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { cartService } from '../../services/api';
 
 const BottomNav = () => {
     const location = useLocation();
     const { wishlistCount } = useWishlist();
+    const { user, isAuthenticated } = useAuth();
+    const [cartCount, setCartCount] = useState(0);
+
+    useEffect(() => {
+        if (isAuthenticated && ['customer', 'seller'].includes(user?.role)) {
+            fetchCartCount();
+        }
+    }, [isAuthenticated, user]);
+
+    const fetchCartCount = async () => {
+        try {
+            const data = await cartService.getCart();
+            setCartCount(data.cart?.items?.length || 0);
+        } catch (error) {
+            console.error('Error fetching cart:', error);
+        }
+    };
 
     return (
         <div className="lg:hidden fixed bottom-0 w-full bg-white border-t border-gray-100 pb-safe z-50">
@@ -32,14 +52,21 @@ const BottomNav = () => {
                     <span className={`text-[10px] mt-1 font-medium ${location.pathname === '/' ? 'text-[#FF5A5F]' : ''}`}>HOME</span>
                 </Link>
 
-                {/* Catalog (Products) */}
-                <Link to="/products" className="flex flex-col items-center justify-center w-16 h-full text-gray-500 hover:text-[#FF5A5F]">
-                    {location.pathname === '/products' ? (
-                        <CatalogSolid className="w-6 h-6 text-[#FF5A5F]" />
-                    ) : (
-                        <CatalogOutline className="w-6 h-6" />
-                    )}
-                    <span className={`text-[10px] mt-1 font-medium ${location.pathname === '/products' ? 'text-[#FF5A5F]' : ''}`}>CATALOG</span>
+                {/* Cart */}
+                <Link to="/cart" className="relative flex flex-col items-center justify-center w-16 h-full text-gray-500 hover:text-[#FF5A5F]">
+                    <div className="relative">
+                        {location.pathname === '/cart' ? (
+                            <CartSolid className="w-6 h-6 text-[#FF5A5F]" />
+                        ) : (
+                            <CartOutline className="w-6 h-6" />
+                        )}
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#FF5A5F] text-white text-[8px] rounded-full flex items-center justify-center font-bold border-2 border-white">
+                                {cartCount}
+                            </span>
+                        )}
+                    </div>
+                    <span className={`text-[10px] mt-1 font-medium ${location.pathname === '/cart' ? 'text-[#FF5A5F]' : ''}`}>CART</span>
                 </Link>
 
                 {/* AI Stylist (Floating Center Button) */}

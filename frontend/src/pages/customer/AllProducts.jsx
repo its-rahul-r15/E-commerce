@@ -8,7 +8,26 @@ const AllProducts = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState({});
+    const [filters, setFilters] = useState(() => {
+        const urlCategories = searchParams.get('categories') || searchParams.get('category');
+        const urlMinPrice = searchParams.get('minPrice');
+        const urlMaxPrice = searchParams.get('maxPrice');
+        const urlSort = searchParams.get('sort');
+        const urlStyle = searchParams.get('style');
+        const urlSizes = searchParams.get('sizes');
+        const urlColors = searchParams.get('colors');
+
+        const initialFilters = {};
+        if (urlCategories) initialFilters.categories = urlCategories.split(',');
+        if (urlMinPrice) initialFilters.minPrice = urlMinPrice;
+        if (urlMaxPrice) initialFilters.maxPrice = urlMaxPrice;
+        if (urlSort) initialFilters.sort = urlSort;
+        if (urlStyle) initialFilters.style = urlStyle;
+        if (urlSizes) initialFilters.sizes = urlSizes.split(',');
+        if (urlColors) initialFilters.colors = urlColors.split(',');
+        
+        return initialFilters;
+    });
     const [pagination, setPagination] = useState(null);
     const [page, setPage] = useState(1);
     const [debugData, setDebugData] = useState(null);
@@ -34,7 +53,7 @@ const AllProducts = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        // Sync filters from URL on component mount
+        // Sync filters from URL when searchParams change (like backward/forward navigation)
         const urlCategories = searchParams.get('categories') || searchParams.get('category');
         const urlMinPrice = searchParams.get('minPrice');
         const urlMaxPrice = searchParams.get('maxPrice');
@@ -43,39 +62,55 @@ const AllProducts = () => {
         const urlSizes = searchParams.get('sizes');
         const urlColors = searchParams.get('colors');
 
-        const initialFilters = {};
-        if (urlCategories) initialFilters.categories = urlCategories.split(',');
-        if (urlMinPrice) initialFilters.minPrice = urlMinPrice;
-        if (urlMaxPrice) initialFilters.maxPrice = urlMaxPrice;
-        if (urlSort) initialFilters.sort = urlSort;
-        if (urlStyle) initialFilters.style = urlStyle;
-        if (urlSizes) initialFilters.sizes = urlSizes.split(',');
-        if (urlColors) initialFilters.colors = urlColors.split(',');
+        const nextFilters = {};
+        if (urlCategories) nextFilters.categories = urlCategories.split(',');
+        if (urlMinPrice) nextFilters.minPrice = urlMinPrice;
+        if (urlMaxPrice) nextFilters.maxPrice = urlMaxPrice;
+        if (urlSort) nextFilters.sort = urlSort;
+        if (urlStyle) nextFilters.style = urlStyle;
+        if (urlSizes) nextFilters.sizes = urlSizes.split(',');
+        if (urlColors) nextFilters.colors = urlColors.split(',');
 
-        setFilters(initialFilters);
+        setFilters(prev => {
+            // Only update state if JSON representation changed, to avoid infinite loops
+            if (JSON.stringify(prev) !== JSON.stringify(nextFilters)) {
+                return nextFilters;
+            }
+            return prev;
+        });
     }, [searchParams]);
 
     useEffect(() => {
-        fetchProducts();
-    }, [page, filters]);
+        let isCancelled = false;
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            console.log('Fetching products with filters:', filters);
-            const data = await productService.getProducts({
-                ...filters,
-                page
-            });
-            console.log('Received data:', data);
-            setProducts(data.data || []);
-            setPagination(data.pagination);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const data = await productService.getProducts({
+                    ...filters,
+                    page
+                });
+                if (!isCancelled) {
+                    setProducts(data.data || []);
+                    setPagination(data.pagination);
+                }
+            } catch (error) {
+                if (!isCancelled) {
+                    console.error('Error fetching products:', error);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchProducts();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [page, filters]);
 
     const handleFilterChange = (newFilters) => {
         const nextParams = new URLSearchParams();

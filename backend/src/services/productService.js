@@ -48,9 +48,22 @@ export const inspectQuery = (filters = {}) => {
     if (style) query.style = style;
 
     if (minPrice || maxPrice) {
-        query.price = {}; // Simulating the logic
-        if (minPrice) query.price.$gte = Number(minPrice);
-        if (maxPrice) query.price.$lte = Number(maxPrice);
+        const discountedCond = {};
+        const priceCond = {};
+        if (minPrice) { discountedCond.$gte = Number(minPrice); priceCond.$gte = Number(minPrice); }
+        if (maxPrice) { discountedCond.$lte = Number(maxPrice); priceCond.$lte = Number(maxPrice); }
+        
+        query.$or = [
+            { discountedPrice: { $gt: 0, ...discountedCond } },
+            {
+                $or: [
+                    { discountedPrice: { $exists: false } },
+                    { discountedPrice: null },
+                    { discountedPrice: 0 }
+                ],
+                price: priceCond
+            }
+        ];
     }
 
     if (sizes) {
@@ -139,7 +152,20 @@ export const getProducts = async (filters = {}) => {
         const priceCond = {};
         if (minPrice) { discountedCond.$gte = Number(minPrice); priceCond.$gte = Number(minPrice); }
         if (maxPrice) { discountedCond.$lte = Number(maxPrice); priceCond.$lte = Number(maxPrice); }
-        priceFilter = { $or: [{ discountedPrice: discountedCond }, { price: priceCond }] };
+        
+        priceFilter = {
+            $or: [
+                { discountedPrice: { $gt: 0, ...discountedCond } },
+                {
+                    $or: [
+                        { discountedPrice: { $exists: false } },
+                        { discountedPrice: null },
+                        { discountedPrice: 0 }
+                    ],
+                    price: priceCond
+                }
+            ]
+        };
     }
 
     // Full-text search — multi-word AND logic (all words must match in name/category/tags)
@@ -184,7 +210,7 @@ export const getProducts = async (filters = {}) => {
     if (shopId) query.shopId = shopId;
 
     // Try cache (only for non-search queries)
-    const cacheKey = `products:${JSON.stringify({ categories, subCategory, brand, sizes, colors, style, shopId, page, limit, sort })}`;
+    const cacheKey = `products:${JSON.stringify({ categories, subCategory, brand, sizes, colors, style, shopId, page, limit, sort, minPrice, maxPrice })}`;
 
     if (!search) {
         const cached = await getCache(cacheKey);

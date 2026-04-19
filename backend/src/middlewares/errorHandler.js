@@ -5,7 +5,7 @@ import { errorResponse } from '../utils/responseFormatter.js';
 const errorHandler = (err, req, res, next) => {
     console.error('❌ Error:', err);
 
-    // Mongoose validation error
+    
     if (err.name === 'ValidationError') {
         const messages = Object.values(err.errors).map((error) => error.message);
         return errorResponse(res, messages.join(', '), 400, 'VALIDATION_ERROR');

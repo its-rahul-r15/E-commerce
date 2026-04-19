@@ -13,12 +13,9 @@ import configureGoogleOAuth from './src/config/passport.js';
 import errorHandler from './src/middlewares/errorHandler.js';
 import verifyIndexes from './src/utils/verifyIndexes.js';
 
-
 dotenv.config();
 
-
 const app = express();
-
 
 app.set('trust proxy', 1);
 app.use(helmet());
@@ -50,7 +47,6 @@ app.use(mongoSanitize());
 
 app.use(passport.initialize());
 configureGoogleOAuth();
-
 
 app.get('/health', (req, res) => {
     res.status(200).json({
@@ -106,9 +102,7 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-
 const PORT = process.env.PORT || 5000;
-
 
 const startServer = async () => {
     try {
@@ -118,9 +112,7 @@ const startServer = async () => {
 
         await connectRedis();
 
-
         configureCloudinary();
-
 
         app.listen(PORT, () => {
             console.log('='.repeat(50));
