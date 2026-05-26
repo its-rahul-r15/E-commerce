@@ -35,6 +35,13 @@ import AdminShops from './pages/admin/AdminShops';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminLoyaltyGifts from './pages/admin/AdminLoyaltyGifts';
 import AdminShoppableVideos from './pages/admin/AdminShoppableVideos';
+import AdminCategories from './pages/admin/AdminCategories';
+import AdminEmails from './pages/admin/AdminEmails';
+import AdminLedger from './pages/admin/AdminLedger';
+import AdminRefunds from './pages/admin/AdminRefunds';
+import AdminTailoring from './pages/admin/AdminTailoring';
+import AdminLoyalty from './pages/admin/AdminLoyalty';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
 import CustomerAIAssistant from './components/customer/CustomerAIAssistant';
 import VirtualTryOn from './pages/customer/VirtualTryOn';
 import CustomTailoring from './pages/customer/CustomTailoring';
@@ -107,6 +114,13 @@ function App() {
               <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/loyalty-gifts" element={<ProtectedRoute allowedRoles={['admin']}><AdminLoyaltyGifts /></ProtectedRoute>} />
               <Route path="/admin/shoppable-videos" element={<ProtectedRoute allowedRoles={['admin']}><AdminShoppableVideos /></ProtectedRoute>} />
+              <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={['admin']}><AdminCategories /></ProtectedRoute>} />
+              <Route path="/admin/emails" element={<ProtectedRoute allowedRoles={['admin']}><AdminEmails /></ProtectedRoute>} />
+              <Route path="/admin/ledger" element={<ProtectedRoute allowedRoles={['admin']}><AdminLedger /></ProtectedRoute>} />
+              <Route path="/admin/refunds" element={<ProtectedRoute allowedRoles={['admin']}><AdminRefunds /></ProtectedRoute>} />
+              <Route path="/admin/tailoring" element={<ProtectedRoute allowedRoles={['admin']}><AdminTailoring /></ProtectedRoute>} />
+              <Route path="/admin/loyalty" element={<ProtectedRoute allowedRoles={['admin']}><AdminLoyalty /></ProtectedRoute>} />
+              <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><AdminAnalytics /></ProtectedRoute>} />
 
             </Routes>
           </Layout>

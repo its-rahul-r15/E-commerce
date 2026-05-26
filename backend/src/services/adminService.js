@@ -4,14 +4,10 @@ import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 
 /**
- * Admin Service
- * Business logic for admin operations
- */
-
-/**
  * Get platform statistics
  * @returns {Promise<Object>} Platform statistics
  */
+
 export const getPlatformStatistics = async () => {
     const [
         totalUsers,
@@ -59,9 +55,9 @@ export const getPlatformStatistics = async () => {
         totalOrders,
         totalRevenue,
         pendingOrders,
-        processingOrders: acceptedOrders, // Map 'accepted' to 'processing' for frontend
-        shippedOrders: preparingOrders,   // Map 'preparing' to 'shipped' for frontend
-        deliveredOrders: completedOrders, // Map 'completed' to 'delivered' for frontend
+        processingOrders: acceptedOrders,
+        shippedOrders: preparingOrders,  
+        deliveredOrders: completedOrders, 
     };
 };
 
@@ -119,7 +115,7 @@ export const blockUser = async (userId) => {
 };
 
 /**
- * Unblock user
+ * 
  * @param {string} userId - User ID
  * @returns {Promise<Object>} Updated user
  */

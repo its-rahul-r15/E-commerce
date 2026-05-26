@@ -8,6 +8,7 @@ const AllProducts = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    
     const [filters, setFilters] = useState(() => {
         const urlCategories = searchParams.get('categories') || searchParams.get('category');
         const urlMinPrice = searchParams.get('minPrice');
@@ -170,7 +171,7 @@ const AllProducts = () => {
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8 items-start pt-2">
-                    {/* Sidebar Filters */}
+                   
                     <div className="w-full lg:w-[260px] flex-shrink-0 sticky top-4 max-h-[90vh] overflow-y-auto no-scrollbar">
                         <FilterPanel
                             onFilterChange={handleFilterChange}

@@ -105,6 +105,39 @@ const shopSchema = new mongoose.Schema({
         },
         default: 'pending',
     },
+    gstin: {
+        type: String,
+        trim: true,
+        default: '',
+    },
+    pan: {
+        type: String,
+        trim: true,
+        default: '',
+    },
+    kycDocumentUrl: {
+        type: String,
+        default: '',
+    },
+    kycStatus: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending',
+    },
+    commissionRate: {
+        type: Number,
+        default: 10, // default 10% platform commission fee
+        min: [0, 'Commission cannot be negative'],
+        max: [100, 'Commission cannot exceed 100'],
+    },
+    balance: {
+        type: Number,
+        default: 0,
+    },
+    totalPaid: {
+        type: Number,
+        default: 0,
+    },
     rating: {
         type: Number,
         default: 0,

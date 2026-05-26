@@ -1,10 +1,11 @@
 import * as productService from '../services/productService.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/responseFormatter.js';
+import ProductAnalytics from '../models/ProductAnalytics.js';
 import { uploadMultipleImages, uploadToCloudinary, uploadVideoToCloudinary } from '../utils/cloudinaryUpload.js';
 
 export const createProduct = async (req, res, next) => {
     try {
-        const sellerId = req.user.userId;
+        const user = req.user;
         const productData = req.body;
 
         // Handle product gallery images  (field: 'images')
@@ -29,7 +30,7 @@ export const createProduct = async (req, res, next) => {
             productData.video360 = videoUrl;
         }
 
-        const product = await productService.createProduct(sellerId, productData);
+        const product = await productService.createProduct(user, productData);
 
         return successResponse(
             res,
@@ -38,7 +39,7 @@ export const createProduct = async (req, res, next) => {
             201
         );
     } catch (error) {
-        if (error.message.includes('must have an approved shop')) {
+        if (error.message.includes('must have an approved shop') || error.message.includes('not approved or does not exist')) {
             return errorResponse(res, error.message, 403, 'NO_APPROVED_SHOP');
         }
         next(error);
@@ -117,6 +118,9 @@ export const searchProducts = async (req, res, next) => {
 export const getProductById = async (req, res, next) => {
     try {
         const product = await productService.getProductById(req.params.id);
+
+        // Track product view (fire-and-forget)
+        ProductAnalytics.recordView(req.params.id, req.user?.userId).catch(() => {});
 
         return successResponse(
             res,
@@ -234,7 +238,7 @@ export const getMyProducts = async (req, res, next) => {
  */
 export const updateProduct = async (req, res, next) => {
     try {
-        const sellerId = req.user.userId;
+        const user = req.user;
         const productId = req.params.id;
         const updates = req.body;
 
@@ -259,7 +263,7 @@ export const updateProduct = async (req, res, next) => {
             updates.video360 = await uploadVideoToCloudinary(req.files.video360[0].buffer, 'products360');
         }
 
-        const product = await productService.updateProduct(productId, sellerId, updates);
+        const product = await productService.updateProduct(productId, user, updates);
 
         return successResponse(
             res,
@@ -283,7 +287,7 @@ export const updateProduct = async (req, res, next) => {
  */
 export const deleteProduct = async (req, res, next) => {
     try {
-        await productService.deleteProduct(req.params.id, req.user.userId);
+        await productService.deleteProduct(req.params.id, req.user);
 
         return successResponse(
             res,

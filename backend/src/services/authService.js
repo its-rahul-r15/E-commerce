@@ -35,6 +35,11 @@ export const registerUser = async (userData) => {
         role: role === 'admin' ? 'customer' : role, // Prevent admin registration via API
     });
 
+    // Send welcome email (Non-blocking)
+    import('./emailService.js').then(({ sendWelcomeEmail }) => {
+        sendWelcomeEmail(user.email, user.name);
+    }).catch(err => console.error('Welcome email failed:', err));
+
     // Generate tokens
     const { accessToken, refreshToken } = generateTokenPair(user);
 

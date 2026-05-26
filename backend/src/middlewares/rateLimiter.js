@@ -1,8 +1,6 @@
 import { incrementCache } from '../services/cacheService.js';
 import { errorResponse } from '../utils/responseFormatter.js';
 
-
-
 /**
  * Create rate limiter for specific endpoint
  * @param {number} maxRequests - Maximum requests allowed
@@ -19,7 +17,6 @@ const rateLimiter = (maxRequests = 100, windowMs = 15 * 60 * 1000, message = 'To
 
 
             const count = await incrementCache(key, ttl);
-
 
             if (count === 0) {
                 return next();
@@ -56,14 +53,13 @@ export const authRateLimiter = rateLimiter(
     'Too many login attempts. Please try again later.'
 );
 
-
 export const apiRateLimiter = rateLimiter(
     100,
     15 * 60 * 1000,
     'Too many requests. Please slow down.'
 );
 
-// Lenient rate limiting for read-only endpoints
+
 export const readRateLimiter = rateLimiter(
     300,
     15 * 60 * 1000,

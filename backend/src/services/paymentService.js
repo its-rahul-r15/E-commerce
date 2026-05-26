@@ -23,7 +23,7 @@ export const createRazorpayOrder = async (amount, orderId) => {
         }
 
         const options = {
-            amount: Math.round(amount * 100), // Convert to paise
+            amount: Math.round(amount * 100), 
             currency: 'INR',
             receipt: orderId,
             notes: {
@@ -46,6 +46,7 @@ export const createRazorpayOrder = async (amount, orderId) => {
  * @param {string} razorpaySignature - Razorpay signature
  * @returns {boolean} Verification result
  */
+
 export const verifyPaymentSignature = (razorpayOrderId, razorpayPaymentId, razorpaySignature) => {
     try {
         const text = `${razorpayOrderId}|${razorpayPaymentId}`;
@@ -70,6 +71,17 @@ export const verifyPaymentSignature = (razorpayOrderId, razorpayPaymentId, razor
 export const processSuccessfulPayment = async (orderId, paymentData) => {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = paymentData;
 
+    const existingOrder = await Order.findById(orderId);
+    if (!existingOrder) {
+        throw new Error('Order not found');
+    }
+
+    // Idempotency: check if already paid
+    if (existingOrder.paymentStatus === 'paid') {
+        console.log(`[PAYMENT IDEMPOTENCY] Order ${orderId} is already paid. Returning current state.`);
+        return existingOrder.populate('customerId', 'name email')
+            .populate('items.productId', 'name price images');
+    }
    
     const isValid = verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
 
@@ -86,7 +98,7 @@ export const processSuccessfulPayment = async (orderId, paymentData) => {
             'payment.razorpaySignature': razorpaySignature,
             'payment.status': 'completed',
             paymentStatus: 'paid',
-            orderStatus: 'confirmed',
+            status: 'accepted', // Update order status to 'accepted'
         },
         { new: true }
     ).populate('customerId', 'name email')
@@ -94,6 +106,29 @@ export const processSuccessfulPayment = async (orderId, paymentData) => {
 
     if (!order) {
         throw new Error('Order not found');
+    }
+
+    // Increment shop's balance with the net sales amount (total amount minus platform commission)
+    try {
+        const Shop = (await import('../models/Shop.js')).default;
+        const shop = await Shop.findById(order.shopId);
+        if (shop) {
+            const commissionRate = shop.commissionRate ?? 10;
+            const vendorShare = order.totalAmount * (1 - (commissionRate / 100));
+            await Shop.findByIdAndUpdate(order.shopId, {
+                $inc: { balance: Number(vendorShare.toFixed(2)) }
+            });
+            console.log(`[LEDGER UPDATE] Credited shop ${order.shopId} with ₹${vendorShare.toFixed(2)} (Commission: ${commissionRate}%)`);
+        }
+    } catch (ledgerError) {
+        console.error('[LEDGER ERROR] Failed to update shop balance:', ledgerError.message);
+    }
+
+    // Trigger order confirmation email now that payment is confirmed
+    if (order.customerId && order.customerId.email) {
+        import('./emailService.js').then(({ sendOrderConfirmationEmail }) => {
+            sendOrderConfirmationEmail(order.customerId.email, order.customerId.name, order._id.toString(), order.totalAmount);
+        }).catch(err => console.error('Order confirmation email failed:', err));
     }
 
     // Clear cart after successful payment
@@ -111,18 +146,45 @@ export const processSuccessfulPayment = async (orderId, paymentData) => {
  * @returns {Promise<Object>} Updated order
  */
 export const processFailedPayment = async (orderId) => {
+    const existingOrder = await Order.findById(orderId);
+    if (!existingOrder) {
+        throw new Error('Order not found');
+    }
+
+    // Idempotency: check if already failed or cancelled
+    if (existingOrder.paymentStatus === 'failed' || existingOrder.status === 'cancelled') {
+        console.log(`[PAYMENT IDEMPOTENCY] Order ${orderId} is already failed/cancelled. Returning current state.`);
+        return existingOrder;
+    }
+
     const order = await Order.findByIdAndUpdate(
         orderId,
         {
             'payment.status': 'failed',
             paymentStatus: 'failed',
-            orderStatus: 'cancelled',
+            status: 'cancelled', // Update order status to 'cancelled'
         },
         { new: true }
     );
 
     if (!order) {
         throw new Error('Order not found');
+    }
+
+    // Restore product stock on failed payment
+    try {
+        const Product = (await import('../models/Product.js')).default;
+        const { deleteCachePattern } = await import('./cacheService.js');
+        
+        for (const item of order.items) {
+            await Product.findByIdAndUpdate(item.productId, {
+                $inc: { stock: item.quantity },
+            });
+        }
+        await deleteCachePattern('products:*');
+        console.log(`[STOCK RESTORED] Restored stock for failed order ${orderId}`);
+    } catch (stockError) {
+        console.error(`[STOCK ERROR] Failed to restore stock for cancelled order ${orderId}:`, stockError.message);
     }
 
     return order;

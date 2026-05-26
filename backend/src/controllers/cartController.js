@@ -1,5 +1,6 @@
 import * as cartService from '../services/cartService.js';
 import { successResponse, errorResponse } from '../utils/responseFormatter.js';
+import ProductAnalytics from '../models/ProductAnalytics.js';
 
 
 export const getCart = async (req, res, next) => {
@@ -29,6 +30,9 @@ export const addToCart = async (req, res, next) => {
         }
 
         const cart = await cartService.addToCart(req.user.userId, { productId, quantity });
+
+        // Track add-to-cart event (fire-and-forget)
+        ProductAnalytics.recordAddToCart(productId).catch(() => {});
 
         return successResponse(
             res,

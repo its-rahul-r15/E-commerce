@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { productService } from '../../services/api';
+import { productService, categoryService } from '../../services/api';
 import ImageUpload from '../../components/common/ImageUpload';
 import {
     ArrowLeftIcon,
@@ -37,13 +37,24 @@ const AddEditProduct = () => {
     const [video360Preview, setVideo360Preview] = useState(null); // { file?, url, existing? }
     const [loading, setLoading] = useState(isEdit);
     const [submitting, setSubmitting] = useState(false);
+    const [categoriesList, setCategoriesList] = useState([]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        fetchCategories();
         if (isEdit) {
             fetchProduct();
         }
     }, [id]);
+
+    const fetchCategories = async () => {
+        try {
+            const data = await categoryService.getCategories();
+            setCategoriesList(data || []);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
 
     const fetchProduct = async () => {
         try {
@@ -136,7 +147,7 @@ const AddEditProduct = () => {
         }));
     };
 
-    const selectedCategoryData = FASHION_CATEGORIES.find(c => c.value === formData.category);
+    const selectedCategoryData = categoriesList.find(c => c.name === formData.category) || FASHION_CATEGORIES.find(c => c.value === formData.category);
 
 
     const handleChange = (e) => {
@@ -348,9 +359,15 @@ const AddEditProduct = () => {
                                     className="w-full px-4 py-3 bg-[var(--cream)]/30 border border-[var(--border-mehron)] rounded-none text-gray-900 focus:ring-1 focus:ring-[var(--gold)] focus:border-[var(--gold)] transition-all outline-none bg-white font-serif text-sm"
                                 >
                                     <option value="">Select the category of elegance</option>
-                                    {FASHION_CATEGORIES.map(cat => (
-                                        <option key={cat.value} value={cat.value}>{cat.label}</option>
-                                    ))}
+                                    {categoriesList.length > 0 ? (
+                                        categoriesList.map(cat => (
+                                            <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                        ))
+                                    ) : (
+                                        FASHION_CATEGORIES.map(cat => (
+                                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                        ))
+                                    )}
                                 </select>
                             </div>
 
@@ -365,7 +382,7 @@ const AddEditProduct = () => {
                                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all outline-none bg-white"
                                     >
                                         <option value="">Select sub-category</option>
-                                        {selectedCategoryData.sub.map(s => (
+                                        {(selectedCategoryData.subCategories || selectedCategoryData.sub || []).map(s => (
                                             <option key={s} value={s}>{s}</option>
                                         ))}
                                     </select>

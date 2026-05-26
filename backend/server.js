@@ -78,6 +78,8 @@ import tailoringRoutes from './src/routes/tailoringRoutes.js';
 import loyaltyRoutes from './src/routes/loyaltyRoutes.js';
 import wishlistRoutes from './src/routes/wishlistRoutes.js';
 import shoppableVideoRoutes from './src/routes/shoppableVideoRoutes.js';
+import categoryRoutes from './src/routes/categoryRoutes.js';
+import emailAdminRoutes from './src/routes/emailAdminRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -91,6 +93,8 @@ app.use('/api/tailoring', tailoringRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/shoppable-videos', shoppableVideoRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/admin/emails', emailAdminRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
@@ -107,6 +111,14 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
     try {
         await connectDB();
+
+        // Seed default categories if empty
+        const { seedCategories } = await import('./src/utils/seedCategories.js');
+        await seedCategories();
+
+        // Seed default email templates if empty
+        const { seedEmailTemplates } = await import('./src/utils/seedEmails.js');
+        await seedEmailTemplates();
 
         await verifyIndexes();
 

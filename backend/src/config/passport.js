@@ -2,18 +2,22 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import User from '../models/User.js';
 
-
-
 const configureGoogleOAuth = () => {
-    passport.use(
-        new GoogleStrategy(
-            {
-                clientID: process.env.GOOGLE_CLIENT_ID,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                callbackURL: process.env.GOOGLE_CALLBACK_URL,
-                scope: ['profile', 'email'],
-                proxy: true, // Enable proxy for Vercel/Heroku
-            },
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+        console.error(' Missing GOOGLE_CLIENT_ID or secret. Google OAuth is disabled.');
+        return;
+    }
+
+    try {
+        passport.use(
+            new GoogleStrategy(
+                {
+                    clientID: process.env.GOOGLE_CLIENT_ID,
+                    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
+                    scope: ['profile', 'email'],
+                    proxy: true, // Enable proxy for Vercel/Heroku
+                },
             async (accessToken, refreshToken, profile, done) => {
                 try {
                     // Extract user info from Google profile
@@ -26,8 +30,7 @@ const configureGoogleOAuth = () => {
                     let user = await User.findOne({ email });
 
                     if (user) {
-                        // User exists with this email
-                        // Update Google ID if not set
+                        
                         if (!user.googleId) {
                             user.googleId = googleId;
                             await user.save();
@@ -36,7 +39,7 @@ const configureGoogleOAuth = () => {
                         return done(null, user);
                     }
 
-                    // Create new user with Google data
+                   
                     user = await User.create({
                         name,
                         email,
@@ -57,13 +60,15 @@ const configureGoogleOAuth = () => {
             }
         )
     );
+    } catch (err) {
+        console.error('⚠️  Failed to initialize Google Strategy:', err.message);
+    }
 
-    // Serialize user for session
     passport.serializeUser((user, done) => {
         done(null, user._id);
     });
 
-    // Deserialize user from session
+    
     passport.deserializeUser(async (id, done) => {
         try {
             const user = await User.findById(id);

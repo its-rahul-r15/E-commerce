@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const connectDB = async () => {
   try {
     const options = {
-      // Connection pooling for performance
+      
       maxPoolSize: 10,
       minPoolSize: 5,
       

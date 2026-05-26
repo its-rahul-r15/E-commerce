@@ -1,5 +1,7 @@
 import * as paymentService from '../services/paymentService.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
+import ProductAnalytics from '../models/ProductAnalytics.js';
+import Order from '../models/Order.js';
 
 /**
  * Payment Controller
@@ -55,6 +57,17 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         razorpayPaymentId,
         razorpaySignature,
     });
+
+    // Track purchase analytics for each item (fire-and-forget)
+    if (order?.items) {
+        for (const item of order.items) {
+            ProductAnalytics.recordPurchase(
+                item.productId,
+                item.quantity,
+                item.price * item.quantity
+            ).catch(() => {});
+        }
+    }
 
     res.status(200).json({
         success: true,

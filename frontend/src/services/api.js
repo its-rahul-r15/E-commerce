@@ -147,9 +147,10 @@ export const productService = {
     },
 
     // Get all products (admin only - includes banned products)
-    getAllProducts: async () => {
-        const response = await axios.get('/products/admin/all');
-        return response.data.data;
+    getAllProducts: async (page = null, limit = 20) => {
+        const url = page ? `/products/admin/all?page=${page}&limit=${limit}` : '/products/admin/all?limit=1000';
+        const response = await axios.get(url);
+        return page ? response.data : response.data.data;
     },
 
     // DEBUG: Get all products raw
@@ -373,6 +374,13 @@ export const shoppableVideoService = {
     },
     deleteVideo: async (id) => {
         const response = await axios.delete(`/shoppable-videos/${id}`);
+        return response.data.data;
+    }
+};
+
+export const categoryService = {
+    getCategories: async () => {
+        const response = await axios.get('/categories');
         return response.data.data;
     }
 };

@@ -2,11 +2,9 @@ import multer from 'multer';
 import { AppError } from './errorHandler.js';
 
 
-
-// Configure multer to use memory storage (buffer)
 const storage = multer.memoryStorage();
 
-// File filter to accept only images
+
 const fileFilter = (req, file, cb) => {
     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -17,7 +15,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Configure multer
+
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -26,7 +24,7 @@ const upload = multer({
     }
 });
 
-// Export different upload configurations
+
 export const uploadSingle = upload.single('image'); // For single image
 export const uploadMultiple = upload.array('images', 5); // For up to 5 images
 export const uploadFields = upload.fields([

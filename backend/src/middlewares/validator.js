@@ -1,7 +1,6 @@
 import { body, param, query, validationResult } from 'express-validator';
 import { errorResponse } from '../utils/responseFormatter.js';
 
-// Helper to handle validation errors
 export const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
 
@@ -12,8 +11,6 @@ export const handleValidationErrors = (req, res, next) => {
 
     next();
 };
-
-// ==================== Auth Validation ====================
 
 export const registerValidator = [
     body('name')
@@ -74,7 +71,6 @@ export const updateProfileValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Shop Validation ====================
 
 export const createShopValidator = [
     body('shopName')
@@ -141,7 +137,6 @@ export const updateShopValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Product Validation ====================
 
 export const createProductValidator = [
     body('name')
@@ -202,7 +197,6 @@ export const updateProductValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Cart Validation ====================
 
 export const addToCartValidator = [
     body('productId')
@@ -216,7 +210,6 @@ export const addToCartValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Order Validation ====================
 
 export const createOrderValidator = [
     body('deliveryAddress.street')
@@ -242,7 +235,6 @@ export const createOrderValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Coupon Validation ====================
 
 export const validateCouponValidator = [
     body('code')
@@ -301,7 +293,6 @@ export const createCouponValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Payment Validation ====================
 
 export const paymentCreateOrderValidator = [
     body('amount')
@@ -343,7 +334,6 @@ export const updateOrderStatusValidator = [
     handleValidationErrors,
 ];
 
-// ==================== Common Validators ====================
 
 export const mongoIdValidator = [
     param('id')

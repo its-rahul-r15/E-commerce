@@ -1,14 +1,13 @@
 import { errorResponse } from '../utils/responseFormatter.js';
 
-
-
 /**
  * Check if user has required role
  * @param {...string} allowedRoles - Roles that can access the route
  */
+
 const requireRole = (...allowedRoles) => {
     return (req, res, next) => {
-        // Ensure user is authenticated (auth middleware must run first)
+      
         if (!req.user) {
             return errorResponse(res, 'Authentication required', 401, 'NOT_AUTHENTICATED');
         }
@@ -27,9 +26,7 @@ const requireRole = (...allowedRoles) => {
     };
 };
 
-/**
- * Shorthand middleware for common roles
- */
+
 export const requireCustomer = requireRole('customer');
 export const requireSeller = requireRole('seller');
 export const requireAdmin = requireRole('admin');

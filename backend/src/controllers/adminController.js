@@ -55,7 +55,7 @@ export const getStats = async (req, res, next) => {
  */
 export const getAllUsers = async (req, res, next) => {
     try {
-        const { role, isBlocked, page = 1, limit = 20 } = req.query;
+        const { role, isBlocked, search, page = 1, limit = 20 } = req.query;
         const skip = (page - 1) * limit;
 
         const query = {};
@@ -66,6 +66,13 @@ export const getAllUsers = async (req, res, next) => {
 
         if (isBlocked !== undefined) {
             query.isBlocked = isBlocked === 'true' || isBlocked === true;
+        }
+
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
         }
 
         const [users, total] = await Promise.all([

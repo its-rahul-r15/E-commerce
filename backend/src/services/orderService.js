@@ -124,6 +124,10 @@ export const createOrder = async (customerId, orderData) => {
     // Create separate order per vendor
     const orders = [];
 
+    // Fetch customer details for email confirmation
+    const User = (await import('../models/User.js')).default;
+    const customerUser = await User.findById(customerId).catch(() => null);
+
     for (const [shopId, items] of Object.entries(itemsByShop)) {
         const orderTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -311,14 +315,14 @@ export const updateOrderStatus = async (orderId, sellerId, newStatus) => {
  * @returns {Promise<Object>} Cancelled order
  */
 export const cancelOrder = async (orderId, userId, userRole) => {
-    const order = await Order.findById(orderId).populate('shopId');
+    const order = await Order.findById(orderId).populate('shopId').populate('customerId');
 
     if (!order) {
         throw new Error('Order not found');
     }
 
     // Verify access
-    const isCustomer = order.customerId.toString() === userId;
+    const isCustomer = (order.customerId._id || order.customerId).toString() === userId;
     const isShopOwner = order.shopId.sellerId.toString() === userId;
 
     if (!isCustomer && !isShopOwner) {
@@ -332,6 +336,13 @@ export const cancelOrder = async (orderId, userId, userRole) => {
 
     order.status = 'cancelled';
     await order.save();
+
+    // Trigger order cancellation email (Non-blocking)
+    if (order.customerId && order.customerId.email) {
+        import('./emailService.js').then(({ sendOrderCancellationEmail }) => {
+            sendOrderCancellationEmail(order.customerId.email, order.customerId.name, order._id.toString());
+        }).catch(err => console.error('Order cancellation email failed:', err));
+    }
 
     // Restore product stock
     for (const item of order.items) {

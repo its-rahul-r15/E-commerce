@@ -1,7 +1,7 @@
 import express from 'express';
 import * as productController from '../controllers/productController.js';
 import auth from '../middlewares/auth.js';
-import { requireSeller, requireAdmin } from '../middlewares/roleCheck.js';
+import { requireSeller, requireAdmin, requireSellerOrAdmin } from '../middlewares/roleCheck.js';
 import { createProductValidator, mongoIdValidator, shopIdValidator, paginationValidator, updateProductValidator } from '../middlewares/validator.js';
 import { apiRateLimiter, readRateLimiter } from '../middlewares/rateLimiter.js';
 import { upload } from '../utils/cloudinaryUpload.js';
@@ -23,11 +23,11 @@ router.get('/:id', readRateLimiter, mongoIdValidator, productController.getProdu
 router.get('/:id/compare', readRateLimiter, mongoIdValidator, productController.getComparisons);
 router.get('/:id/personalized-compare', auth, readRateLimiter, mongoIdValidator, productController.getPersonalizedComparison);
 
-// Seller routes (protected)
+// Seller/Admin routes (protected)
 router.post(
     '/',
     auth,
-    requireSeller,
+    requireSellerOrAdmin,
     apiRateLimiter,
     upload.fields([
         { name: 'images', maxCount: 5 },       // Product gallery images
@@ -49,7 +49,7 @@ router.get(
 router.patch(
     '/:id',
     auth,
-    requireSeller,
+    requireSellerOrAdmin,
     apiRateLimiter,
     upload.fields([
         { name: 'images', maxCount: 5 },       // Product gallery images
@@ -64,7 +64,7 @@ router.patch(
 router.delete(
     '/:id',
     auth,
-    requireSeller,
+    requireSellerOrAdmin,
     apiRateLimiter,
     mongoIdValidator,
     productController.deleteProduct

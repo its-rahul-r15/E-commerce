@@ -1,9 +1,10 @@
 import Wishlist from '../models/Wishlist.js';
 import Product from '../models/Product.js';
+import ProductAnalytics from '../models/ProductAnalytics.js';
 
 export const getWishlist = async (req, res, next) => {
     try {
-        let wishlist = await Wishlist.findOne({ user: req.user._id }).populate({
+        let wishlist = await Wishlist.findOne({ user: req.user.userId }).populate({
             path: 'items.product',
             select: 'name price discountedPrice images category shopId',
             populate: {
@@ -13,7 +14,7 @@ export const getWishlist = async (req, res, next) => {
         });
 
         if (!wishlist) {
-            wishlist = await Wishlist.create({ user: req.user._id, items: [] });
+            wishlist = await Wishlist.create({ user: req.user.userId, items: [] });
         }
 
         res.status(200).json({
@@ -44,10 +45,10 @@ export const toggleWishlistItem = async (req, res, next) => {
             });
         }
 
-        let wishlist = await Wishlist.findOne({ user: req.user._id });
+        let wishlist = await Wishlist.findOne({ user: req.user.userId });
 
         if (!wishlist) {
-            wishlist = new Wishlist({ user: req.user._id, items: [] });
+            wishlist = new Wishlist({ user: req.user.userId, items: [] });
         }
 
         const exactIndex = wishlist.items.findIndex(
@@ -64,6 +65,8 @@ export const toggleWishlistItem = async (req, res, next) => {
             // Add to wishlist
             wishlist.items.push({ product: productId });
             action = 'added';
+            // Track wishlist add (fire-and-forget)
+            ProductAnalytics.recordWishlistAdd(productId).catch(() => {});
         }
 
         await wishlist.save();
@@ -81,7 +84,7 @@ export const toggleWishlistItem = async (req, res, next) => {
 
 export const clearWishlist = async (req, res, next) => {
     try {
-        const wishlist = await Wishlist.findOne({ user: req.user._id });
+        const wishlist = await Wishlist.findOne({ user: req.user.userId });
 
         if (wishlist) {
             wishlist.items = [];

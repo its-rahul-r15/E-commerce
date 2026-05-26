@@ -80,23 +80,35 @@ export const inspectQuery = (filters = {}) => {
     return { filters, mongoQuery: query };
 };
 
-export const createProduct = async (sellerId, productData) => {
-    // Get seller's shop
-    const shop = await Shop.findOne({ sellerId, status: 'approved' });
-
-    if (!shop) {
-        throw new Error('You must have an approved shop to add products');
+export const createProduct = async (user, productData) => {
+    let shopId;
+    if (user.role === 'admin') {
+        if (!productData.shopId) {
+            throw new Error('shopId is required for admin to create a product');
+        }
+        const shop = await Shop.findOne({ _id: productData.shopId, status: 'approved' });
+        if (!shop) {
+            throw new Error('Selected shop is not approved or does not exist');
+        }
+        shopId = shop._id;
+    } else {
+        // Get seller's shop
+        const shop = await Shop.findOne({ sellerId: user.userId, status: 'approved' });
+        if (!shop) {
+            throw new Error('You must have an approved shop to add products');
+        }
+        shopId = shop._id;
     }
 
     // Create product linked to shop
     const product = await Product.create({
-        shopId: shop._id,
         ...productData,
+        shopId,
     });
 
     // Invalidate product list caches
     await deleteCachePattern('products:*');
-    await deleteCachePattern(`shop:${shop._id}:products:*`);
+    await deleteCachePattern(`shop:${shopId}:products:*`);
 
     return product;
 };
@@ -375,7 +387,7 @@ export const getSellerProducts = async (sellerId, page = 1, limit = 20) => {
  * @param {Object} updates - Fields to update
  * @returns {Promise<Object>} Updated product
  */
-export const updateProduct = async (productId, sellerId, updates) => {
+export const updateProduct = async (productId, user, updates) => {
     const product = await Product.findById(productId).populate('shopId');
 
     if (!product) {
@@ -383,7 +395,7 @@ export const updateProduct = async (productId, sellerId, updates) => {
     }
 
     // Verify ownership
-    if (product.shopId.sellerId.toString() !== sellerId) {
+    if (user.role !== 'admin' && product.shopId.sellerId.toString() !== user.userId) {
         throw new Error('You can only update your own products');
     }
 
@@ -414,7 +426,7 @@ export const updateProduct = async (productId, sellerId, updates) => {
  * @param {string} sellerId - Seller user ID
  * @returns {Promise<boolean>} Success status
  */
-export const deleteProduct = async (productId, sellerId) => {
+export const deleteProduct = async (productId, user) => {
     const product = await Product.findById(productId).populate('shopId');
 
     if (!product) {
@@ -422,7 +434,7 @@ export const deleteProduct = async (productId, sellerId) => {
     }
 
     // Verify ownership
-    if (product.shopId.sellerId.toString() !== sellerId) {
+    if (user.role !== 'admin' && product.shopId.sellerId.toString() !== user.userId) {
         throw new Error('You can only delete your own products');
     }
 

@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminApi';
 import AdminLayout from '../../components/admin/AdminLayout';
+import Pagination from '../../components/admin/Pagination';
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [roleFilter, setRoleFilter] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [paginationMeta, setPaginationMeta] = useState(null);
     const [updating, setUpdating] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        fetchUsers();
-    }, [roleFilter]);
+        fetchUsers(currentPage);
+    }, [roleFilter, currentPage]);
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (page = 1) => {
         setLoading(true);
         try {
-            const data = await adminService.getUsers(1, roleFilter);
-            setUsers(data || []);
+            const res = await adminService.getUsers(page, roleFilter);
+            setUsers(res.data || []);
+            setPaginationMeta(res.pagination || null);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -97,7 +101,10 @@ const AdminUsers = () => {
                 ].map((filter) => (
                     <button
                         key={filter.value}
-                        onClick={() => setRoleFilter(filter.value)}
+                        onClick={() => {
+                            setRoleFilter(filter.value);
+                            setCurrentPage(1);
+                        }}
                         className={`px-6 py-2 rounded-none text-[10px] font-bold uppercase tracking-widest transition-all ${roleFilter === filter.value
                             ? 'bg-[var(--mehron)] text-white shadow-lg border border-[var(--gold)]'
                             : 'text-gray-500 hover:text-[var(--mehron)] hover:bg-[var(--cream)]'
@@ -201,6 +208,17 @@ const AdminUsers = () => {
                             </tbody>
                         </table>
                     </div>
+                    {paginationMeta && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={paginationMeta.totalPages}
+                            onPageChange={(page) => setCurrentPage(page)}
+                            hasNextPage={paginationMeta.hasNextPage}
+                            hasPrevPage={paginationMeta.hasPrevPage}
+                            totalItems={paginationMeta.totalItems}
+                            itemsPerPage={paginationMeta.itemsPerPage}
+                        />
+                    )}
                 </div>
             )}
         </AdminLayout>
