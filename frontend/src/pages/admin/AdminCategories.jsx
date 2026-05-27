@@ -12,6 +12,11 @@ const AdminCategories = () => {
     const [categoryName, setCategoryName] = useState('');
     const [subCategories, setSubCategories] = useState([]);
     const [newSubCategory, setNewSubCategory] = useState('');
+    
+    // Dynamic Filters State
+    const [filters, setFilters] = useState([]);
+    const [newFilterName, setNewFilterName] = useState('');
+    const [newFilterOptions, setNewFilterOptions] = useState('');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -43,6 +48,29 @@ const AdminCategories = () => {
         setSubCategories(subCategories.filter(s => s !== sub));
     };
 
+    const handleAddFilter = (e) => {
+        e.preventDefault();
+        const name = newFilterName.trim();
+        const options = newFilterOptions.split(',').map(o => o.trim()).filter(o => o !== '');
+        
+        if (name && options.length > 0) {
+            // Check if filter with same name already exists
+            if (filters.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+                alert('A filter with this name already exists.');
+                return;
+            }
+            setFilters([...filters, { name, options }]);
+            setNewFilterName('');
+            setNewFilterOptions('');
+        } else {
+            alert('Please provide a filter name and at least one option (comma-separated).');
+        }
+    };
+
+    const handleRemoveFilter = (indexToRemove) => {
+        setFilters(filters.filter((_, index) => index !== indexToRemove));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!categoryName.trim()) {
@@ -53,7 +81,8 @@ const AdminCategories = () => {
         try {
             const data = {
                 name: categoryName.trim(),
-                subCategories: subCategories
+                subCategories: subCategories,
+                filters: filters
             };
 
             if (editingId) {
@@ -76,7 +105,10 @@ const AdminCategories = () => {
         setEditingId(category._id);
         setCategoryName(category.name);
         setSubCategories(category.subCategories || []);
+        setFilters(category.filters || []);
         setNewSubCategory('');
+        setNewFilterName('');
+        setNewFilterOptions('');
         setShowForm(true);
     };
 
@@ -94,7 +126,10 @@ const AdminCategories = () => {
     const resetForm = () => {
         setCategoryName('');
         setSubCategories([]);
+        setFilters([]);
         setNewSubCategory('');
+        setNewFilterName('');
+        setNewFilterOptions('');
         setEditingId(null);
         setShowForm(false);
     };
@@ -201,6 +236,64 @@ const AdminCategories = () => {
                                     <p className="text-[10px] text-gray-400 italic">No subcategories added yet.</p>
                                 )}
                             </div>
+
+                            {/* Dynamic Filters Section */}
+                            <div>
+                                <label className="block text-[10px] font-bold text-[var(--mehron)] uppercase tracking-widest mb-2">
+                                    Dynamic Filters (e.g., Fabric, Material)
+                                </label>
+                                <div className="flex space-x-3 mb-4">
+                                    <input
+                                        type="text"
+                                        value={newFilterName}
+                                        onChange={(e) => setNewFilterName(e.target.value)}
+                                        className="w-1/3 px-4 py-2.5 bg-[#FAF9F6] border border-[var(--border-mehron)] rounded-none focus:ring-0 focus:border-[var(--gold)] outline-none font-bold text-[var(--mehron)] placeholder:text-gray-300 text-[11px]"
+                                        placeholder="Filter Name (e.g. Fabric)"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={newFilterOptions}
+                                        onChange={(e) => setNewFilterOptions(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleAddFilter(e);
+                                            }
+                                        }}
+                                        className="flex-1 px-4 py-2.5 bg-[#FAF9F6] border border-[var(--border-mehron)] rounded-none focus:ring-0 focus:border-[var(--gold)] outline-none font-bold text-[var(--mehron)] placeholder:text-gray-300 text-[11px]"
+                                        placeholder="Options (comma separated, e.g. Silk, Cotton, Crepe)"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAddFilter}
+                                        className="bg-[var(--charcoal)] text-[var(--gold)] px-6 py-2.5 border border-[var(--gold)] hover:bg-black font-bold uppercase tracking-widest text-[10px] transition-all"
+                                    >
+                                        Add Filter
+                                    </button>
+                                </div>
+
+                                {/* Render Dynamic Filters */}
+                                {filters.length > 0 ? (
+                                    <div className="flex flex-col gap-2 p-4 bg-[#FAF9F6] border border-[var(--border-mehron)]/30 min-h-[60px]">
+                                        {filters.map((filter, idx) => (
+                                            <div key={idx} className="flex justify-between items-center bg-white border border-[var(--gold)]/30 p-2">
+                                                <div>
+                                                    <span className="text-[11px] font-bold text-[var(--mehron)] uppercase tracking-wider">{filter.name}: </span>
+                                                    <span className="text-[10px] text-gray-500 ml-2">{filter.options.join(', ')}</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveFilter(idx)}
+                                                    className="text-gray-400 hover:text-red-500 font-bold transition-colors ml-4 px-2"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-[10px] text-gray-400 italic">No dynamic filters defined.</p>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit Actions */}
@@ -268,6 +361,20 @@ const AdminCategories = () => {
                                         <p className="text-[10px] text-gray-400 italic">No subcategories defined</p>
                                     )}
                                 </div>
+                                
+                                {category.filters && category.filters.length > 0 && (
+                                    <div className="space-y-2 mt-4 border-t border-gray-50 pt-4">
+                                        <h4 className="text-[9px] font-bold text-[var(--gold)] uppercase tracking-wider mb-2">
+                                            Dynamic Filters ({category.filters.length})
+                                        </h4>
+                                        <div className="flex flex-col gap-1 text-[9px] text-gray-600">
+                                            {category.filters.slice(0, 3).map((f, i) => (
+                                                <div key={i}><span className="font-bold">{f.name}:</span> {f.options.slice(0,2).join(', ')}{f.options.length > 2 ? '...' : ''}</div>
+                                            ))}
+                                            {category.filters.length > 3 && <div className="italic">+ {category.filters.length - 3} more</div>}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="p-6 pt-0 mt-6 border-t border-gray-50 flex space-x-3 bg-[#FAF9F6]/50">

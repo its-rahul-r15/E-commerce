@@ -48,6 +48,11 @@ const productSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    attributes: {
+        type: Map,
+        of: [String], // e.g., { "Fabric": ["Silk", "Cotton"] }
+        default: {}
+    },
     price: {
         type: Number,
         required: [true, 'Price is required'],

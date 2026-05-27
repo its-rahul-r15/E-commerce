@@ -20,7 +20,7 @@ export const getCategories = async (req, res, next) => {
  */
 export const createCategory = async (req, res, next) => {
     try {
-        const { name, subCategories } = req.body;
+        const { name, subCategories, filters } = req.body;
 
         if (!name || name.trim() === '') {
             return errorResponse(res, 'Category name is required', 400, 'INVALID_INPUT');
@@ -40,7 +40,8 @@ export const createCategory = async (req, res, next) => {
 
         const category = await Category.create({
             name: name.trim(),
-            subCategories: subCats
+            subCategories: subCats,
+            filters: Array.isArray(filters) ? filters : []
         });
 
         return successResponse(res, category, 'Category created successfully', 201);
@@ -55,7 +56,7 @@ export const createCategory = async (req, res, next) => {
  */
 export const updateCategory = async (req, res, next) => {
     try {
-        const { name, subCategories } = req.body;
+        const { name, subCategories, filters } = req.body;
         const categoryId = req.params.id;
 
         const category = await Category.findById(categoryId);
@@ -76,6 +77,10 @@ export const updateCategory = async (req, res, next) => {
 
         if (Array.isArray(subCategories)) {
             category.subCategories = subCategories.map(s => s.trim()).filter(s => s !== '');
+        }
+
+        if (Array.isArray(filters)) {
+            category.filters = filters;
         }
 
         await category.save();

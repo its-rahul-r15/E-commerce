@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { productService } from '../../services/api';
+import { productService, categoryService } from '../../services/api';
 import ProductCard from '../../components/customer/ProductCard';
 import FilterPanel from '../../components/common/FilterPanel';
 
@@ -9,6 +9,9 @@ const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     
+    const [allCategories, setAllCategories] = useState([]);
+    const [dynamicFilters, setDynamicFilters] = useState([]);
+
     const [filters, setFilters] = useState(() => {
         const urlCategories = searchParams.get('categories') || searchParams.get('category');
         const urlMinPrice = searchParams.get('minPrice');
@@ -17,6 +20,7 @@ const AllProducts = () => {
         const urlStyle = searchParams.get('style');
         const urlSizes = searchParams.get('sizes');
         const urlColors = searchParams.get('colors');
+        const urlAttributes = searchParams.get('attributes');
 
         const initialFilters = {};
         if (urlCategories) initialFilters.categories = urlCategories.split(',');
@@ -26,6 +30,11 @@ const AllProducts = () => {
         if (urlStyle) initialFilters.style = urlStyle;
         if (urlSizes) initialFilters.sizes = urlSizes.split(',');
         if (urlColors) initialFilters.colors = urlColors.split(',');
+        if (urlAttributes) {
+            try {
+                initialFilters.attributes = JSON.parse(decodeURIComponent(urlAttributes));
+            } catch(e) {}
+        }
         
         return initialFilters;
     });
@@ -33,6 +42,50 @@ const AllProducts = () => {
     const [page, setPage] = useState(1);
     const [debugData, setDebugData] = useState(null);
     const [queryDebug, setQueryDebug] = useState(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await categoryService.getCategories();
+                if (Array.isArray(data)) {
+                    setAllCategories(data);
+                }
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        let filtersToUse = [];
+        const selectedCats = filters.categories || [];
+        if (selectedCats.length === 1) {
+            const cat = allCategories.find(c => c.name.toLowerCase() === selectedCats[0].toLowerCase());
+            if (cat && cat.filters) {
+                filtersToUse = cat.filters;
+            }
+        } else if (selectedCats.length > 1) {
+            const filterMap = new Map();
+            selectedCats.forEach(catName => {
+                const cat = allCategories.find(c => c.name.toLowerCase() === catName.toLowerCase());
+                if (cat && cat.filters) {
+                    cat.filters.forEach(f => {
+                        if (!filterMap.has(f.name)) {
+                            filterMap.set(f.name, new Set(f.options));
+                        } else {
+                            f.options.forEach(opt => filterMap.get(f.name).add(opt));
+                        }
+                    });
+                }
+            });
+            filtersToUse = Array.from(filterMap.entries()).map(([name, optionsSet]) => ({
+                name,
+                options: Array.from(optionsSet)
+            }));
+        }
+        setDynamicFilters(filtersToUse);
+    }, [filters.categories, allCategories]);
 
     const handleDebug = async () => {
         try {
@@ -62,6 +115,7 @@ const AllProducts = () => {
         const urlStyle = searchParams.get('style');
         const urlSizes = searchParams.get('sizes');
         const urlColors = searchParams.get('colors');
+        const urlAttributes = searchParams.get('attributes');
 
         const nextFilters = {};
         if (urlCategories) nextFilters.categories = urlCategories.split(',');
@@ -71,6 +125,11 @@ const AllProducts = () => {
         if (urlStyle) nextFilters.style = urlStyle;
         if (urlSizes) nextFilters.sizes = urlSizes.split(',');
         if (urlColors) nextFilters.colors = urlColors.split(',');
+        if (urlAttributes) {
+            try {
+                nextFilters.attributes = JSON.parse(decodeURIComponent(urlAttributes));
+            } catch(e) {}
+        }
 
         setFilters(prev => {
             // Only update state if JSON representation changed, to avoid infinite loops
@@ -124,6 +183,9 @@ const AllProducts = () => {
         if (newFilters.style) nextParams.set('style', newFilters.style);
         if (newFilters.sizes?.length) nextParams.set('sizes', newFilters.sizes.join(','));
         if (newFilters.colors?.length) nextParams.set('colors', newFilters.colors.join(','));
+        if (newFilters.attributes && Object.keys(newFilters.attributes).length > 0) {
+            nextParams.set('attributes', encodeURIComponent(JSON.stringify(newFilters.attributes)));
+        }
 
         setSearchParams(nextParams);
         setPage(1); // Reset to first page
@@ -177,6 +239,8 @@ const AllProducts = () => {
                             onFilterChange={handleFilterChange}
                             onClearFilters={() => setFilters({})}
                             initialFilters={filters}
+                            dynamicFilters={dynamicFilters}
+                            allCategories={allCategories}
                         />
                     </div>
 

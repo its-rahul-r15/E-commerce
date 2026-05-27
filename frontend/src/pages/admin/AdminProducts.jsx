@@ -44,6 +44,7 @@ const AdminProducts = () => {
         brand: '',
         sizes: [],
         colors: [],
+        attributes: {},
         shopId: '',
     };
 
@@ -199,6 +200,7 @@ const AdminProducts = () => {
                 brand: p.brand || '',
                 sizes: p.sizes || [],
                 colors: p.colors || [],
+                attributes: p.attributes || {},
                 shopId: p.shopId?._id || p.shopId || '',
             });
             setImagePreviews(p.images || []);
@@ -232,6 +234,23 @@ const AdminProducts = () => {
                 ? prev.colors.filter(c => c !== colorName)
                 : [...prev.colors, colorName],
         }));
+    };
+
+    const handleAttributeChange = (filterName, optionValue) => {
+        setFormData(prev => {
+            const currentOptions = prev.attributes[filterName] || [];
+            const updatedOptions = currentOptions.includes(optionValue)
+                ? currentOptions.filter(opt => opt !== optionValue)
+                : [...currentOptions, optionValue];
+            
+            return {
+                ...prev,
+                attributes: {
+                    ...prev.attributes,
+                    [filterName]: updatedOptions
+                }
+            };
+        });
     };
 
     const handleChange = (e) => {
@@ -318,6 +337,10 @@ const AdminProducts = () => {
 
             formData.sizes.forEach(size => data.append('sizes', size));
             formData.colors.forEach(color => data.append('colors', color));
+
+            if (formData.attributes && Object.keys(formData.attributes).length > 0) {
+                data.append('attributes', JSON.stringify(formData.attributes));
+            }
 
             if (tryOnImagePreview?.file) {
                 data.append('tryOnImage', tryOnImagePreview.file);
@@ -529,6 +552,17 @@ const AdminProducts = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            {filteredProducts.length > 10 && (
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={Math.ceil(filteredProducts.length / 10)}
+                                    onPageChange={setCurrentPage}
+                                    hasNextPage={currentPage < Math.ceil(filteredProducts.length / 10)}
+                                    hasPrevPage={currentPage > 1}
+                                    totalItems={filteredProducts.length}
+                                    itemsPerPage={10}
+                                />
+                            )}
                         </div>
                     )}
                 </>
@@ -622,7 +656,7 @@ const AdminProducts = () => {
                                             name="category"
                                             required
                                             value={formData.category}
-                                            onChange={(e) => setFormData({ ...formData, category: e.target.value, subCategory: '' })}
+                                            onChange={(e) => setFormData({ ...formData, category: e.target.value, subCategory: '', attributes: {} })}
                                             className="w-full px-4 py-3 bg-[var(--cream)]/30 border border-gray-300 rounded-none text-gray-900 focus:ring-1 focus:ring-[var(--gold)] focus:border-[var(--gold)] outline-none bg-white text-sm"
                                         >
                                             <option value="">Select Category</option>
@@ -754,6 +788,41 @@ const AdminProducts = () => {
                                         ))}
                                     </div>
                                 </div>
+                                
+                                {selectedCategoryData && selectedCategoryData.filters && selectedCategoryData.filters.length > 0 && (
+                                    <div className="pt-6 mt-6 border-t border-gray-100">
+                                        <h3 className="block text-sm font-semibold text-gray-700 mb-4 flex items-center">
+                                            <span className="bg-[var(--mehron)] text-[var(--gold)] w-6 h-6 inline-flex items-center justify-center rounded-none mr-2 text-xs font-bold">✦</span>
+                                            Dynamic Category Attributes
+                                        </h3>
+                                        <div className="space-y-5">
+                                            {selectedCategoryData.filters.map(filter => (
+                                                <div key={filter.name}>
+                                                    <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2 block">{filter.name}</label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {filter.options.map(option => {
+                                                            const isSelected = (formData.attributes[filter.name] || []).includes(option);
+                                                            return (
+                                                                <button
+                                                                    key={option}
+                                                                    type="button"
+                                                                    onClick={() => handleAttributeChange(filter.name, option)}
+                                                                    className={`px-4 py-2 border rounded-none text-xs font-bold transition-all ${
+                                                                        isSelected
+                                                                            ? 'bg-[var(--mehron)] border-[var(--gold)] text-white shadow-md'
+                                                                            : 'bg-white border-gray-200 text-gray-600 hover:border-[var(--gold)]'
+                                                                    }`}
+                                                                >
+                                                                    {option}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

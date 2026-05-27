@@ -10,6 +10,10 @@ const categorySchema = new mongoose.Schema({
     subCategories: [{
         type: String,
         trim: true
+    }],
+    filters: [{
+        name: { type: String, trim: true, required: true },
+        options: [{ type: String, trim: true }]
     }]
 }, { timestamps: true });
 

@@ -130,6 +130,7 @@ export const getProducts = async (filters = {}) => {
         shopId,
         minPrice,
         maxPrice,
+        attributes,
         search,
         page = 1,
         limit = 20,
@@ -219,10 +220,30 @@ export const getProducts = async (filters = {}) => {
         const colorList = Array.isArray(colors) ? colors : colors.split(',').filter(c => c.trim());
         if (colorList.length > 0) query.colors = { $in: colorList };
     }
+    
+    // Dynamic attributes filter
+    if (attributes) {
+        let parsedAttributes = attributes;
+        if (typeof attributes === 'string') {
+            try {
+                parsedAttributes = JSON.parse(attributes);
+            } catch (e) {
+                parsedAttributes = {};
+            }
+        }
+        for (const [key, values] of Object.entries(parsedAttributes)) {
+            if (Array.isArray(values) && values.length > 0) {
+                query[`attributes.${key}`] = { $in: values };
+            } else if (typeof values === 'string') {
+                query[`attributes.${key}`] = values;
+            }
+        }
+    }
+
     if (shopId) query.shopId = shopId;
 
     // Try cache (only for non-search queries)
-    const cacheKey = `products:${JSON.stringify({ categories, subCategory, brand, sizes, colors, style, shopId, page, limit, sort, minPrice, maxPrice })}`;
+    const cacheKey = `products:${JSON.stringify({ categories, subCategory, brand, sizes, colors, style, shopId, page, limit, sort, minPrice, maxPrice, attributes })}`;
 
     if (!search) {
         const cached = await getCache(cacheKey);
@@ -261,8 +282,10 @@ export const getProducts = async (filters = {}) => {
 };
 
 /**
- * Search products by keyword
- * @param {string} keyword - Search keyword
+ * Search products by keyword using advanced multi-word regex
+ * Each word is matched independently across all fields (AND logic)
+ * Special regex characters are escaped for safety
+ * @param {string} keyword - Search keyword (can be multi-word)
  * @param {number} page - Page number
  * @param {number} limit - Items per page
  * @returns {Promise<Object>} Search results
@@ -270,16 +293,40 @@ export const getProducts = async (filters = {}) => {
 export const searchProducts = async (keyword, page = 1, limit = 20) => {
     const skip = (page - 1) * limit;
 
-    // Build query with case-insensitive regex search
+    // Escape special regex characters to prevent injection
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Split into words, filter short/empty ones
+    const words = keyword.trim().split(/\s+/).filter(w => w.length > 0);
+
+    // Build AND conditions: every word must match at least one field
+    const wordConditions = words.map(word => {
+        const safeWord = escapeRegex(word);
+        const regex = { $regex: safeWord, $options: 'i' };
+        return {
+            $or: [
+                { name: regex },
+                { description: regex },
+                { category: regex },
+                { subCategory: regex },
+                { brand: regex },
+                { style: regex },
+                { tags: { $in: [new RegExp(safeWord, 'i')] } },
+            ],
+        };
+    });
+
     const query = {
         isAvailable: true,
         isBanned: false,
-        $or: [
-            { name: { $regex: keyword, $options: 'i' } },
-            { description: { $regex: keyword, $options: 'i' } },
-            { tags: { $in: [new RegExp(keyword, 'i')] } },
-        ],
     };
+
+    // If single word, use $or directly; if multi-word, use $and for all words
+    if (wordConditions.length === 1) {
+        Object.assign(query, wordConditions[0]);
+    } else if (wordConditions.length > 1) {
+        query.$and = wordConditions;
+    }
 
     const [products, total] = await Promise.all([
         Product.find(query)
@@ -287,7 +334,8 @@ export const searchProducts = async (keyword, page = 1, limit = 20) => {
             .sort('-createdAt')
             .skip(skip)
             .limit(limit)
-            .select('-__v'),
+            .select('-__v')
+            .lean(),
         Product.countDocuments(query),
     ]);
 

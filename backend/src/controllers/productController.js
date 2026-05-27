@@ -8,6 +8,12 @@ export const createProduct = async (req, res, next) => {
         const user = req.user;
         const productData = req.body;
 
+        if (productData.attributes && typeof productData.attributes === 'string') {
+            try {
+                productData.attributes = JSON.parse(productData.attributes);
+            } catch(e) {}
+        }
+
         // Handle product gallery images  (field: 'images')
         if (req.files?.images && req.files.images.length > 0) {
             const imageUrls = await uploadMultipleImages(req.files.images, 'products');
@@ -241,6 +247,12 @@ export const updateProduct = async (req, res, next) => {
         const user = req.user;
         const productId = req.params.id;
         const updates = req.body;
+
+        if (updates.attributes && typeof updates.attributes === 'string') {
+            try {
+                updates.attributes = JSON.parse(updates.attributes);
+            } catch(e) {}
+        }
 
         // Handle new product gallery images (field: 'images')
         const imageFiles = req.files?.images || (Array.isArray(req.files) ? req.files : []);

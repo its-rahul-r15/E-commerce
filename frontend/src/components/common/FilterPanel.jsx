@@ -39,7 +39,7 @@ const COLORS = [
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) => {
+const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {}, dynamicFilters = [], allCategories = [] }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [openSection, setOpenSection] = useState('PRODUCT');
     const [filters, setFilters] = useState({
@@ -50,6 +50,7 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
         style: initialFilters.style || '',
         sizes: initialFilters.sizes || [],
         colors: initialFilters.colors || [],
+        attributes: initialFilters.attributes || {},
     });
 
     // Sync state if initialFilters change from parent
@@ -61,6 +62,7 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
                 categories: initialFilters.categories || prev.categories,
                 sizes: initialFilters.sizes || prev.sizes,
                 colors: initialFilters.colors || prev.colors,
+                attributes: initialFilters.attributes || prev.attributes,
             }));
         }
     }, [initialFilters]);
@@ -91,16 +93,29 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
         applyFilter({ ...filters, colors: next });
     };
 
+    const toggleAttribute = (filterName, optionValue) => {
+        const currentOptions = filters.attributes[filterName] || [];
+        const nextOptions = currentOptions.includes(optionValue)
+            ? currentOptions.filter(o => o !== optionValue)
+            : [...currentOptions, optionValue];
+        
+        const nextAttributes = { ...filters.attributes, [filterName]: nextOptions };
+        if (nextOptions.length === 0) delete nextAttributes[filterName];
+
+        applyFilter({ ...filters, attributes: nextAttributes });
+    };
+
     const handleClear = () => {
-        const empty = { categories: [], minPrice: '', maxPrice: '', sort: '', style: '', sizes: [], colors: [] };
+        const empty = { categories: [], minPrice: '', maxPrice: '', sort: '', style: '', sizes: [], colors: [], attributes: {} };
         setFilters(empty);
         onClearFilters();
     };
 
+    const attributesCount = Object.values(filters.attributes || {}).reduce((sum, arr) => sum + arr.length, 0);
     const activeCount =
         filters.categories.length + filters.sizes.length + filters.colors.length +
         (filters.minPrice ? 1 : 0) + (filters.maxPrice ? 1 : 0) +
-        (filters.sort ? 1 : 0) + (filters.style ? 1 : 0);
+        (filters.sort ? 1 : 0) + (filters.style ? 1 : 0) + attributesCount;
 
     return (
         <div>
@@ -145,17 +160,19 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
                         </button>
                         {openSection === 'PRODUCT' && (
                             <div className="pb-4 space-y-2 max-h-60 overflow-y-auto no-scrollbar pr-1 animate-fade-in">
-                                {FASHION_CATEGORIES.map(cat => (
-                                    <label key={cat.value} className="flex items-center gap-3 cursor-pointer group">
+                                {allCategories.length > 0 ? allCategories.map(cat => (
+                                    <label key={cat._id || cat.name} className="flex items-center gap-3 cursor-pointer group">
                                         <input
                                             type="checkbox"
-                                            checked={filters.categories.includes(cat.value)}
-                                            onChange={() => toggleCategory(cat.value)}
+                                            checked={filters.categories.includes(cat.name)}
+                                            onChange={() => toggleCategory(cat.name)}
                                             className="w-4 h-4 accent-gray-900 rounded border-gray-300 cursor-pointer"
                                         />
-                                        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">{cat.label.replace(/[^a-zA-Z /]/g, '').trim()}</span>
+                                        <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">{cat.name}</span>
                                     </label>
-                                ))}
+                                )) : (
+                                    <p className="text-[10px] text-gray-400">No categories found.</p>
+                                )}
                             </div>
                         )}
                     </div>
@@ -305,6 +322,36 @@ const FilterPanel = ({ onFilterChange, onClearFilters, initialFilters = {} }) =>
                             </div>
                         )}
                     </div>
+
+                    {/* DYNAMIC FILTERS */}
+                    {dynamicFilters.map(filter => (
+                        <div key={filter.name} className="border-b border-gray-200">
+                            <button 
+                                className="w-full py-4 flex justify-between items-center text-left focus:outline-none group"
+                                onClick={() => setOpenSection(openSection === filter.name ? '' : filter.name)}
+                            >
+                                <span className="text-xs font-semibold text-gray-900 uppercase tracking-widest">{filter.name}</span>
+                                <span className="text-lg font-light text-gray-400 group-hover:text-black">
+                                    {openSection === filter.name ? '−' : '+'}
+                                </span>
+                            </button>
+                            {openSection === filter.name && (
+                                <div className="pb-4 space-y-2 animate-fade-in max-h-60 overflow-y-auto no-scrollbar">
+                                    {filter.options.map(option => (
+                                        <label key={option} className="flex items-center gap-3 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={(filters.attributes[filter.name] || []).includes(option)}
+                                                onChange={() => toggleAttribute(filter.name, option)}
+                                                className="w-4 h-4 accent-gray-900 rounded border-gray-300 cursor-pointer"
+                                            />
+                                            <span className="text-xs text-gray-600 group-hover:text-gray-900 transition-colors uppercase font-medium">{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
                 </div>
 

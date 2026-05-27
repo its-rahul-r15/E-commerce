@@ -1,17 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { productService, cartService, shoppableVideoService } from '../../services/api';
+import { productService, cartService, shoppableVideoService, categoryService } from '../../services/api';
 import { ChevronRightIcon, XMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 import ProductCard from '../../components/customer/ProductCard';
 
-const POPULAR_CATEGORIES = [
-    { title: 'SUITS & SETS', defaultImage: 'https://images.unsplash.com/photo-1610189013231-01741164ed2e?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Salwar%20Suit', categoryName: 'Salwar Suit' },
-    { title: 'LEHENGAS', defaultImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Lehenga', categoryName: 'Lehenga' },
-    { title: 'KURTAS', defaultImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Kurta', categoryName: 'Kurta' },
-    { title: 'SAREES', defaultImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Saree', categoryName: 'Saree' },
-    { title: 'WESTERN WEAR', defaultImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Western%20Wear', categoryName: 'Western Wear' },
-    { title: 'SHERWANIS', defaultImage: 'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?auto=format&fit=crop&q=80&w=500', path: '/products?categories=Sherwani', categoryName: 'Sherwani' }
-];
+
 
 import banner1Desktop from '../../assets/desktop-libas_a86e3f1e-d958-4188-b211-63bb00f5ece1.webp';
 import banner1Mobile from '../../assets/mobile-libas.webp';
@@ -48,6 +41,8 @@ const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [randomProducts, setRandomProducts] = useState([]);
     const [sareeProducts, setSareeProducts] = useState([]);
+    const [weddingProducts, setWeddingProducts] = useState([]);
+    const [dynamicCategories, setDynamicCategories] = useState([]);
     const [categoryImages, setCategoryImages] = useState({});
     const [shoppableVideos, setShoppableVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -98,12 +93,14 @@ const Home = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [trendingData, featuredData, randomData, videosData, sareeData] = await Promise.all([
+            const [trendingData, featuredData, randomData, videosData, sareeData, categoriesData, weddingData] = await Promise.all([
                 productService.getProducts({ limit: 10 }),
                 productService.getFeaturedProducts(10),
                 productService.getRandomProducts(10),
                 shoppableVideoService.getVideos().catch(() => []), // Catch error specifically for videos and return empty array
-                productService.getProducts({ categories: ['Saree'], limit: 2 }) // Fetch 4 saree products
+                productService.getProducts({ categories: ['Saree'], limit: 2 }), // Fetch 2 saree products
+                categoryService.getCategories().catch(() => []), // Fetch dynamic categories
+                productService.getProducts({ style: 'Bridal', limit: 4 }).catch(() => ({ data: [] }))
             ]);
             setProducts(trendingData?.data || []);
             setFeaturedProducts(featuredData || []);
@@ -111,8 +108,18 @@ const Home = () => {
             setShoppableVideos(videosData || []);
             setSareeProducts(sareeData?.data || []);
 
-            // Fetch first product image for popular categories
-            const cats = POPULAR_CATEGORIES.map(c => c.categoryName);
+            let wedData = weddingData?.data || [];
+            if (wedData.length < 4) {
+                const fallback = (trendingData?.data || []).filter(p => !wedData.find(w => w._id === p._id)).slice(0, 4 - wedData.length);
+                wedData = [...wedData, ...fallback];
+            }
+            setWeddingProducts(wedData);
+
+            const fetchedCats = Array.isArray(categoriesData) ? categoriesData : [];
+            setDynamicCategories(fetchedCats);
+
+            // Fetch first product image for dynamic categories
+            const cats = fetchedCats.map(c => c.name);
             const catImgMap = {};
             await Promise.all(
                 cats.map(async (c) => {
@@ -405,10 +412,10 @@ const Home = () => {
             <section className="max-w-[1400px] mx-auto px-4 py-8 mt-8">
                 <h2 className="text-2xl md:text-3xl font-serif font-extrabold text-center mb-8 text-black uppercase tracking-widest">SHOP BY CATEGORIES</h2>
                 <div className="flex flex-wrap justify-center gap-3 md:gap-5 px-0 md:px-4">
-                    {POPULAR_CATEGORIES.map((item, itemIndex) => (
+                    {dynamicCategories.map((item, itemIndex) => (
                         <Link
-                            key={itemIndex}
-                            to={item.path}
+                            key={item._id || itemIndex}
+                            to={`/products?category=${encodeURIComponent(item.name)}`}
                             className="flex flex-col items-center group cursor-pointer w-[46%] sm:w-[30%] md:w-[28%] lg:w-[15%] max-w-[220px]"
                         >
                             <div
@@ -416,13 +423,13 @@ const Home = () => {
                                 style={{ background: 'linear-gradient(110deg, #bc2c3d 50%, #006093 50%)' }}
                             >
                                 <img
-                                    src={categoryImages[item.categoryName] || item.defaultImage}
-                                    alt={item.title}
+                                    src={categoryImages[item.name] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=500'}
+                                    alt={item.name}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-10 opacity-95"
                                 />
                                 <div className="absolute bottom-0 inset-x-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 flex items-end justify-center pb-6 md:pb-8 transition-opacity duration-300">
                                     <h3 className="text-center text-white text-[11px] md:text-sm font-bold font-sans tracking-widest uppercase px-2 z-30 drop-shadow-md">
-                                        {item.title}
+                                        {item.name}
                                     </h3>
                                 </div>
                             </div>
@@ -433,6 +440,69 @@ const Home = () => {
 
             {/* Meander Divider */}
             <div className="meander-border opacity-10 my-6"></div>
+            
+            {/* Premium Wedding Edition Section */}
+            {weddingProducts.length > 0 && (
+                <section className="bg-[#fcfaf8] py-16 md:py-24 relative overflow-hidden mb-8 border-y border-[var(--gold)]/20">
+                    {/* Subtle gold gradients/decorations */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--gold)]/10 blur-[100px] rounded-full pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--gold)]/5 blur-[100px] rounded-full pointer-events-none"></div>
+                    
+                    <div className="max-w-[1400px] mx-auto px-4 relative z-10">
+                        <div className="text-center mb-16">
+                            <p className="text-[var(--gold)] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4">Exclusive Collection</p>
+                            <h2 className="text-3xl md:text-5xl font-serif font-extrabold text-gray-900 uppercase tracking-widest">The Wedding Edition</h2>
+                            <div className="w-24 h-[2px] bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent mx-auto mt-6"></div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                            {weddingProducts.map((product, idx) => (
+                                <Link
+                                    key={product._id}
+                                    to={`/product/${product._id}`}
+                                    className="group flex flex-col items-center hover:no-underline"
+                                >
+                                    <div className="w-full aspect-[3/4] overflow-hidden relative border border-[var(--gold)]/20 p-2 transition-all duration-500 hover:border-[var(--gold)] bg-white shadow-sm hover:shadow-xl">
+                                        <div className="w-full h-full relative overflow-hidden">
+                                            <img
+                                                src={product.images?.[0] || '/placeholder-product.png'}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-95 group-hover:opacity-100"
+                                            />
+                                            {/* Subtler overlay for light theme */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                        </div>
+                                        
+                                        {/* Overlay Badge for premium feel */}
+                                        <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+                                            {idx === 0 && <span className="bg-[var(--gold)] text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1 shadow-md">Featured</span>}
+                                            {product.discountedPrice && product.discountedPrice < product.price && (
+                                                <span className="bg-white/90 backdrop-blur-md border border-[var(--gold)]/30 text-[var(--gold)] text-[9px] font-bold uppercase tracking-widest px-3 py-1 shadow-md">Limited</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 text-center w-full px-4">
+                                        <h3 className="text-sm md:text-base font-serif font-medium text-gray-800 tracking-widest line-clamp-1 mb-2 group-hover:text-[var(--gold)] transition-colors">{product.name}</h3>
+                                        <div className="flex justify-center items-center space-x-3">
+                                            <p className="text-sm md:text-base font-bold text-[var(--gold)]">₹{(product.discountedPrice || product.price).toLocaleString()}</p>
+                                            {product.discountedPrice && product.discountedPrice < product.price && (
+                                                <p className="text-xs md:text-sm text-gray-400 line-through">₹{product.price.toLocaleString()}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-16 flex justify-center">
+                            <Link to="/products?style=Bridal" className="inline-block border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)] hover:text-white hover:no-underline px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300">
+                                Explore The Collection
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+            )}
 
 
             {/* Featured Collection styled as Bestselling Styles */}

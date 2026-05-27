@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
-import { cartService, couponService } from '../../services/api';
+import { cartService, couponService, productService } from '../../services/api';
 import {
     Bars3Icon,
     MapPinIcon,
@@ -25,6 +25,15 @@ const Navbar = () => {
     const navigate = useNavigate();
     const routeLocation = useLocation();
     const isHome = routeLocation.pathname === '/';
+
+    // ── Live Search State ──
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const searchRef = useRef(null);
+    const mobileSearchRef = useRef(null);
+    const debounceTimer = useRef(null);
 
     useEffect(() => {
         getUserLocation();
@@ -86,11 +95,290 @@ const Navbar = () => {
         }
     };
 
+    // ── Debounced Live Search ──
+    const performLiveSearch = useCallback(async (query) => {
+        if (!query || query.trim().length < 2) {
+            setSearchResults([]);
+            setShowDropdown(false);
+            setIsSearching(false);
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            const data = await productService.searchProducts(query.trim(), 1, 6);
+            const results = Array.isArray(data) ? data : (data.products || data || []);
+            setSearchResults(results.slice(0, 6));
+            setShowDropdown(true);
+            setActiveIndex(-1);
+        } catch (error) {
+            console.error('Live search error:', error);
+            setSearchResults([]);
+        } finally {
+            setIsSearching(false);
+        }
+    }, []);
+
+    const handleSearchInput = (e) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+
+        // Clear previous debounce timer
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        // Debounce: wait 300ms after user stops typing
+        debounceTimer.current = setTimeout(() => {
+            performLiveSearch(value);
+        }, 300);
+    };
+
+    // ── Highlight matched text with regex ──
+    const highlightMatch = (text, query) => {
+        if (!text || !query || query.trim().length < 2) return text;
+        try {
+            // Escape regex special chars
+            const words = query.trim().split(/\s+/).filter(w => w.length > 0);
+            const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
+            const parts = text.split(pattern);
+            return parts.map((part, i) =>
+                pattern.test(part)
+                    ? <mark key={i} style={{ background: 'linear-gradient(120deg, #ffd54f 0%, #ffb300 100%)', color: '#1a1a1a', padding: '0 2px', borderRadius: '2px', fontWeight: 600 }}>{part}</mark>
+                    : part
+            );
+        } catch {
+            return text;
+        }
+    };
+
+    // ── Keyboard Navigation ──
+    const handleSearchKeyDown = (e) => {
+        if (!showDropdown || searchResults.length === 0) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (searchQuery.trim()) {
+                    setShowDropdown(false);
+                    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                }
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setActiveIndex(prev => (prev < searchResults.length) ? prev + 1 : 0);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setActiveIndex(prev => (prev > 0) ? prev - 1 : searchResults.length);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (activeIndex >= 0 && activeIndex < searchResults.length) {
+                    const selected = searchResults[activeIndex];
+                    setShowDropdown(false);
+                    setSearchQuery('');
+                    navigate(`/product/${selected._id}`);
+                } else {
+                    // "View all" option or default enter
+                    setShowDropdown(false);
+                    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                setActiveIndex(-1);
+                break;
+            default:
+                break;
+        }
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            navigate(`/search?q=${searchQuery}`);
+            setShowDropdown(false);
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
         }
+    };
+
+    // ── Click Outside to Close ──
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (
+                searchRef.current && !searchRef.current.contains(e.target) &&
+                mobileSearchRef.current && !mobileSearchRef.current.contains(e.target)
+            ) {
+                setShowDropdown(false);
+            }
+            if (searchRef.current && !searchRef.current.contains(e.target) && !mobileSearchRef.current) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // ── Close dropdown on route change ──
+    useEffect(() => {
+        setShowDropdown(false);
+        setSearchQuery('');
+        setIsMobileMenuOpen(false);
+    }, [routeLocation.pathname]);
+
+    // ── Cleanup debounce on unmount ──
+    useEffect(() => {
+        return () => {
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        };
+    }, []);
+
+    // ── Search Dropdown Component ──
+    const SearchDropdown = ({ isMobile = false }) => {
+        if (!showDropdown) return null;
+
+        return (
+            <div
+                style={{
+                    position: 'absolute',
+                    top: isMobile ? '44px' : '32px',
+                    left: 0,
+                    right: 0,
+                    background: '#fff',
+                    borderRadius: '0 0 12px 12px',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                    borderTop: 'none',
+                    zIndex: 999,
+                    overflow: 'hidden',
+                    maxHeight: '420px',
+                    overflowY: 'auto',
+                    animation: 'searchDropdownSlide 0.2s ease-out',
+                }}
+            >
+                {isSearching ? (
+                    <div style={{ padding: '20px', textAlign: 'center' }}>
+                        <div style={{
+                            display: 'inline-block', width: '20px', height: '20px',
+                            border: '2px solid #e0e0e0', borderTopColor: 'var(--athenic-gold, #c9a96e)',
+                            borderRadius: '50%', animation: 'spin 0.6s linear infinite',
+                        }} />
+                        <p style={{ fontSize: '12px', color: '#999', marginTop: '8px', fontFamily: 'Inter, sans-serif' }}>Searching...</p>
+                    </div>
+                ) : searchResults.length === 0 && searchQuery.trim().length >= 2 ? (
+                    <div style={{ padding: '24px 16px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '28px', marginBottom: '8px' }}>🔍</div>
+                        <p style={{ fontSize: '13px', color: '#666', fontFamily: 'Inter, sans-serif' }}>
+                            No products found for "<strong>{searchQuery}</strong>"
+                        </p>
+                        <p style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>Try different keywords</p>
+                    </div>
+                ) : (
+                    <>
+                        {searchResults.map((product, index) => (
+                            <div
+                                key={product._id}
+                                onClick={() => {
+                                    setShowDropdown(false);
+                                    setSearchQuery('');
+                                    navigate(`/product/${product._id}`);
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '10px 14px',
+                                    cursor: 'pointer',
+                                    background: activeIndex === index ? '#f8f4ee' : 'transparent',
+                                    borderBottom: '1px solid rgba(0,0,0,0.04)',
+                                    transition: 'background 0.15s ease',
+                                }}
+                                onMouseEnter={() => setActiveIndex(index)}
+                            >
+                                {/* Product Image */}
+                                <div style={{
+                                    width: '44px', height: '44px', borderRadius: '8px',
+                                    overflow: 'hidden', flexShrink: 0,
+                                    background: '#f5f5f5', border: '1px solid rgba(0,0,0,0.06)',
+                                }}>
+                                    <img
+                                        src={product.images?.[0] || '/placeholder.png'}
+                                        alt={product.name}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        loading="lazy"
+                                    />
+                                </div>
+
+                                {/* Product Info */}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{
+                                        fontSize: '13px', fontWeight: 500, color: '#1a1a1a',
+                                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }}>
+                                        {highlightMatch(product.name, searchQuery)}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '11px', color: '#888', marginTop: '2px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }}>
+                                        {product.category}
+                                        {product.brand ? ` · ${product.brand}` : ''}
+                                        {product.shopId?.shopName ? ` · ${product.shopId.shopName}` : ''}
+                                    </div>
+                                </div>
+
+                                {/* Price */}
+                                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                    <div style={{
+                                        fontSize: '13px', fontWeight: 700, color: '#1a1a1a',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }}>
+                                        ₹{product.discountedPrice || product.price}
+                                    </div>
+                                    {product.discountedPrice && product.discountedPrice < product.price && (
+                                        <div style={{
+                                            fontSize: '10px', color: '#aaa',
+                                            textDecoration: 'line-through',
+                                        }}>
+                                            ₹{product.price}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* View All Results */}
+                        {searchResults.length > 0 && (
+                            <div
+                                onClick={() => {
+                                    setShowDropdown(false);
+                                    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    gap: '6px', padding: '12px',
+                                    cursor: 'pointer',
+                                    background: activeIndex === searchResults.length ? '#f8f4ee' : '#fafafa',
+                                    fontFamily: 'Inter, sans-serif',
+                                    fontSize: '12px', fontWeight: 600,
+                                    color: 'var(--athenic-gold, #c9a96e)',
+                                    borderTop: '1px solid rgba(0,0,0,0.06)',
+                                    transition: 'background 0.15s ease',
+                                }}
+                                onMouseEnter={() => setActiveIndex(searchResults.length)}
+                            >
+                                <MagnifyingGlassIcon style={{ width: '14px', height: '14px' }} />
+                                View all results for "{searchQuery}"
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -223,17 +511,26 @@ const Navbar = () => {
                         <div className="flex items-center justify-end w-1/4 lg:flex-1 lg:space-x-4">
                             {/* Desktop-only Actions */}
                             <div className="hidden lg:flex items-center space-x-4 sm:space-x-6">
-                                {/* Search */}
-                                <form onSubmit={handleSearch} className="hidden md:block relative">
-                                    <input
-                                        type="text"
-                                        placeholder="Search for products..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className={`w-48 lg:w-64 bg-transparent border-b py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] transition-all ${isHome ? 'border-white/50 text-white placeholder:text-white/60 group-hover:text-[var(--athenic-blue)] group-hover:border-[var(--athenic-blue)] group-hover:border-opacity-20 group-hover:placeholder:text-[var(--athenic-blue)] group-hover:placeholder:opacity-50' : 'border-[var(--athenic-blue)] border-opacity-20 text-[var(--athenic-blue)] placeholder:italic placeholder:opacity-50'}`}
-                                    />
-                                    <MagnifyingGlassIcon className={`w-4 h-4 absolute right-2 top-1.5 ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} opacity-50`} />
-                                </form>
+                                {/* Search with Live Dropdown */}
+                                <div ref={searchRef} className="hidden md:block relative">
+                                    <form onSubmit={handleSearch} className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search for products..."
+                                            value={searchQuery}
+                                            onChange={handleSearchInput}
+                                            onKeyDown={handleSearchKeyDown}
+                                            onFocus={() => { if (searchResults.length > 0 && searchQuery.trim().length >= 2) setShowDropdown(true); }}
+                                            className={`w-48 lg:w-64 bg-transparent border-b py-1 px-2 text-xs font-serif focus:outline-none focus:border-[var(--athenic-gold)] transition-all ${isHome ? 'border-white/50 text-white placeholder:text-white/60 group-hover:text-[var(--athenic-blue)] group-hover:border-[var(--athenic-blue)] group-hover:border-opacity-20 group-hover:placeholder:text-[var(--athenic-blue)] group-hover:placeholder:opacity-50' : 'border-[var(--athenic-blue)] border-opacity-20 text-[var(--athenic-blue)] placeholder:italic placeholder:opacity-50'}`}
+                                            autoComplete="off"
+                                            id="navbar-search-desktop"
+                                        />
+                                        <button type="submit" className="absolute right-2 top-1.5">
+                                            <MagnifyingGlassIcon className={`w-4 h-4 ${isHome ? 'text-white group-hover:text-[var(--athenic-blue)]' : 'text-[var(--athenic-blue)]'} opacity-50 hover:opacity-100 transition-opacity`} />
+                                        </button>
+                                    </form>
+                                    <SearchDropdown />
+                                </div>
 
                                 {/* Wishlist */}
                                 <button
@@ -305,16 +602,23 @@ const Navbar = () => {
                 {isMobileMenuOpen && (
                     <div className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl z-[60]">
                         <div className="px-4 py-4 space-y-2">
-                            <form onSubmit={handleSearch} className="relative mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Search for products..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 pl-10 text-sm focus:outline-none focus:border-[#FF5A5F] transition-all"
-                                />
-                                <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
-                            </form>
+                            <div ref={mobileSearchRef} className="relative mb-4">
+                                <form onSubmit={handleSearch} className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Search for products..."
+                                        value={searchQuery}
+                                        onChange={handleSearchInput}
+                                        onKeyDown={handleSearchKeyDown}
+                                        onFocus={() => { if (searchResults.length > 0 && searchQuery.trim().length >= 2) setShowDropdown(true); }}
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 pl-10 text-sm focus:outline-none focus:border-[#FF5A5F] transition-all"
+                                        autoComplete="off"
+                                        id="navbar-search-mobile"
+                                    />
+                                    <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+                                </form>
+                                <SearchDropdown isMobile={true} />
+                            </div>
                             <div className="flex flex-col space-y-1">
                                 {['WOMEN', 'MEN', 'KIDS', 'WEDDING', 'COUPLES'].map((cat) => (
                                     <Link
@@ -357,6 +661,16 @@ const Navbar = () => {
                 )}
             </nav>
 
+            {/* Search Dropdown Animation Styles */}
+            <style>{`
+                @keyframes searchDropdownSlide {
+                    from { opacity: 0; transform: translateY(-4px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </header>
     );
 };
