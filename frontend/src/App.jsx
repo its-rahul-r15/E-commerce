@@ -32,6 +32,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminShops from './pages/admin/AdminShops';
+import AdminOrders from './pages/admin/AdminOrders';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminLoyaltyGifts from './pages/admin/AdminLoyaltyGifts';
 import AdminShoppableVideos from './pages/admin/AdminShoppableVideos';
@@ -111,6 +112,7 @@ function App() {
               <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/coupons" element={<ProtectedRoute allowedRoles={['admin']}><AdminCoupons /></ProtectedRoute>} />
               <Route path="/admin/shops" element={<ProtectedRoute allowedRoles={['admin']}><AdminShops /></ProtectedRoute>} />
+              <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={['admin']}><AdminOrders /></ProtectedRoute>} />
               <Route path="/admin/products" element={<ProtectedRoute allowedRoles={['admin']}><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/loyalty-gifts" element={<ProtectedRoute allowedRoles={['admin']}><AdminLoyaltyGifts /></ProtectedRoute>} />
               <Route path="/admin/shoppable-videos" element={<ProtectedRoute allowedRoles={['admin']}><AdminShoppableVideos /></ProtectedRoute>} />

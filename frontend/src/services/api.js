@@ -384,3 +384,18 @@ export const categoryService = {
         return response.data.data;
     }
 };
+
+export const reviewService = {
+    getReviews: async (productId) => {
+        const response = await axios.get(`/reviews/${productId}`);
+        return response.data.reviews;
+    },
+    createReview: async (productId, reviewData) => {
+        const response = await axios.post(`/reviews/${productId}`, reviewData);
+        return response.data;
+    },
+    checkPurchase: async (productId) => {
+        const response = await axios.get(`/reviews/check-purchase/${productId}`);
+        return response.data;
+    }
+};

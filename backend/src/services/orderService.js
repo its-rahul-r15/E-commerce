@@ -308,6 +308,35 @@ export const updateOrderStatus = async (orderId, sellerId, newStatus) => {
 };
 
 /**
+ * Update order status (Admin only)
+ * @param {string} orderId - Order ID
+ * @param {string} newStatus - New status
+ * @returns {Promise<Object>} Updated order
+ */
+export const updateOrderStatusAdmin = async (orderId, newStatus) => {
+    const order = await Order.findById(orderId).populate('shopId');
+
+    if (!order) {
+        throw new Error('Order not found');
+    }
+
+    const validStatuses = ['pending', 'accepted', 'preparing', 'ready', 'completed', 'cancelled'];
+
+    if (!validStatuses.includes(newStatus)) {
+        throw new Error('Invalid status');
+    }
+
+    if (newStatus === 'completed' && order.status === 'pending') {
+        throw new Error('Order must be accepted before completing');
+    }
+
+    order.status = newStatus;
+    await order.save();
+
+    return order;
+};
+
+/**
  * Cancel order (Customer or Seller)
  * @param {string} orderId - Order ID
  * @param {string} userId - User ID

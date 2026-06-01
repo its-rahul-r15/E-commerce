@@ -153,3 +153,33 @@ export const deleteUser = async (req, res, next) => {
         next(error);
     }
 };
+
+/**
+ * Update order status (Admin only)
+ * PATCH /api/admin/orders/:id/status
+ */
+export const updateOrderStatus = async (req, res, next) => {
+    try {
+        const { status } = req.body;
+
+        if (!status) {
+            return errorResponse(res, 'Status is required', 400, 'MISSING_STATUS');
+        }
+
+        const order = await orderService.updateOrderStatusAdmin(req.params.id, status);
+
+        return successResponse(
+            res,
+            { order },
+            'Order status updated successfully'
+        );
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return errorResponse(res, error.message, 404, 'ORDER_NOT_FOUND');
+        }
+        if (error.message.includes('Invalid status') || error.message.includes('must be accepted')) {
+            return errorResponse(res, error.message, 400, 'INVALID_STATUS');
+        }
+        next(error);
+    }
+};

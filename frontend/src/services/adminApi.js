@@ -168,4 +168,17 @@ export const adminService = {
         const response = await axios.post('/loyalty/send-coupons', payload);
         return response.data.data;
     },
+
+    // Orders Management
+    getAllOrders: async (page = 1, status = '') => {
+        const params = new URLSearchParams({ page });
+        if (status) params.append('status', status);
+        const response = await axios.get(`/orders/admin/all?${params}`);
+        return response.data;
+    },
+
+    updateOrderStatus: async (orderId, status) => {
+        const response = await axios.patch(`/admin/orders/${orderId}/status`, { status });
+        return response.data.data;
+    },
 };

@@ -40,4 +40,7 @@ router.post('/orders/:id/refund', mongoIdValidator, adminAnalyticsController.pro
 router.get('/tailoring', adminAnalyticsController.getAdminTailoringRequests);
 router.patch('/tailoring/:id/status', mongoIdValidator, adminAnalyticsController.updateAdminTailoringStatus);
 
+// Orders
+router.patch('/orders/:id/status', mongoIdValidator, adminController.updateOrderStatus);
+
 export default router;

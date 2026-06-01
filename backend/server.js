@@ -80,6 +80,7 @@ import wishlistRoutes from './src/routes/wishlistRoutes.js';
 import shoppableVideoRoutes from './src/routes/shoppableVideoRoutes.js';
 import categoryRoutes from './src/routes/categoryRoutes.js';
 import emailAdminRoutes from './src/routes/emailAdminRoutes.js';
+import reviewRoutes from './src/routes/reviewRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
@@ -95,6 +96,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/shoppable-videos', shoppableVideoRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin/emails', emailAdminRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
