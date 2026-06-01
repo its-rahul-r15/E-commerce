@@ -5,17 +5,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import ProductCard from '../../components/customer/ProductCard';
 import Product360Viewer from '../../components/customer/Product360Viewer';
 import ImageZoomModal from '../../components/customer/ImageZoomModal';
+import { useWishlist } from '../../contexts/WishlistContext';
 
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    
+
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState('');
-    
+    const { toggleWishlist, isInWishlist } = useWishlist();
+
     // Pincode states
     const [pincode, setPincode] = useState('');
     const [pincodeMessage, setPincodeMessage] = useState('Valid 6-digit PIN required');
@@ -24,10 +26,10 @@ const ProductDetails = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [moreFromShop, setMoreFromShop] = useState([]);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-    
+
     // Accordion state
     const [openAccordion, setOpenAccordion] = useState('');
-    
+
     // Zoom/360 states
     const [zoomOpen, setZoomOpen] = useState(false);
     const [show360, setShow360] = useState(false);
@@ -95,7 +97,7 @@ const ProductDetails = () => {
     const handleAddToCart = async () => {
         if (!isAuthenticated) return setShowLoginPrompt(true);
         if (product.sizes?.length > 0 && !selectedSize) return alert('Please select a size first');
-        
+
         setAddingToCart(true);
         try {
             await cartService.addToCart(id, 1, { size: selectedSize || '' });
@@ -110,7 +112,7 @@ const ProductDetails = () => {
     const handleBuyNow = async () => {
         if (!isAuthenticated) return setShowLoginPrompt(true);
         if (product.sizes?.length > 0 && !selectedSize) return alert('Please select a size first');
-        
+
         try {
             await cartService.addToCart(id, 1, { size: selectedSize || '' });
             navigate('/cart');
@@ -147,7 +149,7 @@ const ProductDetails = () => {
         <div className="min-h-screen bg-white text-gray-900 pb-20 pt-10 font-sans">
             <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col lg:flex-row gap-10">
-                    
+
                     {/* LEFT COLUMN: Thumbnails (Hidden on mobile) */}
                     <div className="hidden lg:flex flex-col gap-3 w-20 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide">
                         {(product.images || ['/placeholder.png']).map((img, idx) => (
@@ -163,17 +165,17 @@ const ProductDetails = () => {
 
                     {/* MIDDLE COLUMN: Main Image */}
                     <div className="flex-1">
-                        <div 
+                        <div
                             className="relative w-full bg-[#f4f3f1] aspect-[3/4] cursor-none overflow-hidden group"
                             onClick={() => setZoomOpen(true)}
                             onMouseMove={(e) => {
                                 const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
                                 const x = e.clientX - left;
                                 const y = e.clientY - top;
-                                
+
                                 const bgX = (x / width) * 100;
                                 const bgY = (y / height) * 100;
-                                
+
                                 const magnifier = e.currentTarget.querySelector('.circular-magnifier');
                                 if (magnifier) {
                                     magnifier.style.opacity = '1';
@@ -196,7 +198,7 @@ const ProductDetails = () => {
                                 className="w-full h-full object-cover"
                             />
                             {/* Circular Magnifier Overlay */}
-                            <div 
+                            <div
                                 className="circular-magnifier pointer-events-none absolute rounded-full border border-gray-300 shadow-[0_0_20px_rgba(0,0,0,0.3)] bg-white z-50 transition-opacity duration-150"
                                 style={{
                                     width: '250px',
@@ -223,17 +225,39 @@ const ProductDetails = () => {
 
                     {/* RIGHT COLUMN: Details */}
                     <div className="w-full lg:w-[450px] flex-shrink-0 lg:sticky lg:top-24">
-                        
+
                         {/* Header: Title & Icons */}
                         <div className="flex justify-between items-start mb-2">
                             <h1 className="text-xl lg:text-2xl font-medium tracking-wide">
                                 {product.name}
                             </h1>
                             <div className="flex gap-4 text-gray-400">
-                                <button className="hover:text-red-500 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                <button 
+                                    onClick={() => toggleWishlist(product)}
+                                    className={`transition-colors ${isInWishlist(product._id) ? 'text-red-500' : 'hover:text-red-500'}`}
+                                >
+                                    <svg className="w-6 h-6" fill={isInWishlist(product._id) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                                 </button>
-                                <button className="hover:text-gray-900 transition-colors">
+                                <button 
+                                    onClick={async () => {
+                                        const shareData = {
+                                            title: product.name,
+                                            text: `Check out ${product.name} on KLYRA!`,
+                                            url: window.location.href,
+                                        };
+                                        try {
+                                            if (navigator.share) {
+                                                await navigator.share(shareData);
+                                            } else {
+                                                await navigator.clipboard.writeText(window.location.href);
+                                                alert('Link copied to clipboard!');
+                                            }
+                                        } catch (err) {
+                                            console.error('Error sharing:', err);
+                                        }
+                                    }}
+                                    className="hover:text-gray-900 transition-colors"
+                                >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
                                 </button>
                             </div>
@@ -241,7 +265,7 @@ const ProductDetails = () => {
 
                         {/* Style Num */}
                         <div className="text-sm font-medium text-gray-500 italic mb-4">
-                            Style No {product._id?.substring(0,8).toUpperCase() || 'SG382817'}
+                            Style No {product._id?.substring(0, 8).toUpperCase() || 'SG382817'}
                         </div>
 
                         {/* Price */}
@@ -306,15 +330,7 @@ const ProductDetails = () => {
                         {/* Additional Actions */}
                         {(TRYON_CATEGORIES.includes(product.category) || TAILORING_CATEGORIES.includes(product.category)) && (
                             <div className="grid grid-cols-2 gap-3 mb-6">
-                                {TRYON_CATEGORIES.includes(product.category) && (
-                                    <button
-                                        onClick={() => navigate(`/try-on?product=${product._id}`)}
-                                        className="py-4 border text-[11px] font-medium tracking-wide uppercase flex items-center justify-center gap-2 border-[#1A2E28] text-[#1A2E28] hover:bg-[#1A2E28] hover:text-white transition-colors"
-                                    >
-                                        <span className="text-base">👗</span>
-                                        <span className="truncate">Try-On</span>
-                                    </button>
-                                )}
+
 
                                 {TAILORING_CATEGORIES.includes(product.category) && (
                                     <button
@@ -367,9 +383,9 @@ const ProductDetails = () => {
                                 { title: 'Style & Fit Tips', content: 'Runs true to size. For a more relaxed fit, consider sizing up. Pair with statement jewelry and heels.' },
                                 { title: 'Shipping & Returns', content: 'Free express shipping on all orders. Easy 5-day returns with home pickup. Final sale items excluded.' },
                                 { title: 'FAQs', content: 'Q: Is the color exact? A: We shoot in natural light to be as accurate as possible. Slight variations may occur.' }
-                            ].map(({title, content}) => (
+                            ].map(({ title, content }) => (
                                 <div key={title} className="border-t border-gray-100 relative">
-                                    <button 
+                                    <button
                                         className="w-full py-5 flex justify-between items-center text-left font-medium hover:text-gray-600 transition-colors bg-white focus:outline-none"
                                         onClick={() => toggleAccordion(title)}
                                     >

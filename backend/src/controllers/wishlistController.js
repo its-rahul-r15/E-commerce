@@ -15,6 +15,13 @@ export const getWishlist = async (req, res, next) => {
 
         if (!wishlist) {
             wishlist = await Wishlist.create({ user: req.user.userId, items: [] });
+        } else {
+            // Filter out items where the product was deleted
+            const originalLength = wishlist.items.length;
+            wishlist.items = wishlist.items.filter(item => item.product != null);
+            if (wishlist.items.length !== originalLength) {
+                await wishlist.save();
+            }
         }
 
         res.status(200).json({
@@ -70,6 +77,15 @@ export const toggleWishlistItem = async (req, res, next) => {
         }
 
         await wishlist.save();
+
+        await wishlist.populate({
+            path: 'items.product',
+            select: 'name price discountedPrice images category shopId',
+            populate: {
+                path: 'shopId',
+                select: 'name'
+            }
+        });
 
         res.status(200).json({
             success: true,

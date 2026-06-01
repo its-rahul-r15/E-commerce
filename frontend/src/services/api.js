@@ -187,8 +187,8 @@ export const cartService = {
     },
 
     // Add to cart
-    addToCart: async (productId, quantity = 1) => {
-        const response = await axios.post('/cart/items', { productId, quantity });
+    addToCart: async (productId, quantity = 1, options = {}) => {
+        const response = await axios.post('/cart/items', { productId, quantity, ...options });
         return response.data.data; // Returns { cart: {...} }
     },
 

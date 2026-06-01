@@ -74,8 +74,10 @@ const Wishlist = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {wishlistItems.map((item) => (
-                        <div key={item.product._id} className="bg-white rounded-2xl shadow-sm border border-[var(--athenic-gold)] border-opacity-30 overflow-hidden group">
+                    {wishlistItems.map((item) => {
+                        if (!item.product) return null;
+                        return (
+                        <div key={item.product._id || item.product} className="bg-white rounded-2xl shadow-sm border border-[var(--athenic-gold)] border-opacity-30 overflow-hidden group">
                             <div className="relative aspect-[4/5] bg-gray-100 cursor-pointer" onClick={() => navigate(`/product/${item.product._id}`)}>
                                 {item.product.images && item.product.images[0] ? (
                                     <img
@@ -136,7 +138,8 @@ const Wishlist = () => {
                                 </button>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

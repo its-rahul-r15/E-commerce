@@ -15,7 +15,7 @@ export const WishlistProvider = ({ children }) => {
     // Check if a product is in the wishlist
     const isInWishlist = (productId) => {
         return wishlistItems.some(item =>
-            (item.product._id || item.product) === productId
+            item.product && (item.product._id || item.product) === productId
         );
     };
 
@@ -29,7 +29,8 @@ export const WishlistProvider = ({ children }) => {
         try {
             setIsLoading(true);
             const data = await wishlistService.getWishlist();
-            setWishlistItems(data?.items || []);
+            const validItems = (data?.items || []).filter(item => item.product != null);
+            setWishlistItems(validItems);
         } catch (error) {
             console.error('Error fetching wishlist:', error);
         } finally {
@@ -63,7 +64,8 @@ export const WishlistProvider = ({ children }) => {
         try {
             const result = await wishlistService.toggleItem(productId);
             // Sync with server state completely
-            setWishlistItems(result.wishlist?.items || []);
+            const validItems = (result.wishlist?.items || []).filter(item => item.product != null);
+            setWishlistItems(validItems);
 
             if (result.action === 'added') {
                 toast.success('Added to wishlist');

@@ -38,7 +38,6 @@ const productAnalyticsSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Indexes
-productAnalyticsSchema.index({ productId: 1 });
 productAnalyticsSchema.index({ totalViews: -1 });
 productAnalyticsSchema.index({ totalAddToCart: -1 });
 productAnalyticsSchema.index({ totalPurchases: -1 });
